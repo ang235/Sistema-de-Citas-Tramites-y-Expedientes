@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+
+<html class="h-full bg-slate-50" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="web_dashboard" name="shell-type"/>
+<title>Matriz de Distribución y Asignación | SETC Enterprise Portal</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              950: '#071321',
+              900: '#0b192c',
+              850: '#0f2744',
+              800: '#17365d',
+              700: '#1e487a',
+              600: '#2563eb',
+              500: '#3b82f6',
+              100: '#dbeafe',
+              50: '#eff6ff'
+            },
+            surface: {
+              DEFAULT: '#f8fafc',
+              card: '#ffffff',
+              muted: '#f1f5f9'
+            },
+            status: {
+              emerald: '#059669',
+              'emerald-light': '#ecfdf5',
+              amber: '#d97706',
+              'amber-light': '#fffbeb',
+              rose: '#e11d48',
+              'rose-light': '#fff1f2'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            heading: ['Plus Jakarta Sans', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    @layer base {
+      body {
+        font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+      }
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="h-full bg-slate-50 font-sans text-slate-800 antialiased selection:bg-brand-100 selection:text-brand-900">
+<!-- SIDEBAR INSTITUCIONAL (Dark Navy #0b192c / #0f2744) -->
+<aside class="fixed inset-y-0 left-0 w-72 bg-[#0b192c] border-r border-slate-800 z-50 flex flex-col justify-between overflow-y-auto">
+<div class="flex flex-col">
+<!-- Logo Institucional Header -->
+<div class="h-16 px-5 flex items-center gap-3 border-b border-slate-800/80 bg-[#071321]/60">
+<div class="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center text-white shadow-md shadow-blue-900/30">
+<span class="material-symbols-outlined text-[22px]">account_balance</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-1.5">
+<span class="font-heading font-extrabold text-[15px] text-white tracking-tight">SETC</span>
+<span class="px-1.5 py-0.2 text-[10px] font-semibold uppercase tracking-wider rounded bg-blue-500/20 text-blue-300 border border-blue-400/30">Enterprise</span>
+</div>
+<span class="text-[11px] text-slate-400 font-medium truncate">Mesa de Control &amp; Dictamen</span>
+</div>
+</div>
+<!-- Selector de Rol / Contexto Activo -->
+<div class="p-4">
+<div class="p-2.5 bg-slate-800/60 border border-slate-700/60 rounded-xl">
+<div class="flex items-center justify-between mb-1.5 px-0.5">
+<span class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">Contexto Operativo</span>
+<span class="flex h-2 w-2 relative">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+</span>
+</div>
+<div class="relative">
+<select class="w-full bg-[#071321] text-xs text-white font-medium pl-2.5 pr-8 py-2 rounded-lg border border-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none cursor-pointer">
+<option value="supervisor">Supervisión General (L1/L2)</option>
+<option value="revisor">Panel Técnico Revisor</option>
+<option value="administrador">Administración GobTech</option>
+<option value="ciudadano">Auditoría Ciudadana</option>
+</select>
+<span class="material-symbols-outlined absolute right-2.5 top-2.5 text-slate-400 text-[18px] pointer-events-none">unfold_more</span>
+</div>
+</div>
+</div>
+<!-- Navegación Primaria -->
+<nav class="px-3 flex flex-col gap-1 text-xs">
+<div class="px-3 pt-2 pb-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Operación &amp; Dictamen</div>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors font-medium" href="#">
+<span class="material-symbols-outlined text-[19px] text-slate-400">dashboard</span>
+<span>Dashboard Operativo</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors font-medium" href="#">
+<span class="material-symbols-outlined text-[19px] text-slate-400">gavel</span>
+<span>Mesa de Dictamen</span>
+</a>
+<a class="flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors font-medium" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[19px] text-slate-400">assignment_late</span>
+<span>Expedientes Observados</span>
+</div>
+<span class="px-1.5 py-0.5 rounded text-[10px] bg-rose-500/20 text-rose-300 font-semibold">4</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors font-medium" href="#">
+<span class="material-symbols-outlined text-[19px] text-slate-400">calendar_today</span>
+<span>Agenda de Citas</span>
+</a>
+<div class="px-3 pt-5 pb-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Supervisión Técnica</div>
+<!-- Item Activo con indicador pill azul suave shadcn -->
+<a class="flex items-center justify-between px-3 py-2 rounded-lg bg-blue-600/15 text-blue-300 font-semibold border border-blue-500/30" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[19px] text-blue-400">work_history</span>
+<span>Matriz de Cargas</span>
+</div>
+<span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors font-medium" href="#">
+<span class="material-symbols-outlined text-[19px] text-slate-400">insights</span>
+<span>Métricas y SLA</span>
+</a>
+<div class="px-3 pt-5 pb-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Gobernanza</div>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors font-medium" href="#">
+<span class="material-symbols-outlined text-[19px] text-slate-400">admin_panel_settings</span>
+<span>Gestión de Revisores</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors font-medium" href="#">
+<span class="material-symbols-outlined text-[19px] text-slate-400">tune</span>
+<span>Parámetros de Trámites</span>
+</a>
+</nav>
+</div>
+<!-- Perfil del Funcionario en Footer Sidebar -->
+<div class="p-3 m-3 bg-[#071321]/90 rounded-xl border border-slate-800/80">
+<div class="flex items-center gap-3">
+<div class="relative">
+<div class="w-9 h-9 rounded-full bg-slate-700 border border-slate-600 flex items-center justify-center text-white font-semibold text-xs">
+            CR
+          </div>
+<span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-[#071321] rounded-full"></span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="text-xs font-semibold text-white truncate">Ing. Carlos Ruiz</span>
+<span class="text-[11px] text-slate-400 truncate">Revisor Jurídico L2</span>
+</div>
+</div>
+<div class="mt-2.5 pt-2 border-t border-slate-800/70 flex items-center justify-between text-[10px] text-slate-400">
+<span class="flex items-center gap-1 font-medium text-emerald-400">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"></span>
+          En Servicio
+        </span>
+<span class="font-mono text-slate-500">v3.4.2</span>
+</div>
+</div>
+</aside>
+<!-- CONTENEDOR PRINCIPAL CON PL-72 -->
+<div class="pl-72 min-h-screen flex flex-col bg-slate-50">
+<!-- HEADER SUPERIOR ESTILO CIVIC ENTERPRISE / SHADCN -->
+<header class="sticky top-0 z-40 h-16 bg-white/95 backdrop-blur border-b border-slate-200/80 px-8 flex items-center justify-between gap-4 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+<!-- Buscador Institucional con shortcut Cmd+K -->
+<div class="flex-1 max-w-lg">
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-slate-400 text-[19px] pointer-events-none">search</span>
+<input class="w-full pl-9 pr-14 py-1.5 text-xs text-slate-900 bg-slate-50 hover:bg-slate-100/70 focus:bg-white border border-slate-200 rounded-lg placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all" placeholder="Buscar por Folio, Administrado, RFC o Expediente..." type="text"/>
+<kbd class="absolute right-2.5 px-1.5 py-0.5 text-[10px] font-mono text-slate-400 bg-white border border-slate-200 rounded shadow-xs">⌘K</kbd>
+</div>
+</div>
+<!-- Acciones de Cabecera: Certificación, Sede y Notificaciones -->
+<div class="flex items-center gap-3">
+<div class="hidden md:flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 border border-emerald-200/60 rounded-full text-emerald-700">
+<span class="material-symbols-outlined text-[15px] text-emerald-600">verified_user</span>
+<span class="text-[11px] font-semibold">Red Segura PKI</span>
+</div>
+<div class="h-4 w-px bg-slate-200"></div>
+<div class="flex items-center gap-2 px-2.5 py-1 bg-slate-100/80 border border-slate-200 rounded-lg text-slate-700">
+<span class="material-symbols-outlined text-[16px] text-blue-600">location_city</span>
+<span class="text-xs font-medium">Sede Central Metropolitana</span>
+</div>
+<button aria-label="Notificaciones" class="relative p-2 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors">
+<span class="material-symbols-outlined text-[21px]">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-blue-600 ring-2 ring-white"></span>
+</button>
+<button aria-label="Centro de Soporte" class="p-2 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors">
+<span class="material-symbols-outlined text-[21px]">help_outline</span>
+</button>
+</div>
+</header>
+<!-- CUERPO PRINCIPAL DEL DASHBOARD -->
+<main class="flex-1 px-8 py-7 space-y-6">
+<!-- BREADCRUMBS & TITULAR PRINCIPAL -->
+<div class="flex flex-col gap-4">
+<!-- Breadcrumb & Badges Operativos -->
+<div class="flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500">
+<div class="flex items-center gap-2">
+<a class="hover:text-blue-600 transition-colors font-medium" href="#">Inicio</a>
+<span class="material-symbols-outlined text-[14px] text-slate-400">chevron_right</span>
+<a class="hover:text-blue-600 transition-colors font-medium" href="#">Supervisión Operativa</a>
+<span class="material-symbols-outlined text-[14px] text-slate-400">chevron_right</span>
+<span class="text-slate-900 font-semibold">Matriz de Distribución &amp; Cargas</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+<span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+              Algoritmo Heurístico L2 Activo
+            </span>
+<span class="text-slate-400 text-xs">•</span>
+<span class="text-slate-500 text-xs font-medium">Turno Ordinario (08:00 - 17:00)</span>
+</div>
+</div>
+<!-- Título y Botones de Acción Global -->
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-1">
+<div>
+<h1 class="font-heading font-extrabold text-2xl lg:text-3xl text-slate-900 tracking-tight">
+              Matriz de Distribución de Carga y Asignación
+            </h1>
+<p class="text-sm text-slate-500 mt-1 max-w-3xl">
+              Balanceo de carga técnica, gestión de expedientes en cola y asignación pericial para Revisores Jurídicos L1/L2.
+            </p>
+</div>
+<div class="flex flex-wrap items-center gap-2.5 shrink-0">
+<button class="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 hover:border-slate-400 transition-all shadow-xs" id="btn-rebalance">
+<span class="material-symbols-outlined text-[18px] text-slate-500">sync_alt</span>
+<span>Rebalancear Cola Activa</span>
+</button>
+<!-- Botón shadcn style Asignación Inteligente -->
+<button class="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-all shadow-sm shadow-blue-600/20 active:scale-[0.99]" id="btn-auto-assign">
+<span class="material-symbols-outlined text-[18px]">bolt</span>
+<span>Asignación Inteligente</span>
+<span class="ml-1 px-2 py-0.5 rounded bg-blue-500/40 text-[10px] font-bold tracking-wide">
+                94% Efectividad
+              </span>
+</button>
+</div>
+</div>
+<!-- Banner de Capacidad Operativa Sistémica -->
+<div class="bg-white border border-slate-200/90 rounded-xl p-4 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex items-center gap-3.5">
+<div class="w-10 h-10 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-700 shrink-0">
+<span class="material-symbols-outlined text-[24px]">speed</span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-heading font-bold text-sm text-slate-900">Capacidad Global del Equipo al 78%</span>
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  Umbral Seguro
+                </span>
+</div>
+<p class="text-xs text-slate-500 mt-0.5">
+                Capacidad nominal: 85 expedientes en simultáneo • <strong class="text-slate-700 font-semibold">66 en curso</strong> • 19 cupos disponibles en el turno
+              </p>
+</div>
+</div>
+<div class="flex items-center gap-3 min-w-[260px]">
+<div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+<div class="bg-blue-600 h-full rounded-full transition-all duration-500" style="width: 78%"></div>
+</div>
+<span class="font-heading font-bold text-xs text-slate-700 shrink-0">66 / 85</span>
+</div>
+</div>
+</div>
+<!-- KPIS / METRIC CARDS (SHADCN CLEAN STYLE) -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+<!-- KPI 1: Revisores Activos -->
+<div class="bg-white rounded-xl border border-slate-200/90 p-4 shadow-xs flex flex-col justify-between hover:border-slate-300 transition-all">
+<div class="flex items-center justify-between">
+<span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Revisores Activos</span>
+<div class="w-8 h-8 rounded-lg bg-slate-100 text-blue-700 flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">badge</span>
+</div>
+</div>
+<div class="my-2.5 flex items-baseline gap-2">
+<span class="font-heading font-bold text-2xl text-slate-900">8</span>
+<span class="text-xs text-slate-500 font-medium">/ 10 asignados</span>
+</div>
+<div class="flex items-center gap-2 text-[11px] text-slate-500">
+<span class="inline-flex items-center gap-1 text-emerald-700 font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> 6 Libres
+            </span>
+<span class="text-slate-300">•</span>
+<span class="inline-flex items-center gap-1 text-rose-700 font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> 2 Saturados
+            </span>
+<span class="text-slate-300">•</span>
+<span class="text-slate-500">1 Pausa</span>
+</div>
+</div>
+<!-- KPI 2: Expedientes Sin Asignar -->
+<div class="bg-white rounded-xl border border-slate-200/90 p-4 shadow-xs flex flex-col justify-between hover:border-slate-300 transition-all">
+<div class="flex items-center justify-between">
+<span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Expedientes en Cola</span>
+<div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">pending_actions</span>
+</div>
+</div>
+<div class="my-2.5 flex items-baseline gap-2">
+<span class="font-heading font-bold text-2xl text-slate-900">14</span>
+<span class="text-xs text-slate-500 font-medium">pendientes en turno</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+<span class="material-symbols-outlined text-[13px]">alarm</span>
+              4 con SLA &lt; 6 horas
+            </span>
+</div>
+</div>
+<!-- KPI 3: Tiempo Medio de Dictamen -->
+<div class="bg-white rounded-xl border border-slate-200/90 p-4 shadow-xs flex flex-col justify-between hover:border-slate-300 transition-all">
+<div class="flex items-center justify-between">
+<span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Tiempo Promedio</span>
+<div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+</div>
+</div>
+<div class="my-2.5 flex items-baseline gap-2">
+<span class="font-heading font-bold text-2xl text-slate-900">1h 42m</span>
+<span class="text-xs text-slate-400">/ trámite</span>
+</div>
+<div class="flex items-center gap-1 text-[11px] font-semibold text-emerald-600">
+<span class="material-symbols-outlined text-[15px]">trending_down</span>
+<span>-18% comparado con semana previa</span>
+</div>
+</div>
+<!-- KPI 4: Índice de Equidad de Carga -->
+<div class="bg-white rounded-xl border border-slate-200/90 p-4 shadow-xs flex flex-col justify-between hover:border-slate-300 transition-all">
+<div class="flex items-center justify-between">
+<span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Equidad de Carga</span>
+<div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">balance</span>
+</div>
+</div>
+<div class="my-2.5 flex items-baseline gap-2">
+<span class="font-heading font-bold text-2xl text-slate-900">94%</span>
+<span class="text-xs font-medium text-slate-500">Gini 0.08</span>
+</div>
+<div class="flex items-center gap-1 text-[11px] text-slate-600">
+<span class="material-symbols-outlined text-[15px] text-emerald-600">check_circle</span>
+<span>Distribución institucional óptima</span>
+</div>
+</div>
+</div>
+<!-- MAIN SPLIT WORKSPACE: REVISORES (IZQ) & EXPEDIENTES (DER) -->
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+<!-- COLUMNA IZQUIERDA: EQUIPO TÉCNICO Y CAPACIDAD (5 cols) -->
+<section class="xl:col-span-5 space-y-4">
+<!-- Header de Sección y Filtros -->
+<div class="bg-white border border-slate-200/90 rounded-xl p-4 shadow-xs space-y-3">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-blue-700 text-[20px]">groups</span>
+<h2 class="font-heading font-bold text-sm text-slate-900">Revisores y Capacidad Operativa</h2>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[11px] font-semibold">
+                5 Especialistas
+              </span>
+</div>
+<!-- Filtros de búsqueda para revisores -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-2.5 top-2.5 text-slate-400 text-[17px]">search</span>
+<input class="w-full pl-8 pr-2.5 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-600 focus:bg-white" placeholder="Buscar especialista..." type="text"/>
+</div>
+<select class="w-full bg-slate-50 text-xs text-slate-700 py-1.5 px-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-600 cursor-pointer">
+<option value="all">Todas las especialidades</option>
+<option value="juridico">Jurídico L2</option>
+<option value="itse">Arquitectura ITSE</option>
+<option value="ambiental">Impacto Ambiental</option>
+<option value="admin">Derecho Administrativo</option>
+</select>
+</div>
+<div class="flex items-center justify-between pt-1 text-[11px] text-slate-500 border-t border-slate-100">
+<span>Orden: <strong class="text-slate-700">Mayor Disponibilidad</strong></span>
+<button class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 transition-colors font-medium">
+<span class="material-symbols-outlined text-[15px]">swap_vert</span>
+<span>Alternar orden</span>
+</button>
+</div>
+</div>
+<!-- LISTA DE REVISORES TÉCNICOS -->
+<div class="space-y-3" id="revisores-list">
+<!-- Revisor 1: Ing. Carlos Ruiz -->
+<div class="bg-white border border-slate-200/90 rounded-xl p-4 shadow-xs hover:border-slate-300 transition-all border-l-4 border-l-blue-600">
+<div class="flex items-start justify-between gap-3">
+<div class="flex items-center gap-3 min-w-0">
+<div class="relative">
+<div class="w-10 h-10 rounded-full bg-blue-100 text-blue-800 font-bold flex items-center justify-center font-heading text-xs">
+                      CR
+                    </div>
+<span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white"></span>
+</div>
+<div class="min-w-0">
+<div class="flex items-center gap-1.5">
+<h3 class="font-heading font-bold text-xs text-slate-900 truncate">Ing. Carlos Ruiz</h3>
+<span class="px-1.5 py-0.2 rounded text-[10px] bg-blue-50 text-blue-700 font-semibold border border-blue-200/60">L2 Senior</span>
+</div>
+<p class="text-[11px] text-slate-500 truncate">Especialista Jurídico e ITSE • Reg. #4412</p>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<button class="p-1 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-slate-100 transition-colors" title="Asignación directa">
+<span class="material-symbols-outlined text-[18px]">add_circle</span>
+</button>
+<span class="material-symbols-outlined text-slate-300 cursor-grab text-[18px]" title="Arrastrar">drag_indicator</span>
+</div>
+</div>
+<!-- Barra de capacidad (Verde/Disponible 60%) -->
+<div class="mt-3 pt-2 border-t border-slate-100 space-y-1.5">
+<div class="flex items-center justify-between text-xs">
+<span class="text-slate-500 font-medium">Carga: <strong class="text-slate-800">6 / 10 exp.</strong></span>
+<span class="text-emerald-700 font-semibold text-[11px] bg-emerald-50 px-2 py-0.2 rounded-full border border-emerald-200/60">
+                    60% Disponible
+                  </span>
+</div>
+<div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+<div class="bg-blue-600 h-full rounded-full transition-all" style="width: 60%"></div>
+</div>
+</div>
+<!-- Tags y Estadísticas -->
+<div class="mt-3 pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500">
+<div class="flex flex-wrap items-center gap-1">
+<span class="px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-medium">Lic. Comerciales</span>
+<span class="px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-medium">ITSE C</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="flex items-center gap-1" title="SLA Promedio">
+<span class="material-symbols-outlined text-[14px] text-slate-400">timelapse</span>
+                    1h 15m
+                  </span>
+<span class="flex items-center gap-1 font-semibold text-emerald-700" title="Precisión">
+<span class="material-symbols-outlined text-[14px]">verified</span>
+                    99.2%
+                  </span>
+</div>
+</div>
+</div>
+<!-- Revisor 2: Dra. Patricia Alva (Carga Óptima 80%) -->
+<div class="bg-white border border-slate-200/90 rounded-xl p-4 shadow-xs hover:border-slate-300 transition-all border-l-4 border-l-amber-500">
+<div class="flex items-start justify-between gap-3">
+<div class="flex items-center gap-3 min-w-0">
+<div class="relative">
+<div class="w-10 h-10 rounded-full bg-amber-100 text-amber-800 font-bold flex items-center justify-center font-heading text-xs">
+                      PA
+                    </div>
+<span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white"></span>
+</div>
+<div class="min-w-0">
+<div class="flex items-center gap-1.5">
+<h3 class="font-heading font-bold text-xs text-slate-900 truncate">Dra. Patricia Alva</h3>
+<span class="px-1.5 py-0.2 rounded text-[10px] bg-slate-100 text-slate-600 font-medium">SUNARP</span>
+</div>
+<p class="text-[11px] text-slate-500 truncate">Mesa de Partes y Títulos • Reg. #3189</p>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<button class="p-1 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-slate-100 transition-colors">
+<span class="material-symbols-outlined text-[18px]">add_circle</span>
+</button>
+<span class="material-symbols-outlined text-slate-300 cursor-grab text-[18px]">drag_indicator</span>
+</div>
+</div>
+<!-- Barra de capacidad 80% (Ámbar) -->
+<div class="mt-3 pt-2 border-t border-slate-100 space-y-1.5">
+<div class="flex items-center justify-between text-xs">
+<span class="text-slate-500 font-medium">Carga: <strong class="text-slate-800">8 / 10 exp.</strong></span>
+<span class="text-amber-700 font-semibold text-[11px] bg-amber-50 px-2 py-0.2 rounded-full border border-amber-200/60">
+                    80% Carga Óptima
+                  </span>
+</div>
+<div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+<div class="bg-amber-500 h-full rounded-full transition-all" style="width: 80%"></div>
+</div>
+</div>
+<div class="mt-3 pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500">
+<div class="flex flex-wrap items-center gap-1">
+<span class="px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-medium">Poderes</span>
+<span class="px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-medium">Cotejo Registral</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-slate-400">timelapse</span>
+                    1h 30m
+                  </span>
+<span class="flex items-center gap-1 font-semibold text-emerald-700">
+<span class="material-symbols-outlined text-[14px]">verified</span>
+                    98.7%
+                  </span>
+</div>
+</div>
+</div>
+<!-- Revisor 3: Arq. Elena Valenzuela (Saturada 100% - Rojo) -->
+<div class="bg-white border border-slate-200/90 rounded-xl p-4 shadow-xs hover:border-slate-300 transition-all border-l-4 border-l-rose-500 bg-rose-50/20">
+<div class="flex items-start justify-between gap-3">
+<div class="flex items-center gap-3 min-w-0">
+<div class="relative">
+<div class="w-10 h-10 rounded-full bg-rose-100 text-rose-800 font-bold flex items-center justify-center font-heading text-xs">
+                      EV
+                    </div>
+<span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-rose-500 ring-2 ring-white"></span>
+</div>
+<div class="min-w-0">
+<div class="flex items-center gap-1.5">
+<h3 class="font-heading font-bold text-xs text-slate-900 truncate">Arq. Elena Valenzuela</h3>
+<span class="px-1.5 py-0.2 rounded text-[10px] bg-rose-100 text-rose-700 font-bold">Saturada</span>
+</div>
+<p class="text-[11px] text-slate-500 truncate">Arquitectura y Urbanismo • Reg. #5120</p>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-rose-400 text-[18px]">lock</span>
+</div>
+</div>
+<!-- Barra 100% Carga Crítica -->
+<div class="mt-3 pt-2 border-t border-slate-100 space-y-1.5">
+<div class="flex items-center justify-between text-xs">
+<span class="text-rose-700 font-medium">Capacidad: <strong>10 / 10 exp.</strong></span>
+<span class="text-rose-700 font-bold text-[11px] bg-rose-50 px-2 py-0.2 rounded-full border border-rose-200">
+                    100% Límite Máximo
+                  </span>
+</div>
+<div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+<div class="bg-rose-600 h-full rounded-full transition-all" style="width: 100%"></div>
+</div>
+</div>
+<div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
+<span class="inline-flex items-center gap-1 text-rose-700 font-semibold">
+<span class="material-symbols-outlined text-[14px]">warning</span>
+                  2 expedientes con riesgo SLA
+                </span>
+<button class="text-blue-600 hover:text-blue-800 font-semibold underline decoration-blue-300">
+                  Descargar Carga
+                </button>
+</div>
+</div>
+<!-- Revisor 4: Abg. Marco Aurelio Soto (Disponible 20% - Recomendado) -->
+<div class="bg-white border border-blue-200 rounded-xl p-4 shadow-xs ring-1 ring-blue-500/20 border-l-4 border-l-emerald-600">
+<div class="flex items-start justify-between gap-3">
+<div class="flex items-center gap-3 min-w-0">
+<div class="relative">
+<div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center font-heading text-xs">
+                      MS
+                    </div>
+<span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white"></span>
+</div>
+<div class="min-w-0">
+<div class="flex items-center gap-1.5">
+<h3 class="font-heading font-bold text-xs text-slate-900 truncate">Abg. Marco Aurelio Soto</h3>
+<span class="px-1.5 py-0.2 rounded text-[10px] bg-emerald-50 text-emerald-700 font-bold border border-emerald-200">Recomendado</span>
+</div>
+<p class="text-[11px] text-slate-500 truncate">Derecho Administrativo y Notarial • Reg. #1042</p>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<button class="px-2.5 py-1 bg-blue-600 text-white rounded text-[11px] font-semibold hover:bg-blue-700 transition-colors shadow-2xs">
+                    Asignar
+                  </button>
+<span class="material-symbols-outlined text-slate-300 cursor-grab text-[18px]">drag_indicator</span>
+</div>
+</div>
+<!-- Barra 20% Alta disponibilidad -->
+<div class="mt-3 pt-2 border-t border-slate-100 space-y-1.5">
+<div class="flex items-center justify-between text-xs">
+<span class="text-slate-500 font-medium">Carga: <strong class="text-emerald-700">2 / 10 exp.</strong></span>
+<span class="text-emerald-700 font-semibold text-[11px] bg-emerald-50 px-2 py-0.2 rounded-full border border-emerald-200/60">
+                    20% Alta Disponibilidad
+                  </span>
+</div>
+<div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+<div class="bg-emerald-500 h-full rounded-full transition-all" style="width: 20%"></div>
+</div>
+</div>
+<div class="mt-3 pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500">
+<div class="flex flex-wrap items-center gap-1">
+<span class="px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-medium">Hab. Urbana</span>
+<span class="px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-medium">Recursos</span>
+</div>
+<span class="flex items-center gap-1 text-emerald-700 font-semibold">
+<span class="material-symbols-outlined text-[14px]">bolt</span>
+                  Listo para carga
+                </span>
+</div>
+</div>
+<!-- Revisor 5: Dra. Lucía Menéndez (En Pausa) -->
+<div class="bg-white/80 border border-slate-200/70 rounded-xl p-4 shadow-xs opacity-75">
+<div class="flex items-start justify-between gap-3">
+<div class="flex items-center gap-3 min-w-0">
+<div class="relative">
+<div class="w-10 h-10 rounded-full bg-slate-100 text-slate-600 font-bold flex items-center justify-center font-heading text-xs">
+                      LM
+                    </div>
+<span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-slate-400 ring-2 ring-white"></span>
+</div>
+<div class="min-w-0">
+<div class="flex items-center gap-1.5">
+<h3 class="font-heading font-bold text-xs text-slate-700 truncate">Dra. Lucía Menéndez</h3>
+<span class="px-1.5 py-0.2 rounded text-[10px] bg-slate-100 text-slate-500 font-medium">En Pausa</span>
+</div>
+<p class="text-[11px] text-slate-500 truncate">Impacto Ambiental y Recursos • Reg. #2290</p>
+</div>
+</div>
+<div class="flex items-center gap-1 text-slate-400 text-xs">
+<span class="material-symbols-outlined text-[17px]">nature_people</span>
+<span>Inspección</span>
+</div>
+</div>
+<div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+<span>Retorno programado: <strong class="text-slate-700">15:30 hrs</strong></span>
+<span class="text-slate-400">Carga congelada: 4 exp.</span>
+</div>
+</div>
+</div>
+</section>
+<!-- COLUMNA DERECHA: BANDEJA DE EXPEDIENTES PENDIENTES (7 cols) -->
+<section class="xl:col-span-7 space-y-4">
+<!-- Header de Bandeja, Búsqueda y Filtros de Lote -->
+<div class="bg-white border border-slate-200/90 rounded-xl p-4 shadow-xs space-y-3">
+<div class="flex flex-wrap items-center justify-between gap-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-blue-700 text-[20px]">inbox_customize</span>
+<h2 class="font-heading font-bold text-sm text-slate-900">Expedientes Pendientes de Asignación</h2>
+</div>
+<span class="px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 text-[11px] font-semibold">
+                14 en Cola Técnica
+              </span>
+</div>
+<!-- Filtros de expedientes -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-2">
+<div class="md:col-span-6 relative">
+<span class="material-symbols-outlined absolute left-2.5 top-2.5 text-slate-400 text-[17px]">search</span>
+<input class="w-full pl-8 pr-2.5 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-600 focus:bg-white" placeholder="Filtrar por Folio, Administrado o RUC..." type="text"/>
+</div>
+<div class="md:col-span-3">
+<select class="w-full bg-slate-50 text-xs text-slate-700 py-1.5 px-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-600 cursor-pointer">
+<option value="all">Todos los trámites</option>
+<option value="urbana">Hab. Urbana</option>
+<option value="comercial">Lic. Comercial</option>
+<option value="ambiental">Cert. Ambiental</option>
+</select>
+</div>
+<div class="md:col-span-3">
+<select class="w-full bg-slate-50 text-xs text-slate-700 py-1.5 px-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-600 cursor-pointer">
+<option value="sla">Mayor Urgencia SLA</option>
+<option value="prioridad">Prioridad Alta</option>
+<option value="antiguo">Más antiguos</option>
+</select>
+</div>
+</div>
+<!-- Asignación Masiva por Lote -->
+<div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100 text-xs text-slate-600">
+<label class="flex items-center gap-2 cursor-pointer font-medium select-none">
+<input class="w-3.5 h-3.5 rounded text-blue-600 border-slate-300 focus:ring-blue-500 cursor-pointer" id="check-all" type="checkbox"/>
+<span>Seleccionar prioritarios (5)</span>
+</label>
+<div class="flex items-center gap-2">
+<span class="text-[11px] text-slate-400">Asignar a:</span>
+<select class="bg-slate-50 text-xs text-slate-800 font-medium px-2 py-1 rounded border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-600 cursor-pointer">
+<option value="auto">Algoritmo Inteligente</option>
+<option value="soto">Abg. Marco Soto (8 slots)</option>
+<option value="ruiz">Ing. Carlos Ruiz (4 slots)</option>
+</select>
+<button class="px-2.5 py-1 bg-slate-900 text-white rounded text-xs font-semibold hover:bg-slate-800 transition-colors shadow-xs">
+                  Aplicar
+                </button>
+</div>
+</div>
+</div>
+<!-- LISTA DE EXPEDIENTES EN COLA -->
+<div class="space-y-3" id="expedientes-list">
+<!-- EXPEDIENTE 1: Crítico SLA (Consorcio Lima Sur) -->
+<div class="bg-white border border-slate-200/90 rounded-xl p-4 shadow-xs hover:border-slate-300 transition-all border-l-4 border-l-rose-500">
+<div class="flex items-start justify-between gap-4">
+<div class="flex items-start gap-3 min-w-0">
+<input checked="" class="mt-1 w-3.5 h-3.5 rounded text-blue-600 border-slate-300 focus:ring-blue-500 cursor-pointer" type="checkbox"/>
+<div class="min-w-0">
+<div class="flex flex-wrap items-center gap-2">
+<span class="font-mono text-xs font-bold text-blue-700">SETC-2025-9921</span>
+<span class="px-2 py-0.2 rounded-full bg-rose-50 text-rose-700 border border-rose-200 text-[10px] font-bold">
+                        Prioridad Alta
+                      </span>
+<span class="px-2 py-0.2 rounded bg-slate-100 text-slate-600 text-[10px] font-medium">
+                        Habilitación Urbana L3
+                      </span>
+</div>
+<h3 class="font-heading font-bold text-sm text-slate-900 mt-1 truncate">
+                      Consorcio Inmobiliario Lima Sur
+                    </h3>
+<p class="text-xs text-slate-500 mt-0.5">
+                      RUC: 20491823901 • Mesa de Entrada Digital Vía Portal
+                    </p>
+</div>
+</div>
+<!-- SLA Urgencia Crítica -->
+<div class="flex flex-col items-end shrink-0">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 font-bold text-xs">
+<span class="material-symbols-outlined text-[15px]">alarm</span>
+                    SLA: 04h 15m
+                  </span>
+<span class="text-[10px] text-slate-400 mt-1">Vence hoy a las 18:00</span>
+</div>
+</div>
+<!-- Sugerencia Algorítmica -->
+<div class="mt-3 p-2.5 bg-slate-50 border border-slate-200/60 rounded-lg flex flex-wrap items-center justify-between gap-2 text-xs">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[17px] text-blue-600">smart_toy</span>
+<span class="text-slate-700">
+                    Sugerencia pericial: <strong class="text-slate-900">Abg. Soto</strong> o <strong class="text-slate-900">Arq. Valenzuela</strong>
+</span>
+</div>
+<div class="flex items-center gap-1.5 text-slate-500 text-[11px]">
+<span class="material-symbols-outlined text-[15px]">description</span>
+<span>12 folios técnicos</span>
+</div>
+</div>
+<!-- Acciones de Ficha -->
+<div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
+<span class="text-slate-400 text-[11px] flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]">history_edu</span>
+                  Ingresó hace 18 horas
+                </span>
+<div class="flex items-center gap-2">
+<button class="px-2.5 py-1 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded font-medium transition-colors">
+                    Ver Previo
+                  </button>
+<button class="inline-flex items-center gap-1 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded font-semibold transition-colors shadow-2xs">
+<span>Asignar a Revisor</span>
+<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- EXPEDIENTE 2: Minera Los Andes (Certificado Ambiental) -->
+<div class="bg-white border border-slate-200/90 rounded-xl p-4 shadow-xs hover:border-slate-300 transition-all border-l-4 border-l-amber-500">
+<div class="flex items-start justify-between gap-4">
+<div class="flex items-start gap-3 min-w-0">
+<input class="mt-1 w-3.5 h-3.5 rounded text-blue-600 border-slate-300 focus:ring-blue-500 cursor-pointer" type="checkbox"/>
+<div class="min-w-0">
+<div class="flex flex-wrap items-center gap-2">
+<span class="font-mono text-xs font-bold text-blue-700">SETC-2025-9918</span>
+<span class="px-2 py-0.2 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-bold">
+                        Prioridad Alta
+                      </span>
+<span class="px-2 py-0.2 rounded bg-slate-100 text-slate-600 text-[10px] font-medium">
+                        Certificado Ambiental L2
+                      </span>
+</div>
+<h3 class="font-heading font-bold text-sm text-slate-900 mt-1 truncate">
+                      Minera Los Andes S.A.C.
+                    </h3>
+<p class="text-xs text-slate-500 mt-0.5">
+                      RUC: 20100481923 • Estudio de Mitigación Hídrica
+                    </p>
+</div>
+</div>
+<div class="flex flex-col items-end shrink-0">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 font-bold text-xs">
+<span class="material-symbols-outlined text-[15px]">schedule</span>
+                    SLA: 05h 40m
+                  </span>
+<span class="text-[10px] text-slate-400 mt-1">Crítico hoy</span>
+</div>
+</div>
+<div class="mt-3 p-2.5 bg-slate-50 border border-slate-200/60 rounded-lg flex flex-wrap items-center justify-between gap-2 text-xs">
+<div class="flex items-center gap-1.5 text-slate-700">
+<span class="material-symbols-outlined text-[17px] text-emerald-600">verified_user</span>
+<span>6 anexos con <strong>firma digital PKI</strong> válida</span>
+</div>
+<span class="px-2 py-0.5 rounded bg-slate-200/70 text-slate-700 text-[10px] font-medium">
+                  Requiere Peritaje Químico
+                </span>
+</div>
+<div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
+<span class="text-slate-400 text-[11px] flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]">pin_drop</span>
+                  Sede Satelital Sur
+                </span>
+<div class="flex items-center gap-2">
+<button class="px-2.5 py-1 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded font-medium transition-colors">
+                    Ver Previo
+                  </button>
+<button class="inline-flex items-center gap-1 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded font-semibold transition-colors shadow-2xs">
+<span>Asignar a Revisor</span>
+<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- EXPEDIENTE 3: Valeria Mendoza (Licencia Comercial Tipo A) -->
+<div class="bg-white border border-slate-200/90 rounded-xl p-4 shadow-xs hover:border-slate-300 transition-all border-l-4 border-l-slate-300">
+<div class="flex items-start justify-between gap-4">
+<div class="flex items-start gap-3 min-w-0">
+<input class="mt-1 w-3.5 h-3.5 rounded text-blue-600 border-slate-300 focus:ring-blue-500 cursor-pointer" type="checkbox"/>
+<div class="min-w-0">
+<div class="flex flex-wrap items-center gap-2">
+<span class="font-mono text-xs font-bold text-blue-700">SETC-2025-9904</span>
+<span class="px-2 py-0.2 rounded-full bg-slate-100 text-slate-600 text-[10px] font-semibold">
+                        Prioridad Media
+                      </span>
+<span class="px-2 py-0.2 rounded bg-slate-100 text-slate-600 text-[10px] font-medium">
+                        Licencia Comercial A
+                      </span>
+</div>
+<h3 class="font-heading font-bold text-sm text-slate-900 mt-1 truncate">
+                      Valeria Mendoza Ramos
+                    </h3>
+<p class="text-xs text-slate-500 mt-0.5">
+                      DNI: 47291048 • Giro: Servicios Farmacéuticos (200m²)
+                    </p>
+</div>
+</div>
+<div class="flex flex-col items-end shrink-0">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-semibold text-xs">
+<span class="material-symbols-outlined text-[15px]">timelapse</span>
+                    SLA: 1d 02h
+                  </span>
+<span class="text-[10px] text-slate-400 mt-1">Holgura regular</span>
+</div>
+</div>
+<div class="mt-3 p-2.5 bg-slate-50 border border-slate-200/60 rounded-lg flex flex-wrap items-center justify-between gap-2 text-xs">
+<div class="flex items-center gap-1.5 text-slate-700">
+<span class="material-symbols-outlined text-[17px] text-blue-600">psychology</span>
+<span>Sugerido: <strong class="text-slate-900">Ing. Carlos Ruiz</strong> (Compatibilidad 98%)</span>
+</div>
+<button class="text-blue-600 hover:text-blue-800 font-bold hover:underline">
+                  Auto-vincular
+                </button>
+</div>
+<div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
+<span class="text-slate-400 text-[11px] flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]">verified</span>
+                  Cotejo SUNARP completado
+                </span>
+<div class="flex items-center gap-2">
+<button class="px-2.5 py-1 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded font-medium transition-colors">
+                    Ver Previo
+                  </button>
+<button class="inline-flex items-center gap-1 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded font-semibold transition-colors shadow-2xs">
+<span>Asignar</span>
+<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- EXPEDIENTE 4: Operadora Logística TransPac -->
+<div class="bg-white border border-slate-200/90 rounded-xl p-4 shadow-xs hover:border-slate-300 transition-all border-l-4 border-l-slate-300">
+<div class="flex items-start justify-between gap-4">
+<div class="flex items-start gap-3 min-w-0">
+<input class="mt-1 w-3.5 h-3.5 rounded text-blue-600 border-slate-300 focus:ring-blue-500 cursor-pointer" type="checkbox"/>
+<div class="min-w-0">
+<div class="flex flex-wrap items-center gap-2">
+<span class="font-mono text-xs font-bold text-blue-700">SETC-2025-9892</span>
+<span class="px-2 py-0.2 rounded-full bg-slate-100 text-slate-600 text-[10px]">
+                        Prioridad Normal
+                      </span>
+<span class="px-2 py-0.2 rounded bg-slate-100 text-slate-600 text-[10px]">
+                        Edificación Industrial
+                      </span>
+</div>
+<h3 class="font-heading font-bold text-sm text-slate-900 mt-1 truncate">
+                      Operadora Logística TransPac S.A.
+                    </h3>
+<p class="text-xs text-slate-500 mt-0.5">
+                      RUC: 20559123841 • Almacén Techado Sector Industrial
+                    </p>
+</div>
+</div>
+<div class="flex flex-col items-end shrink-0">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-semibold text-xs">
+<span class="material-symbols-outlined text-[15px]">schedule</span>
+                    SLA: 2d 18h
+                  </span>
+</div>
+</div>
+<div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
+<span class="text-slate-400 text-[11px] flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]">attachment</span>
+                  18 Planos DWG validados
+                </span>
+<div class="flex items-center gap-2">
+<button class="px-2.5 py-1 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded font-medium transition-colors">
+                    Ver Previo
+                  </button>
+<button class="inline-flex items-center gap-1 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded font-semibold transition-colors shadow-2xs">
+<span>Asignar</span>
+<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- EXPEDIENTE 5: Dra. Claudia Benítez Flores -->
+<div class="bg-white border border-slate-200/90 rounded-xl p-4 shadow-xs hover:border-slate-300 transition-all border-l-4 border-l-slate-300">
+<div class="flex items-start justify-between gap-4">
+<div class="flex items-start gap-3 min-w-0">
+<input class="mt-1 w-3.5 h-3.5 rounded text-blue-600 border-slate-300 focus:ring-blue-500 cursor-pointer" type="checkbox"/>
+<div class="min-w-0">
+<div class="flex flex-wrap items-center gap-2">
+<span class="font-mono text-xs font-bold text-blue-700">SETC-2025-9884</span>
+<span class="px-2 py-0.2 rounded-full bg-slate-100 text-slate-600 text-[10px] font-semibold">
+                        Prioridad Media
+                      </span>
+<span class="px-2 py-0.2 rounded bg-slate-100 text-slate-600 text-[10px]">
+                        Licencia Comercial
+                      </span>
+</div>
+<h3 class="font-heading font-bold text-sm text-slate-900 mt-1 truncate">
+                      Dra. Claudia Benítez Flores
+                    </h3>
+<p class="text-xs text-slate-500 mt-0.5">
+                      DNI: 09384918 • Policlínico de Especialidades Médicas
+                    </p>
+</div>
+</div>
+<div class="flex flex-col items-end shrink-0">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-semibold text-xs">
+<span class="material-symbols-outlined text-[15px]">timelapse</span>
+                    SLA: 1d 08h
+                  </span>
+</div>
+</div>
+<div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
+<span class="text-slate-400 text-[11px] flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]">verified_user</span>
+                  Requisitos DIGESA validados
+                </span>
+<div class="flex items-center gap-2">
+<button class="px-2.5 py-1 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded font-medium transition-colors">
+                    Ver Previo
+                  </button>
+<button class="inline-flex items-center gap-1 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded font-semibold transition-colors shadow-2xs">
+<span>Asignar</span>
+<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- BARRA FLOTANTE INFERIOR DE ACCIÓN / STATUS OPERATIVO (SHADCN DOCKED BAR) -->
+<div class="sticky bottom-4 z-30 bg-white/95 backdrop-blur border border-slate-200/90 p-4 rounded-xl shadow-lg shadow-slate-900/5 flex flex-col md:flex-row items-center justify-between gap-4">
+<div class="flex items-center gap-3.5">
+<div class="w-10 h-10 rounded-lg bg-[#0b192c] text-white flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[22px]">hub</span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-heading font-bold text-xs text-slate-900">
+                Modo de Asignación por Inteligencia Algorítmica Activo
+              </span>
+<span class="px-2 py-0.2 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-semibold">
+                v4.2 Heurística
+              </span>
+</div>
+<p class="text-[11px] text-slate-500 mt-0.5">
+              Criterio de balanceo: Minimizar tiempo ocioso + máxima afinidad técnica en peritaje y especialidad L2.
+            </p>
+</div>
+</div>
+<div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto justify-end">
+<button class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[16px]">history</span>
+<span>Historial de Auditoría</span>
+</button>
+<button class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow-sm shadow-blue-600/20 transition-all active:scale-[0.99]">
+<span class="material-symbols-outlined text-[17px]">send_and_archive</span>
+<span>Confirmar Asignaciones &amp; Notificar</span>
+</button>
+</div>
+</div>
+</main>
+<!-- FOOTER INSTITUCIONAL -->
+<footer class="mt-auto border-t border-slate-200 bg-white py-3.5 px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+<div class="flex items-center gap-2">
+<span class="font-semibold text-slate-700">SETC Enterprise Portal</span>
+<span>•</span>
+<span>Sistema de Citas, Trámites y Dictamen v3.4.2</span>
+</div>
+<div class="flex items-center gap-4 text-[11px]">
+<a class="hover:text-blue-600 transition-colors" href="#">Mesa de Ayuda Técnica</a>
+<a class="hover:text-blue-600 transition-colors" href="#">Guía Operativa</a>
+<a class="hover:text-blue-600 transition-colors" href="#">Políticas de Seguridad y Auditoría</a>
+</div>
+</footer>
+</div>
+<!-- Micro-interacciones interactivas -->
+<script>
+    // Selección rápida por lotes
+    const checkAll = document.getElementById('check-all');
+    if (checkAll) {
+      checkAll.addEventListener('change', function(e) {
+        const checkboxes = document.querySelectorAll('#expedientes-list input[type="checkbox"]');
+        checkboxes.forEach(cb => cb.checked = e.target.checked);
+      });
+    }
+
+    // Micro-interacción: Asignación Inteligente con feedback visual
+    const btnAuto = document.getElementById('btn-auto-assign');
+    if (btnAuto) {
+      btnAuto.addEventListener('click', function() {
+        const originalContent = btnAuto.innerHTML;
+        btnAuto.innerHTML = '<span class="material-symbols-outlined text-[18px] animate-spin">refresh</span><span>Balanceando Carga...</span>';
+        btnAuto.classList.add('opacity-80', 'pointer-events-none');
+        
+        setTimeout(() => {
+          btnAuto.innerHTML = '<span class="material-symbols-outlined text-[18px]">check_circle</span><span>¡14 Expedientes Asignados!</span>';
+          setTimeout(() => {
+            btnAuto.innerHTML = originalContent;
+            btnAuto.classList.remove('opacity-80', 'pointer-events-none');
+          }, 2400);
+        }, 1100);
+      });
+    }
+
+    // Micro-interacción: Rebalancear Cola Activa
+    const btnRebalance = document.getElementById('btn-rebalance');
+    if (btnRebalance) {
+      btnRebalance.addEventListener('click', function() {
+        const icon = btnRebalance.querySelector('.material-symbols-outlined');
+        if (icon) {
+          icon.classList.add('rotate-180', 'transition-transform', 'duration-500');
+          setTimeout(() => {
+            icon.classList.remove('rotate-180');
+          }, 500);
+        }
+      });
+    }
+  </script>
+</body></html>

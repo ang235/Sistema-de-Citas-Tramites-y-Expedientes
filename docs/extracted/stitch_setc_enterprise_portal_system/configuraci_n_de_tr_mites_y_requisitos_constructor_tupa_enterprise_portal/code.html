@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="web_dashboard" name="shell-type"/>
+<title>Constructor TUPA - S.E.T.C. GobTech</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+      main > :first-child { margin-top: 0 !important; }
+      main > :last-child { margin-bottom: 0 !important; }
+    }
+    ::-webkit-scrollbar { display: none; }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-bright": "#f8f9ff",
+            "error-container": "#fee2e2",
+            "on-error": "#ffffff",
+            "on-background": "#0b1c30",
+            "inverse-on-surface": "#eaf1ff",
+            "on-primary-fixed-variant": "#324866",
+            "surface": "#f8f9ff",
+            "surface-container": "#e5eeff",
+            "secondary-fixed": "#dbe1ff",
+            "surface-container-highest": "#d3e4fe",
+            "on-secondary-container": "#ffffff",
+            "inverse-surface": "#213145",
+            "primary-fixed": "#d4e3ff",
+            "on-tertiary-container": "#065f46",
+            "outline-variant": "#cbd5e1",
+            "surface-container-low": "#eff4ff",
+            "on-secondary": "#ffffff",
+            "primary-container": "#0f2744",
+            "tertiary-fixed": "#d1fae5",
+            "on-error-container": "#991b1b",
+            "on-primary-fixed": "#021c39",
+            "inverse-primary": "#b2c8ed",
+            "secondary": "#2563eb",
+            "on-tertiary-fixed-variant": "#064e3b",
+            "on-primary-container": "#d4e3ff",
+            "surface-dim": "#cbdbf5",
+            "primary": "#0f2744",
+            "on-secondary-fixed-variant": "#1d4ed8",
+            "tertiary-container": "#047857",
+            "surface-container-lowest": "#ffffff",
+            "background": "#f8f9ff",
+            "tertiary-fixed-dim": "#6ee7b7",
+            "on-surface": "#0b1c30",
+            "error": "#dc2626",
+            "secondary-fixed-dim": "#b4c5ff",
+            "secondary-container": "#1d4ed8",
+            "on-secondary-fixed": "#00174b",
+            "on-primary": "#ffffff",
+            "surface-variant": "#e2e8f0",
+            "tertiary": "#059669",
+            "surface-container-high": "#dce9ff",
+            "primary-fixed-dim": "#b2c8ed",
+            "on-tertiary": "#ffffff",
+            "on-surface-variant": "#475569",
+            "on-tertiary-fixed": "#022c22",
+            "surface-tint": "#2563eb",
+            "outline": "#64748b"
+          },
+          borderRadius: {
+            DEFAULT: "0.25rem",
+            lg: "0.5rem",
+            xl: "0.75rem",
+            full: "9999px"
+          },
+          spacing: {
+            "space-sm": "0.5rem",
+            "space-xs": "0.25rem",
+            "margin-sm": "1rem",
+            "space-xl": "2rem",
+            "margin": "2rem",
+            "space-md": "1rem",
+            "space-lg": "1.5rem",
+            "gutter-sm": "1rem",
+            "gutter": "1.5rem"
+          },
+          fontFamily: {
+            "headline-sm": ["Plus Jakarta Sans"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "body-sm": ["Inter"],
+            "headline-xl-mobile": ["Plus Jakarta Sans"],
+            "body-lg": ["Inter"],
+            "label-sm": ["Inter"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "label-md": ["Inter"],
+            "code-sm": ["Inter"],
+            "headline-lg-mobile": ["Plus Jakarta Sans"],
+            "body-md": ["Inter"],
+            "headline-xl": ["Plus Jakarta Sans"]
+          },
+          fontSize: {
+            "headline-sm": ["18px", { lineHeight: "24px", fontWeight: "600" }],
+            "headline-lg": ["30px", { lineHeight: "38px", fontWeight: "700" }],
+            "body-sm": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+            "headline-xl-mobile": ["28px", { lineHeight: "36px", fontWeight: "700" }],
+            "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
+            "label-sm": ["12px", { lineHeight: "16px", fontWeight: "600" }],
+            "headline-md": ["22px", { lineHeight: "28px", fontWeight: "600" }],
+            "label-md": ["14px", { lineHeight: "20px", fontWeight: "500" }],
+            "code-sm": ["13px", { lineHeight: "18px", fontWeight: "500" }],
+            "headline-lg-mobile": ["24px", { lineHeight: "32px", fontWeight: "600" }],
+            "body-md": ["15px", { lineHeight: "22px", fontWeight: "400" }],
+            "headline-xl": ["34px", { lineHeight: "40px", fontWeight: "700" }]
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-50 font-body-md text-on-surface antialiased selection:bg-blue-600 selection:text-white">
+<!-- SIDEBAR: DARK NAVY INSTITUTIONAL (Civic Enterprise Portal) -->
+<aside class="fixed left-0 top-0 bottom-0 h-full w-72 bg-[#0b1c30] text-slate-200 border-r border-slate-800 z-50 flex flex-col justify-between overflow-y-auto">
+<div class="flex flex-col">
+<!-- Institutional Brand Header -->
+<div class="h-16 px-5 flex items-center gap-3 border-b border-slate-800 bg-[#071322]">
+<div class="w-9 h-9 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold shadow-md shadow-blue-900/50">
+<span class="material-symbols-outlined text-[20px]">account_balance</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="font-headline-sm text-white font-bold tracking-tight text-[17px]">S.E.T.C.</span>
+<span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-500/20 text-blue-300 border border-blue-400/30">GOB.PE</span>
+</div>
+<span class="font-label-sm text-[11px] text-slate-400 uppercase tracking-wider">Mesa de Control Central</span>
+</div>
+</div>
+<!-- Scope / Role Selector -->
+<div class="p-3.5 border-b border-slate-800/80">
+<div class="p-2.5 bg-slate-900/70 border border-slate-800 rounded-lg">
+<div class="flex items-center justify-between mb-1.5">
+<span class="text-[11px] text-slate-400 uppercase tracking-wider font-semibold">Contexto Institucional</span>
+<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+</div>
+<div class="flex items-center gap-2 text-white font-medium text-xs bg-slate-800/90 px-2 py-1.5 rounded border border-slate-700">
+<span class="material-symbols-outlined text-blue-400 text-[16px]">admin_panel_settings</span>
+<span class="truncate">Administración GobTech (TUPA)</span>
+</div>
+</div>
+</div>
+<!-- Navigation -->
+<nav class="px-3 py-3 flex flex-col gap-0.5">
+<div class="px-3 pt-2 pb-1 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Operación y Dictamen</div>
+<a class="flex items-center px-3 py-2 rounded-lg text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined mr-3 text-[19px] text-slate-400">dashboard</span>
+          Dashboard Operativo
+        </a>
+<a class="flex items-center px-3 py-2 rounded-lg text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined mr-3 text-[19px] text-slate-400">gavel</span>
+          Mesa de Dictamen
+        </a>
+<a class="flex items-center px-3 py-2 rounded-lg text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined mr-3 text-[19px] text-slate-400">warning</span>
+          Expedientes Observados
+        </a>
+<a class="flex items-center px-3 py-2 rounded-lg text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined mr-3 text-[19px] text-slate-400">calendar_today</span>
+          Agenda de Citas Presenciales
+        </a>
+<div class="px-3 pt-4 pb-1 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Supervisión &amp; SLA</div>
+<a class="flex items-center px-3 py-2 rounded-lg text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined mr-3 text-[19px] text-slate-400">work_history</span>
+          Matriz de Cargas y Turnos
+        </a>
+<a class="flex items-center px-3 py-2 rounded-lg text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined mr-3 text-[19px] text-slate-400">insights</span>
+          Métricas y SLA Normativo
+        </a>
+<div class="px-3 pt-4 pb-1 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Normativa y Catálogo</div>
+<a class="flex items-center px-3 py-2 rounded-lg text-xs font-semibold bg-blue-600/90 text-white shadow-sm shadow-blue-900/30" href="#">
+<span class="material-symbols-outlined mr-3 text-[19px] text-blue-200">account_tree</span>
+          Constructor TUPA
+          <span class="ml-auto text-[10px] bg-blue-800 px-1.5 py-0.5 rounded text-blue-100 font-bold">ACTIVO</span>
+</a>
+<a class="flex items-center px-3 py-2 rounded-lg text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined mr-3 text-[19px] text-slate-400">tune</span>
+          Parámetros y Aranceles
+        </a>
+<a class="flex items-center px-3 py-2 rounded-lg text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined mr-3 text-[19px] text-slate-400">badge</span>
+          Gestión de Usuarios y Roles
+        </a>
+</nav>
+</div>
+<!-- User & Session Footer -->
+<div class="p-3 m-3 bg-slate-900/90 border border-slate-800 rounded-xl">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-blue-700 text-white font-semibold text-xs flex items-center justify-center border border-blue-400/40">
+          CR
+        </div>
+<div class="flex flex-col min-w-0">
+<span class="text-xs font-semibold text-white truncate">Ing. Carlos Ruiz</span>
+<span class="text-[11px] text-slate-400 truncate">Revisor Jurídico L2 • TUPA Admin</span>
+</div>
+</div>
+<div class="mt-2.5 pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
+<span class="flex items-center gap-1.5 text-emerald-400 font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>Conectado
+        </span>
+<span class="font-mono text-slate-500">v3.4.2-civic</span>
+</div>
+</div>
+</aside>
+<!-- MAIN WRAPPER (Shifted for 72 = 18rem sidebar) -->
+<div class="pl-72 flex flex-col min-h-screen">
+<!-- TOP HEADER -->
+<header class="sticky top-0 h-16 bg-white/95 backdrop-blur border-b border-slate-200 z-40 px-8 flex items-center justify-between gap-6 shadow-[0_1px_3px_rgba(0,0,0,0.03)]">
+<!-- Search Bar style shadcn / gov.uk -->
+<div class="flex-1 max-w-xl">
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-slate-400 text-[18px]">search</span>
+<input class="w-full pl-9 pr-4 py-1.5 bg-slate-50 hover:bg-slate-100/80 focus:bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all" placeholder="Búsqueda institucional: Folio, DNI, RUC, Código TUPA..." type="text"/>
+<kbd class="absolute right-2.5 top-2 px-1.5 py-0.5 text-[10px] font-mono text-slate-400 bg-white border border-slate-200 rounded shadow-xs">⌘K</kbd>
+</div>
+</div>
+<!-- Trust Badges & User Utilities -->
+<div class="flex items-center gap-3">
+<div class="hidden md:flex items-center gap-2 px-2.5 py-1 bg-emerald-50 border border-emerald-200/80 rounded-full text-emerald-800 text-[11px] font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+<span>Red Gubernamental Encriptada (PIDE/PCM)</span>
+</div>
+<div class="h-5 w-px bg-slate-200"></div>
+<button aria-label="Notificaciones" class="relative p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-blue-600 ring-2 ring-white"></span>
+</button>
+<button aria-label="Manual TUPA" class="p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
+<span class="material-symbols-outlined text-[20px]">help_outline</span>
+</button>
+</div>
+</header>
+<!-- MAIN CONTENT -->
+<main class="flex-1 px-8 py-6 bg-slate-50/60 flex flex-col gap-6">
+<!-- BREADCRUMB & PAGE TITLE WITH ACTION BUTTONS -->
+<div class="flex flex-col gap-3 bg-white p-6 rounded-xl border border-slate-200/90 shadow-sm relative overflow-hidden">
+<div class="absolute -right-16 -top-16 w-56 h-56 rounded-full bg-blue-500/5 pointer-events-none blur-3xl"></div>
+<!-- Breadcrumb gov.uk humanized -->
+<nav class="flex items-center gap-1.5 text-xs text-slate-500">
+<a class="hover:text-blue-700 transition-colors" href="#">Inicio</a>
+<span class="material-symbols-outlined text-[14px] text-slate-400">chevron_right</span>
+<a class="hover:text-blue-700 transition-colors" href="#">Administración Central</a>
+<span class="material-symbols-outlined text-[14px] text-slate-400">chevron_right</span>
+<a class="hover:text-blue-700 transition-colors" href="#">Parámetros y Requisitos</a>
+<span class="material-symbols-outlined text-[14px] text-slate-400">chevron_right</span>
+<span class="text-blue-900 font-semibold">Constructor TUPA</span>
+</nav>
+<!-- Header content & CTAs -->
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mt-1">
+<div class="max-w-3xl">
+<div class="flex items-start gap-3.5">
+<div class="w-11 h-11 rounded-lg bg-blue-900 text-white flex items-center justify-center shadow-sm shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[22px]">account_tree</span>
+</div>
+<div>
+<h1 class="font-headline-lg text-2xl lg:text-[26px] font-bold text-slate-900 tracking-tight leading-snug">
+                  Configuración de Procedimientos y Requisitos (Constructor TUPA)
+                </h1>
+<p class="text-xs lg:text-sm text-slate-600 mt-1 leading-relaxed">
+                  Gestión del catálogo normativo, parametrización de recaudos admisibles, tiempos de SLA, aranceles y flujos de inspección técnica según Texto Único de Procedimientos Administrativos vigente.
+                </p>
+</div>
+</div>
+</div>
+<!-- Action Buttons (shadcn style) -->
+<div class="flex items-center flex-wrap gap-2.5 self-start lg:self-center">
+<button class="px-3.5 py-2 rounded-lg bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 font-medium text-xs flex items-center gap-1.5 shadow-xs transition-colors">
+<span class="material-symbols-outlined text-[16px] text-blue-600">visibility</span>
+<span>Previsualizar Vista Ciudadana</span>
+</button>
+<button class="px-3.5 py-2 rounded-lg bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 font-medium text-xs flex items-center gap-1.5 shadow-xs transition-colors">
+<span class="material-symbols-outlined text-[16px] text-slate-600">upload_file</span>
+<span>Importar Matriz</span>
+</button>
+<button class="px-4 py-2 rounded-lg bg-[#0f2744] hover:bg-[#16365c] text-white font-semibold text-xs flex items-center gap-1.5 shadow-sm hover:shadow transition-all">
+<span class="material-symbols-outlined text-[16px]">add_circle</span>
+<span>+ Nuevo Trámite TUPA</span>
+</button>
+</div>
+</div>
+</div>
+<!-- KPIS RIBBON -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+<!-- KPI 1 -->
+<div class="bg-white p-4 rounded-xl border border-slate-200/90 shadow-xs flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Trámites Catalogados</span>
+<div class="flex items-baseline gap-2 mt-1">
+<span class="text-3xl font-bold text-slate-900 font-headline-xl">48</span>
+<span class="text-xs text-slate-500 font-medium">Procedimientos</span>
+</div>
+<div class="flex items-center gap-2 mt-1.5 text-xs text-slate-600">
+<span class="inline-flex items-center gap-1 font-semibold text-blue-700">
+<span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>42 Activos
+              </span>
+<span class="text-slate-300">•</span>
+<span class="text-amber-700 font-medium">6 Borrador</span>
+</div>
+</div>
+<div class="w-11 h-11 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center border border-blue-100">
+<span class="material-symbols-outlined text-[22px]">fact_check</span>
+</div>
+</div>
+<!-- KPI 2 -->
+<div class="bg-white p-4 rounded-xl border border-slate-200/90 shadow-xs flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Reglas de Recaudos</span>
+<div class="flex items-baseline gap-2 mt-1">
+<span class="text-3xl font-bold text-blue-600 font-headline-xl">312</span>
+<span class="text-xs text-slate-500 font-medium">Reglas</span>
+</div>
+<div class="flex items-center gap-1.5 mt-1.5 text-xs text-emerald-700 font-medium">
+<span class="material-symbols-outlined text-emerald-600 text-[15px]">verified</span>
+<span>100% interoperable PIDE</span>
+</div>
+</div>
+<div class="w-11 h-11 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-100">
+<span class="material-symbols-outlined text-[22px]">rule</span>
+</div>
+</div>
+<!-- KPI 3 -->
+<div class="bg-white p-4 rounded-xl border border-slate-200/90 shadow-xs flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Cita Previa Obligatoria</span>
+<div class="flex items-baseline gap-2 mt-1">
+<span class="text-3xl font-bold text-slate-900 font-headline-xl">18</span>
+<span class="text-xs text-slate-500 font-medium">Trámites</span>
+</div>
+<span class="text-xs text-slate-600 mt-1.5">Inspección ITSE / Cotejo</span>
+</div>
+<div class="w-11 h-11 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center border border-amber-100">
+<span class="material-symbols-outlined text-[22px]">event_seat</span>
+</div>
+</div>
+<!-- KPI 4 -->
+<div class="bg-white p-4 rounded-xl border border-slate-200/90 shadow-xs flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Tasa Promedio | Autovalidación</span>
+<div class="flex items-baseline gap-1 mt-1">
+<span class="text-2xl font-bold text-slate-900">S/. 184.20</span>
+</div>
+<div class="flex items-center gap-2 mt-1.5 text-xs text-slate-600">
+<div class="w-14 bg-slate-100 h-2 rounded-full overflow-hidden flex border border-slate-200">
+<div class="bg-blue-600 h-full w-[34%]"></div>
+</div>
+<span class="font-bold text-blue-700">34%</span>
+<span class="text-slate-500">Aprobación directa</span>
+</div>
+</div>
+<div class="w-11 h-11 rounded-lg bg-indigo-50 text-indigo-700 flex items-center justify-center border border-indigo-100">
+<span class="material-symbols-outlined text-[22px]">analytics</span>
+</div>
+</div>
+</div>
+<!-- MASTER-DETAIL MAIN SECTION -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+<!-- LEFT COLUMN: Catálogo Normativo (Master List) -->
+<div class="lg:col-span-4 flex flex-col gap-3.5 bg-white p-4 rounded-xl border border-slate-200/90 shadow-xs">
+<div class="flex items-center justify-between pb-2 border-b border-slate-100">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-blue-900 text-[20px]">menu_book</span>
+<h2 class="font-headline-sm text-sm font-bold text-slate-900">Catálogo Normativo</h2>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-[11px] font-semibold">48 ítems</span>
+</div>
+<!-- Search & Filters -->
+<div class="flex flex-col gap-2">
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-2.5 text-slate-400 text-[16px]">search</span>
+<input class="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-blue-600 focus:bg-white" placeholder="Buscar código TUPA o nombre..." type="text" value="TUPA-LC-014"/>
+</div>
+<div class="grid grid-cols-2 gap-2">
+<select class="w-full bg-slate-50 border border-slate-200 px-2 py-1.5 rounded-lg text-[11px] font-medium text-slate-700 focus:outline-none focus:border-blue-600 cursor-pointer">
+<option>Todas las Categorías</option>
+<option selected="">Licencias Comerciales</option>
+<option>Edificaciones y Obras</option>
+<option>Certificaciones Ambientales</option>
+<option>Defensa Civil / ITSE</option>
+</select>
+<select class="w-full bg-slate-50 border border-slate-200 px-2 py-1.5 rounded-lg text-[11px] font-medium text-slate-700 focus:outline-none focus:border-blue-600 cursor-pointer">
+<option selected="">Estado: Vigentes</option>
+<option>En Revisión</option>
+<option>Borrador</option>
+</select>
+</div>
+</div>
+<!-- Procedure List -->
+<div class="flex flex-col gap-2.5 max-h-[720px] overflow-y-auto pr-1">
+<!-- ACTIVE ITEM: TUPA-LC-014 in Blue Navy Civic Style -->
+<div class="p-3.5 rounded-xl bg-[#0f2744] text-white shadow-sm transition-all border border-blue-900 relative">
+<div class="flex items-center justify-between mb-1.5">
+<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/25 text-blue-200 border border-blue-400/30">
+                  TUPA-LC-014
+                </span>
+<span class="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-300">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Vigente
+                </span>
+</div>
+<h3 class="font-headline-sm text-xs font-bold leading-snug text-white">
+                Licencia de Funcionamiento Comercial e Inspección Técnica Tipo A
+              </h3>
+<p class="text-[11px] text-slate-300 mt-1">Licencias y Comercio • Vigencia Indeterminada</p>
+<div class="flex flex-wrap items-center gap-1.5 mt-2.5 pt-2 border-t border-slate-700/60 text-[10px]">
+<span class="px-2 py-0.5 rounded bg-slate-800/80 text-blue-200 font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">calendar_month</span> Cita ITSE
+                </span>
+<span class="px-2 py-0.5 rounded bg-slate-800/80 text-slate-300 font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">schedule</span> SLA: 5 Días
+                </span>
+<span class="px-2 py-0.5 rounded bg-blue-600/30 text-white font-bold ml-auto">
+                  S/. 214.50
+                </span>
+</div>
+</div>
+<!-- PROCEDURE 2 -->
+<div class="p-3 rounded-xl bg-slate-50 hover:bg-slate-100/90 border border-slate-200 transition-colors cursor-pointer">
+<div class="flex items-center justify-between mb-1">
+<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-200 text-slate-700">TUPA-ED-008</span>
+<span class="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-700">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span> Vigente
+                </span>
+</div>
+<h4 class="text-xs font-semibold text-slate-800 leading-snug mt-1">Licencia de Edificación Modalidad C (Multifamiliar)</h4>
+<p class="text-[11px] text-slate-500 mt-0.5">Desarrollo Urbano • Vigencia 36 meses</p>
+<div class="flex flex-wrap items-center gap-1.5 mt-2 text-[10px] text-slate-600">
+<span class="px-1.5 py-0.5 rounded bg-white border border-slate-200">Comisión Técnica</span>
+<span class="px-1.5 py-0.5 rounded bg-white border border-slate-200">SLA: 25 Días</span>
+<span class="font-bold text-slate-900 ml-auto">S/. 1,480.00</span>
+</div>
+</div>
+<!-- PROCEDURE 3 -->
+<div class="p-3 rounded-xl bg-slate-50 hover:bg-slate-100/90 border border-slate-200 transition-colors cursor-pointer">
+<div class="flex items-center justify-between mb-1">
+<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-200 text-slate-700">TUPA-AM-003</span>
+<span class="inline-flex items-center gap-1 text-[11px] font-medium text-amber-700">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> En Revisión
+                </span>
+</div>
+<h4 class="text-xs font-semibold text-slate-800 leading-snug mt-1">Certificación Ambiental Categoría I (DIA)</h4>
+<p class="text-[11px] text-slate-500 mt-0.5">Medio Ambiente • Evaluación Previa</p>
+<div class="flex flex-wrap items-center gap-1.5 mt-2 text-[10px] text-slate-600">
+<span class="px-1.5 py-0.5 rounded bg-white border border-slate-200">Opinión SERFOR</span>
+<span class="px-1.5 py-0.5 rounded bg-white border border-slate-200">SLA: 20 Días</span>
+<span class="font-bold text-slate-900 ml-auto">S/. 620.00</span>
+</div>
+</div>
+<!-- PROCEDURE 4 -->
+<div class="p-3 rounded-xl bg-slate-50 hover:bg-slate-100/90 border border-slate-200 transition-colors cursor-pointer">
+<div class="flex items-center justify-between mb-1">
+<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-200 text-slate-700">TUPA-IT-002</span>
+<span class="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-700">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span> Vigente
+                </span>
+</div>
+<h4 class="text-xs font-semibold text-slate-800 leading-snug mt-1">Inspección Técnica ITSE Ex-Post</h4>
+<p class="text-[11px] text-slate-500 mt-0.5">Gestión de Riesgos • Renovación Bienal</p>
+<div class="flex flex-wrap items-center gap-1.5 mt-2 text-[10px] text-slate-600">
+<span class="px-1.5 py-0.5 rounded bg-white border border-slate-200">Cita Campo Requerida</span>
+<span class="px-1.5 py-0.5 rounded bg-white border border-slate-200">SLA: 7 Días</span>
+<span class="font-bold text-slate-900 ml-auto">S/. 195.40</span>
+</div>
+</div>
+<!-- PROCEDURE 5 -->
+<div class="p-3 rounded-xl bg-slate-50 hover:bg-slate-100/90 border border-slate-200 transition-colors cursor-pointer">
+<div class="flex items-center justify-between mb-1">
+<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-200 text-slate-700">TUPA-ID-001</span>
+<span class="inline-flex items-center gap-1 text-[11px] font-medium text-blue-700">
+<span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span> Automático
+                </span>
+</div>
+<h4 class="text-xs font-semibold text-slate-800 leading-snug mt-1">Constancia de No Inhabilitación Cívica</h4>
+<p class="text-[11px] text-slate-500 mt-0.5">Secretaría General • Emisión Inmediata</p>
+<div class="flex flex-wrap items-center gap-1.5 mt-2 text-[10px] text-slate-600">
+<span class="px-1.5 py-0.5 rounded bg-white border border-slate-200">Sin Cita</span>
+<span class="px-1.5 py-0.5 rounded bg-white border border-slate-200">Inmediato</span>
+<span class="font-bold text-emerald-700 ml-auto">Gratuito</span>
+</div>
+</div>
+</div>
+</div>
+<!-- RIGHT COLUMN: Procedure Editor & Requirements (Detail) -->
+<div class="lg:col-span-8 flex flex-col gap-6">
+<!-- Procedure Header Card -->
+<div class="bg-white p-5 rounded-xl border border-slate-200/90 shadow-xs flex flex-col gap-4">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-0.5 rounded bg-blue-900 text-white font-mono text-xs font-bold tracking-wide">
+                    TUPA-LC-014
+                  </span>
+<span class="text-xs text-slate-500">
+                    Base Legal: <strong class="text-slate-800 font-semibold">D.S. N° 002-2018-PCM / Ord. Mun. 632-SETC</strong>
+</span>
+</div>
+<h2 class="font-headline-md text-lg lg:text-xl font-bold text-slate-900 mt-1 leading-snug">
+                  Licencia de Funcionamiento Comercial e Inspección Técnica Tipo A
+                </h2>
+</div>
+<!-- Switch Activo / Visibilidad -->
+<div class="flex items-center gap-3 bg-slate-50 border border-slate-200 px-3.5 py-2 rounded-lg self-start md:self-auto">
+<div class="flex flex-col">
+<span class="text-xs font-semibold text-slate-800">Procedimiento Activo</span>
+<span class="text-[11px] text-emerald-700 font-medium">Visible a Ciudadanía</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-10 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+</label>
+</div>
+</div>
+<!-- Navigation Tabs shadcn style -->
+<div class="flex items-center gap-1.5 border-b border-slate-200 pt-1 overflow-x-auto">
+<button class="px-3.5 py-2 rounded-t-lg text-xs font-semibold text-blue-900 bg-blue-50/80 border-b-2 border-blue-800 flex items-center gap-1.5 whitespace-nowrap">
+<span class="material-symbols-outlined text-[17px] text-blue-700">checklist</span>
+<span>1. Requisitos y Recaudos (4)</span>
+</button>
+<button class="px-3.5 py-2 rounded-t-lg text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 flex items-center gap-1.5 whitespace-nowrap transition-colors">
+<span class="material-symbols-outlined text-[17px] text-slate-400">timelapse</span>
+<span>2. Plazos y Costos</span>
+</button>
+<button class="px-3.5 py-2 rounded-t-lg text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 flex items-center gap-1.5 whitespace-nowrap transition-colors">
+<span class="material-symbols-outlined text-[17px] text-slate-400">event_available</span>
+<span>3. Parámetros de Cita</span>
+</button>
+<button class="px-3.5 py-2 rounded-t-lg text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 flex items-center gap-1.5 whitespace-nowrap transition-colors">
+<span class="material-symbols-outlined text-[17px] text-slate-400">draw</span>
+<span>4. Flujo de Dictamen y Firmas</span>
+</button>
+</div>
+</div>
+<!-- TAB CONTENT: MATRIZ DE REQUISITOS ADMISIBLES -->
+<div class="bg-white p-5 rounded-xl border border-slate-200/90 shadow-xs flex flex-col gap-5">
+<!-- Toolbar -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/80 p-3.5 rounded-lg border border-slate-200/80">
+<div>
+<h3 class="text-sm font-bold text-slate-900">Matriz de Requisitos Admisibles</h3>
+<p class="text-xs text-slate-500 mt-0.5">Reglas de validación previa antes de admisión a la mesa de dictamen.</p>
+</div>
+<div class="flex items-center gap-2.5">
+<label class="flex items-center gap-1.5 cursor-pointer bg-white px-2.5 py-1.5 rounded-md border border-slate-200 text-xs font-medium text-slate-700 shadow-2xs">
+<input checked="" class="w-3.5 h-3.5 rounded text-blue-600 focus:ring-blue-500" type="checkbox"/>
+<span>Exigir Firma PKI</span>
+</label>
+<button class="px-3 py-1.5 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold flex items-center gap-1 shadow-xs transition-colors" onclick="document.getElementById('drawer-requisito').classList.toggle('hidden')">
+<span class="material-symbols-outlined text-[16px]">playlist_add</span>
+<span>+ Añadir Nuevo Requisito</span>
+</button>
+</div>
+</div>
+<!-- List of Requirements -->
+<div class="flex flex-col gap-3">
+<!-- #01 Identificación Oficial PIDE/RENIEC -->
+<div class="bg-slate-50/50 hover:bg-slate-50 p-4 rounded-xl border border-slate-200 transition-shadow relative group">
+<div class="flex items-start justify-between gap-3">
+<div class="flex items-start gap-3">
+<div class="mt-0.5 cursor-grab text-slate-400 hover:text-slate-600 flex flex-col items-center">
+<span class="material-symbols-outlined text-[18px]">drag_indicator</span>
+<span class="font-mono text-[11px] font-bold text-blue-900">#01</span>
+</div>
+<div>
+<div class="flex flex-wrap items-center gap-2">
+<span class="text-xs font-bold text-slate-900">Identificación Oficial Vigente del Representante (DNI / CE / Pasaporte)</span>
+<span class="px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 text-[10px] font-semibold">Obligatorio ★</span>
+<span class="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-semibold">Cotejo PIDE / RENIEC</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-2 mt-2.5 pt-1.5 text-xs text-slate-600 border-t border-slate-200/60">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[15px] text-blue-600">description</span>
+<span>Formatos: <strong class="text-slate-800">PDF, JPG, PNG</strong></span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[15px] text-blue-600">data_usage</span>
+<span>Peso máx: <strong class="text-slate-800">10 MB</strong> (300 DPI)</span>
+</div>
+<div class="flex items-center gap-1.5 text-emerald-700">
+<span class="material-symbols-outlined text-[15px]">verified_user</span>
+<span>Validación OCR automática</span>
+</div>
+</div>
+<div class="mt-2 text-[11px] text-slate-500 bg-white border border-slate-200/70 px-2.5 py-1 rounded inline-flex items-center gap-1.5">
+<span class="material-symbols-outlined text-blue-600 text-[14px]">info</span>
+<span>Interoperabilidad inmediata con Plataforma Nacional PIDE (Sin costo al administrado).</span>
+</div>
+</div>
+</div>
+<!-- Actions -->
+<div class="flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
+<button class="p-1 rounded text-slate-500 hover:text-blue-700 hover:bg-slate-200/60 transition-colors" title="Editar">
+<span class="material-symbols-outlined text-[17px]">edit</span>
+</button>
+<button class="p-1 rounded text-slate-500 hover:text-blue-700 hover:bg-slate-200/60 transition-colors" title="Duplicar">
+<span class="material-symbols-outlined text-[17px]">content_copy</span>
+</button>
+<button class="p-1 rounded text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors" title="Eliminar">
+<span class="material-symbols-outlined text-[17px]">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- #02 Domicilio Fiscal -->
+<div class="bg-slate-50/50 hover:bg-slate-50 p-4 rounded-xl border border-slate-200 transition-shadow relative group">
+<div class="flex items-start justify-between gap-3">
+<div class="flex items-start gap-3">
+<div class="mt-0.5 cursor-grab text-slate-400 hover:text-slate-600 flex flex-col items-center">
+<span class="material-symbols-outlined text-[18px]">drag_indicator</span>
+<span class="font-mono text-[11px] font-bold text-blue-900">#02</span>
+</div>
+<div>
+<div class="flex flex-wrap items-center gap-2">
+<span class="text-xs font-bold text-slate-900">Comprobante de Domicilio Fiscal del Predio Objeto del Trámite</span>
+<span class="px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 text-[10px] font-semibold">Obligatorio ★</span>
+<span class="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 text-[10px] font-semibold">Documento Adjunto</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-2 mt-2.5 pt-1.5 text-xs text-slate-600 border-t border-slate-200/60">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[15px] text-blue-600">description</span>
+<span>Formatos: <strong class="text-slate-800">PDF Exclusivo</strong></span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[15px] text-blue-600">data_usage</span>
+<span>Peso máx: <strong class="text-slate-800">15 MB</strong></span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[15px] text-slate-500">history</span>
+<span>Antigüedad máx: <strong class="text-slate-800">90 días naturales</strong></span>
+</div>
+</div>
+<div class="mt-2 text-[11px] text-amber-700 bg-amber-50/70 border border-amber-200 px-2.5 py-1 rounded inline-flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[14px]">warning</span>
+<span>Sujeto a observación preventiva si no figura código de suministro de luz o agua.</span>
+</div>
+</div>
+</div>
+<!-- Actions -->
+<div class="flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
+<button class="p-1 rounded text-slate-500 hover:text-blue-700 hover:bg-slate-200/60 transition-colors" title="Editar">
+<span class="material-symbols-outlined text-[17px]">edit</span>
+</button>
+<button class="p-1 rounded text-slate-500 hover:text-blue-700 hover:bg-slate-200/60 transition-colors" title="Duplicar">
+<span class="material-symbols-outlined text-[17px]">content_copy</span>
+</button>
+<button class="p-1 rounded text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors" title="Eliminar">
+<span class="material-symbols-outlined text-[17px]">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- #03 Planos de Distribución ITSE -->
+<div class="bg-slate-50/50 hover:bg-slate-50 p-4 rounded-xl border border-slate-200 transition-shadow relative group">
+<div class="flex items-start justify-between gap-3">
+<div class="flex items-start gap-3">
+<div class="mt-0.5 cursor-grab text-slate-400 hover:text-slate-600 flex flex-col items-center">
+<span class="material-symbols-outlined text-[18px]">drag_indicator</span>
+<span class="font-mono text-[11px] font-bold text-blue-900">#03</span>
+</div>
+<div>
+<div class="flex flex-wrap items-center gap-2">
+<span class="text-xs font-bold text-slate-900">Plano de Distribución y Seguridad Visado por Ingeniero Colegiado</span>
+<span class="px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 text-[10px] font-semibold">Obligatorio ★</span>
+<span class="px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-semibold">Peritaje Técnico ITSE</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-2 mt-2.5 pt-1.5 text-xs text-slate-600 border-t border-slate-200/60">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[15px] text-blue-600">architecture</span>
+<span>Formatos: <strong class="text-slate-800">PDF Vectorial, DWG</strong></span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[15px] text-blue-600">data_usage</span>
+<span>Peso máx: <strong class="text-slate-800">25 MB</strong></span>
+</div>
+<div class="flex items-center gap-1.5 text-blue-700">
+<span class="material-symbols-outlined text-[15px]">verified</span>
+<span>Colegiatura CIP/CAP Habilitada</span>
+</div>
+</div>
+<div class="mt-2 text-[11px] text-slate-600 bg-white border border-slate-200/70 px-2.5 py-1 rounded inline-flex items-center gap-1.5">
+<span class="material-symbols-outlined text-blue-600 text-[14px]">key</span>
+<span>Requiere firma digital con certificado digital compatible con REFIRMA del profesional colegiado.</span>
+</div>
+</div>
+</div>
+<!-- Actions -->
+<div class="flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
+<button class="p-1 rounded text-slate-500 hover:text-blue-700 hover:bg-slate-200/60 transition-colors" title="Editar">
+<span class="material-symbols-outlined text-[17px]">edit</span>
+</button>
+<button class="p-1 rounded text-slate-500 hover:text-blue-700 hover:bg-slate-200/60 transition-colors" title="Duplicar">
+<span class="material-symbols-outlined text-[17px]">content_copy</span>
+</button>
+<button class="p-1 rounded text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors" title="Eliminar">
+<span class="material-symbols-outlined text-[17px]">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- #04 Tasa Administrativa -->
+<div class="bg-slate-50/50 hover:bg-slate-50 p-4 rounded-xl border border-slate-200 transition-shadow relative group">
+<div class="flex items-start justify-between gap-3">
+<div class="flex items-start gap-3">
+<div class="mt-0.5 cursor-grab text-slate-400 hover:text-slate-600 flex flex-col items-center">
+<span class="material-symbols-outlined text-[18px]">drag_indicator</span>
+<span class="font-mono text-[11px] font-bold text-blue-900">#04</span>
+</div>
+<div>
+<div class="flex flex-wrap items-center gap-2">
+<span class="text-xs font-bold text-slate-900">Constancia de Pago de Tasa Administrativa (TUPA-04)</span>
+<span class="px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 text-[10px] font-semibold">Obligatorio ★</span>
+<span class="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 text-[10px] font-semibold">Arancel Financiero</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-2 mt-2.5 pt-1.5 text-xs text-slate-600 border-t border-slate-200/60">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[15px] text-blue-600">payments</span>
+<span>Monto fijo: <strong class="text-slate-900 font-bold">S/. 214.50</strong></span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[15px] text-slate-500">account_balance</span>
+<span>Banco de la Nación / Págalo.pe</span>
+</div>
+<div class="flex items-center gap-1.5 text-emerald-700">
+<span class="material-symbols-outlined text-[15px]">bolt</span>
+<span>Conciliación en tiempo real</span>
+</div>
+</div>
+<div class="mt-2 text-[11px] text-emerald-800 bg-emerald-50/70 border border-emerald-200 px-2.5 py-1 rounded inline-flex items-center gap-1.5">
+<span class="material-symbols-outlined text-emerald-600 text-[14px]">check_circle</span>
+<span>Validación automática del número de operación bancaria contra el servicio de Tesorería.</span>
+</div>
+</div>
+</div>
+<!-- Actions -->
+<div class="flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
+<button class="p-1 rounded text-slate-500 hover:text-blue-700 hover:bg-slate-200/60 transition-colors" title="Editar">
+<span class="material-symbols-outlined text-[17px]">edit</span>
+</button>
+<button class="p-1 rounded text-slate-500 hover:text-blue-700 hover:bg-slate-200/60 transition-colors" title="Duplicar">
+<span class="material-symbols-outlined text-[17px]">content_copy</span>
+</button>
+<button class="p-1 rounded text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors" title="Eliminar">
+<span class="material-symbols-outlined text-[17px]">delete</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- MODAL / CARD INTERACTIVO: CONSTRUCTOR DE PARÁMETROS DE REQUISITO -->
+<div class="bg-slate-50 p-5 rounded-xl border border-blue-200 flex flex-col gap-4 shadow-xs" id="drawer-requisito">
+<div class="flex items-center justify-between pb-2 border-b border-slate-200">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
+<h4 class="text-sm font-bold text-slate-900">Constructor de Parámetros de Requisito</h4>
+<span class="text-[11px] text-slate-500 font-normal">(Configurador dinámico de validaciones)</span>
+</div>
+<button class="p-1 rounded text-slate-400 hover:text-slate-700 transition-colors" onclick="document.getElementById('drawer-requisito').classList.add('hidden')">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<!-- Left Input group -->
+<div class="flex flex-col gap-3">
+<div>
+<label class="text-xs font-semibold text-slate-700 block mb-1">Nombre Técnico del Recaudo / Documento</label>
+<input class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600" placeholder="Ej. Certificado de Pozo a Tierra firmado por Ing. Electricista" type="text"/>
+</div>
+<div>
+<label class="text-xs font-semibold text-slate-700 block mb-1">Fundamento Normativo (Artículo TUPA)</label>
+<input class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600" placeholder="Ej. Art. 14 Numeral 3.1 D.S. N° 002-2018-PCM" type="text"/>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div>
+<label class="text-xs font-semibold text-slate-700 block mb-1">Nivel de Exigencia</label>
+<select class="w-full px-2.5 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:border-blue-600 cursor-pointer">
+<option>Obligatorio (Bloqueante)</option>
+<option>Opcional / Condicional</option>
+<option>Subsanable Ex-Post</option>
+</select>
+</div>
+<div>
+<label class="text-xs font-semibold text-slate-700 block mb-1">Tipo de Validación</label>
+<select class="w-full px-2.5 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:border-blue-600 cursor-pointer">
+<option>Cotejo PIDE / Automático</option>
+<option>Revisión Manual Dictaminador</option>
+<option>Validación Firma PKI</option>
+<option>Arancel / Caja</option>
+</select>
+</div>
+</div>
+</div>
+<!-- Right Input group: Formatos, Slider hasta 50MB, Verificación PKI -->
+<div class="flex flex-col gap-3">
+<div>
+<label class="text-xs font-semibold text-slate-700 block mb-1">Formatos Permitidos</label>
+<div class="flex flex-wrap gap-2.5 p-2 bg-white border border-slate-300 rounded-lg">
+<label class="flex items-center gap-1.5 text-xs text-slate-700 cursor-pointer">
+<input checked="" class="w-3.5 h-3.5 rounded text-blue-600 focus:ring-blue-500" type="checkbox"/>
+<span class="font-medium">PDF</span>
+</label>
+<label class="flex items-center gap-1.5 text-xs text-slate-700 cursor-pointer">
+<input checked="" class="w-3.5 h-3.5 rounded text-blue-600 focus:ring-blue-500" type="checkbox"/>
+<span class="font-medium">JPG / PNG</span>
+</label>
+<label class="flex items-center gap-1.5 text-xs text-slate-700 cursor-pointer">
+<input checked="" class="w-3.5 h-3.5 rounded text-blue-600 focus:ring-blue-500" type="checkbox"/>
+<span class="font-medium">DWG (CAD)</span>
+</label>
+<label class="flex items-center gap-1.5 text-xs text-slate-700 cursor-pointer">
+<input class="w-3.5 h-3.5 rounded text-blue-600 focus:ring-blue-500" type="checkbox"/>
+<span class="font-medium">ZIP Seguro</span>
+</label>
+</div>
+</div>
+<div>
+<div class="flex items-center justify-between mb-1">
+<label class="text-xs font-semibold text-slate-700">Peso Máximo Admisible por Archivo</label>
+<span class="text-xs font-bold font-mono text-blue-900 bg-blue-100/70 px-2 py-0.5 rounded border border-blue-200">25 MB</span>
+</div>
+<input class="w-full accent-blue-600 cursor-pointer h-2 bg-slate-200 rounded-lg" max="50" min="5" step="5" type="range" value="25"/>
+<div class="flex justify-between text-[10px] text-slate-400 font-mono mt-0.5">
+<span>5 MB</span>
+<span>15 MB</span>
+<span class="font-bold text-blue-700">25 MB</span>
+<span>35 MB</span>
+<span>50 MB</span>
+</div>
+</div>
+<div class="flex flex-col gap-1.5 pt-1">
+<label class="text-xs font-semibold text-slate-700">Verificación Criptográfica y Reglas</label>
+<div class="flex flex-col gap-1.5">
+<label class="flex items-center gap-2 cursor-pointer text-xs text-slate-800 bg-white p-2 rounded border border-slate-200">
+<input checked="" class="w-3.5 h-3.5 rounded text-blue-600 focus:ring-blue-500" type="checkbox"/>
+<span class="font-medium">Verificación de Sello de Tiempo y Firma Digital PKI / X.509</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer text-xs text-slate-800 bg-white p-2 rounded border border-slate-200">
+<input class="w-3.5 h-3.5 rounded text-blue-600 focus:ring-blue-500" type="checkbox"/>
+<span class="font-medium">Extracción de metadatos vía OCR institucional (DNI, RUC, Dirección)</span>
+</label>
+</div>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-200">
+<button class="px-3.5 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 text-xs font-medium transition-colors" onclick="document.getElementById('drawer-requisito').classList.add('hidden')">
+                  Cancelar
+                </button>
+<button class="px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors">
+                  Guardar Requisito en Matriz
+                </button>
+</div>
+</div>
+</div>
+<!-- FOOTER AUDIT BAR & SAVE CONTROLS -->
+<div class="bg-white p-4 rounded-xl border border-slate-200/90 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex items-center gap-2.5 text-xs text-slate-500">
+<span class="material-symbols-outlined text-[20px] text-blue-600">history_toggle_off</span>
+<div>
+<span>Última modificación normativa: <strong class="text-slate-800 font-semibold">18 Oct 2025, 16:30</strong></span>
+<span class="hidden sm:inline"> • Auditor: <strong class="text-slate-800 font-semibold">Lic. Roberto Mendoza (Admin Global)</strong></span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="px-3.5 py-2 rounded-lg bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-medium transition-colors">
+                Descartar Cambios
+              </button>
+<button class="px-3.5 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold transition-colors">
+                Guardar Borrador
+              </button>
+<button class="px-4 py-2 rounded-lg bg-[#0f2744] hover:bg-[#16365c] text-white text-xs font-bold shadow-sm flex items-center gap-1.5 transition-all">
+<span class="material-symbols-outlined text-[16px] text-blue-300">publish</span>
+<span>Publicar en Portal Ciudadano</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- FOOTER INSTITUCIONAL -->
+<footer class="w-full bg-white border-t border-slate-200 py-3 px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
+<span>S.E.T.C. • Sistema de Citas, Trámites y Expedientes • v3.4.2 Enterprise (Civic Enterprise Portal)</span>
+<div class="flex items-center gap-4">
+<a class="hover:text-blue-700 transition-colors" href="#">Soporte Técnico Especializado</a>
+<span>•</span>
+<a class="hover:text-blue-700 transition-colors" href="#">Políticas de Seguridad y Privacidad</a>
+</div>
+</footer>
+</div>
+</body></html>

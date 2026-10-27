@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+
+<html lang="es"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Plus+Jakarta+Sans:wght@100..900&display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={"darkMode":"class","theme":{"extend":{"colors":{"inverse-surface":"#213145","on-tertiary":"#ffffff","primary-fixed":"#d4e3ff","on-secondary-fixed":"#00174b","on-primary":"#ffffff","secondary-container":"#316bf3","on-tertiary-fixed":"#002114","on-tertiary-fixed-variant":"#005137","on-secondary-fixed-variant":"#003ea8","on-surface-variant":"#44474d","surface-container-low":"#eff4ff","surface-container-high":"#dce9ff","secondary-fixed":"#dbe1ff","error-container":"#ffdad6","secondary-fixed-dim":"#b4c5ff","on-primary-fixed":"#021c39","surface-bright":"#f8f9ff","on-primary-container":"#798fb1","background":"#f8f9ff","on-background":"#0b1c30","error":"#ba1a1a","on-error":"#ffffff","tertiary-fixed":"#85f8c4","on-secondary-container":"#fefcff","surface":"#f8f9ff","primary":"#001229","secondary":"#0051d5","on-error-container":"#93000a","tertiary-fixed-dim":"#68dba9","outline":"#74777e","on-surface":"#0b1c30","on-tertiary-container":"#1fa072","on-primary-fixed-variant":"#324866","primary-fixed-dim":"#b2c8ed","surface-dim":"#cbdbf5","surface-container-highest":"#d3e4fe","surface-container":"#e5eeff","surface-container-lowest":"#ffffff","outline-variant":"#c4c6ce","inverse-primary":"#b2c8ed","inverse-on-surface":"#eaf1ff","surface-tint":"#4a5f7f","on-secondary":"#ffffff","primary-container":"#0f2744","surface-variant":"#d3e4fe","tertiary-container":"#002d1d","tertiary":"#00160c"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"space-lg":"1.5rem","gutter-sm":"1rem","margin":"2rem","space-md":"1rem","gutter":"1.5rem","space-xl":"2rem","space-xs":"0.25rem","space-sm":"0.5rem","margin-sm":"1rem"},"fontFamily":{"code-sm":["Inter"],"label-sm":["Inter"],"headline-xl":["Plus Jakarta Sans"],"headline-lg":["Plus Jakarta Sans"],"headline-xl-mobile":["Plus Jakarta Sans"],"body-sm":["Inter"],"label-md":["Inter"],"body-md":["Inter"],"body-lg":["Inter"],"headline-md":["Plus Jakarta Sans"],"headline-sm":["Plus Jakarta Sans"],"headline-lg-mobile":["Plus Jakarta Sans"]},"fontSize":{"code-sm":["13px",{"lineHeight":"18px","fontWeight":"500"}],"label-sm":["12px",{"lineHeight":"16px","fontWeight":"600"}],"headline-xl":["36px",{"lineHeight":"44px","fontWeight":"700"}],"headline-lg":["30px",{"lineHeight":"38px","fontWeight":"600"}],"headline-xl-mobile":["28px",{"lineHeight":"36px","fontWeight":"700"}],"body-sm":["14px",{"lineHeight":"20px","fontWeight":"400"}],"label-md":["14px",{"lineHeight":"20px","fontWeight":"500"}],"body-md":["16px",{"lineHeight":"24px","fontWeight":"400"}],"body-lg":["18px",{"lineHeight":"28px","fontWeight":"400"}],"headline-md":["22px",{"lineHeight":"28px","fontWeight":"600"}],"headline-sm":["18px",{"lineHeight":"24px","fontWeight":"600"}],"headline-lg-mobile":["24px",{"lineHeight":"32px","fontWeight":"600"}]}}}};</script></head><body class="bg-background font-body-md text-on-surface antialiased"><header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-20 max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between gap-6"><div class="flex items-center gap-4 shrink-0"><img alt="SETC Portal Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UsFh0iBLpJECHGgFWUMEi4XQfxZ24TXd4lISUs6FdBtSbxBlkwCEe90wQN-FIdyc9TUssUAVXEaMa4jRH5sU1EaDlhNHUSVWSX6ufdHbVVAFS8mI0tIbt5jAqqEiZvP_ayNszEdF590RMIz047XlnirGUODEDOnva_V2YOeNLv_Aj5Mj9t0rxOoOAsQh8DrKkO04EXe7NuWWtnvjDIGD_BVRutZWKwRTgj232sS2sG"/><div class="flex flex-col"><span class="font-headline-sm text-headline-sm text-primary font-bold tracking-tight">SETC</span><span class="font-label-sm text-label-sm text-on-surface-variant">Portal Ciudadano</span></div></div><div class="hidden xl:flex items-center flex-1 max-w-md mx-4"><div class="relative w-full"><span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm pointer-events-none">search</span><input class="w-full pl-9 pr-4 py-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-secondary transition-all" placeholder="Buscar trámites, requisitos o folios..." type="text"/></div></div><nav class="hidden lg:flex items-center gap-1 shrink-0" data-active-classes="bg-surface-container text-on-surface font-semibold"><a class="px-3 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="inicio" href="#">Inicio</a><a class="px-3 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="tramites-y-servicios" href="#">Trámites y Servicios</a><a aria-current="page" class="px-3 py-2 rounded-lg transition-colors bg-surface-container text-on-surface font-semibold" data-path="mis-expedientes" href="#">Mis Expedientes</a><a class="px-3 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="agendar-cita" href="#">Agendar Cita</a><a class="px-3 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="mesa-de-ayuda" href="#">Mesa de Ayuda</a></nav><div class="flex items-center gap-3 shrink-0"><button class="relative p-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" type="button"><span class="material-symbols-outlined">notifications</span><span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-secondary ring-2 ring-surface-container-lowest"></span></button><div class="flex items-center gap-3 pl-2"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZGJRrhlPogvmNGSbktezZIaAwZpLFEg-ebIsrqInz3lwswvl7xtxzPR-zVT830JnoDGQbLGgT3x0s6vtZ2IrsiPv3KYT8ZFz-FFzACf_PDwm_z5zV8sk7iiTdJle-a1NzueLjkgSls3hvKY-KeiHhJke8IvyPVKe5LV90jSW9mnjo2GWvWJC61OTJSe6L1UPcTvJgLFmJap-ub0gre4GlwJ0hUgz9KzDn-PtCrnkk"/><div class="hidden sm:flex flex-col text-left"><span class="font-label-md text-label-md text-on-surface font-semibold leading-none">C. Morales</span><span class="font-label-sm text-label-sm text-on-surface-variant leading-tight">CURP: MORM84...</span></div></div></div></div></header><main class="w-full pt-20 bg-background"><div class="max-w-7xl mx-auto px-6 lg:px-12 pt-6"><div class="flex items-center gap-2 font-label-sm text-label-sm text-on-surface-variant"><span class="hover:text-on-surface cursor-pointer">SETC</span><span class="material-symbols-outlined text-xs">chevron_right</span><span class="hover:text-on-surface cursor-pointer">Servicios al Ciudadano</span><span class="material-symbols-outlined text-xs">chevron_right</span><span class="text-on-surface font-semibold">Ventanilla Digital</span></div></div><div class="flex flex-col w-full">
+<div class="max-w-7xl mx-auto px-6 lg:px-12 py-8 w-full space-y-8">
+<!-- Top Meta Context Strip -->
+<div class="flex flex-wrap items-center justify-between gap-4">
+<div class="flex items-center gap-3">
+<div class="w-2.5 h-2.5 rounded-full bg-secondary animate-pulse"></div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Expediente Telemático Unificado</span>
+<span class="text-outline-variant">•</span>
+<span class="font-code-sm text-code-sm text-on-surface font-semibold bg-surface-container-high px-2 py-0.5 rounded">SETC-2025-8841</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant hidden sm:inline">(SIAF N° 8493120-25)</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md transition-colors shadow-sm" id="btn-share" onclick="navigator.clipboard.writeText('SETC-2025-8841'); alert('Folio copiado al portapapeles');">
+<span class="material-symbols-outlined text-base">content_copy</span>
+<span>Copiar Folio</span>
+</button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md transition-colors shadow-sm">
+<span class="material-symbols-outlined text-base">print</span>
+<span>Imprimir Hoja de Ruta</span>
+</button>
+</div>
+</div>
+<!-- 1. Header de Expediente Activo y Estado General -->
+<div class="relative overflow-hidden bg-surface-container-lowest rounded-xl shadow-sm p-6 lg:p-8">
+<div class="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-secondary-container/10 pointer-events-none blur-3xl"></div>
+<div class="relative z-10 flex flex-col lg:flex-row lg:items-start justify-between gap-8">
+<!-- Left: Core Dossier Info -->
+<div class="space-y-4 max-w-2xl">
+<div class="flex flex-wrap items-center gap-2.5">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-high text-on-primary-fixed-variant font-label-sm text-label-sm font-semibold">
+<span class="material-symbols-outlined text-sm">business</span>
+              Régimen Tipo A
+            </span>
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 text-amber-900 font-label-sm text-label-sm font-semibold">
+<span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+              En proceso de subsanación técnica
+            </span>
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-xs">gavel</span>
+              Ley N° 27444
+            </span>
+</div>
+<div>
+<h1 class="font-headline-lg text-headline-lg text-primary tracking-tight">Licencia de Funcionamiento Comercial e Inspección Técnica Tipo A</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1.5">
+              Titular: <span class="font-semibold text-on-surface">Mendoza & Asociados S.A.C.</span> <span class="font-code-sm text-code-sm text-on-surface-variant">(RUC: 20601849312)</span>
+</p>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+<div class="flex items-start gap-3 p-3.5 rounded-lg bg-surface-container-low">
+<span class="material-symbols-outlined text-secondary text-xl mt-0.5">schedule</span>
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Tiempo estimado restante</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold">2 a 3 días hábiles</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant block text-xs">Fecha límite legal: 04 Nov 2025</span>
+</div>
+</div>
+<div class="flex items-start gap-3 p-3.5 rounded-lg bg-surface-container-low">
+<span class="material-symbols-outlined text-secondary text-xl mt-0.5">badge</span>
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Especialista Asignado</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold">Ing. Rafael Castillo V.</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant block text-xs">Subgerencia de Fiscalización Urbana</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Right: Progress Meter & Official Indicator -->
+<div class="lg:w-80 shrink-0 bg-surface-container p-6 rounded-xl space-y-5">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Avance General</span>
+<span class="font-headline-md text-headline-md font-bold text-secondary">65%</span>
+</div>
+<!-- Progress Bar -->
+<div class="w-full bg-surface-container-high h-3 rounded-full overflow-hidden">
+<div class="bg-secondary h-full rounded-full transition-all duration-700 ease-out" style="width: 65%;"></div>
+</div>
+<div class="grid grid-cols-3 text-center gap-2 pt-1 font-body-sm text-body-sm">
+<div class="p-2 rounded bg-surface-container-lowest">
+<span class="block font-headline-sm text-headline-sm text-on-surface font-bold">3/4</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant text-[11px]">Recaudos</span>
+</div>
+<div class="p-2 rounded bg-surface-container-lowest">
+<span class="block font-headline-sm text-headline-sm text-amber-700 font-bold">1</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant text-[11px]">Subsanación</span>
+</div>
+<div class="p-2 rounded bg-surface-container-lowest">
+<span class="block font-headline-sm text-headline-sm text-on-surface font-bold">10d</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant text-[11px]">En Proceso</span>
+</div>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant font-label-sm text-label-sm pt-2">
+<span class="material-symbols-outlined text-sm text-tertiary-fixed-variant">lock</span>
+<span>Trazabilidad sellada criptográficamente</span>
+</div>
+</div>
+</div>
+</div>
+<!-- 2. Alerta de Acción Humanizada y Comprensible -->
+<section aria-labelledby="alert-action-title" class="bg-amber-50/90 rounded-xl p-6 lg:p-7 shadow-sm transition-all">
+<div class="flex flex-col md:flex-row items-start gap-5">
+<div class="w-12 h-12 rounded-xl bg-amber-500/15 flex items-center justify-center shrink-0 text-amber-900 mt-0.5">
+<span class="material-symbols-outlined text-2xl">edit_document</span>
+</div>
+<div class="flex-1 space-y-3">
+<div class="flex flex-wrap items-center justify-between gap-2">
+<h2 class="font-headline-sm text-headline-sm text-amber-950 font-semibold tracking-tight" id="alert-action-title">
+              Necesitamos un pequeño ajuste en uno de tus documentos
+            </h2>
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-200/70 text-amber-900 font-label-sm text-label-sm font-bold">
+<span class="material-symbols-outlined text-sm">alarm</span>
+              Plazo vence: 28 de Octubre (4 días)
+            </span>
+</div>
+<div class="bg-surface-container-lowest/80 p-4 rounded-lg space-y-2">
+<div class="flex items-center gap-2 text-on-surface font-label-md text-label-md font-semibold">
+<span class="material-symbols-outlined text-amber-700 text-lg">chat_bubble_outline</span>
+<span>Mensaje del revisor técnico (Ing. Rafael Castillo):</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+              "Hola Mariana, el <strong class="text-on-surface font-semibold">Comprobante de Domicilio</strong> adjunto presenta el sello institucional un poco borroso en la esquina inferior derecha. Para evitar retrasos u observaciones en la posterior inspección de tu licencia, por favor sube una foto o escaneo nítido donde se aprecie claramente el código de suministro eléctrico. Tienes hasta el 28 de Octubre para adjuntarlo sin perder tu turno asignado."
+            </p>
+</div>
+<div class="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+<button class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg bg-amber-900 hover:bg-amber-950 text-white font-label-md text-label-md font-semibold shadow-md transition-all" onclick="document.getElementById('upload-modal').classList.remove('hidden')">
+<span class="material-symbols-outlined text-lg">cloud_upload</span>
+<span>Corregir documento ahora (Solo te tomará 1 minuto) →</span>
+</button>
+<a class="inline-flex items-center justify-center gap-1.5 px-4 py-3 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md transition-colors" href="#documentos-panel">
+<span class="material-symbols-outlined text-base">visibility</span>
+<span>Ver documento observado</span>
+</a>
+</div>
+</div>
+</div>
+</section>
+<!-- Main Grid: Timeline + Lateral Documents/Support Panel -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<!-- 3. Línea de Tiempo (Timeline) Vertical Interactiva y Transparente -->
+<section aria-labelledby="timeline-title" class="lg:col-span-8 bg-surface-container-lowest rounded-xl p-6 lg:p-8 shadow-sm space-y-8">
+<div class="flex flex-wrap items-center justify-between gap-4 pb-4">
+<div>
+<span class="font-label-sm text-label-sm text-secondary font-bold uppercase tracking-wider block">Transparencia Radical</span>
+<h2 class="font-headline-md text-headline-md text-primary font-bold" id="timeline-title">Línea de Vida del Expediente</h2>
+</div>
+<span class="inline-flex items-center gap-1 font-body-sm text-body-sm text-on-surface-variant bg-surface-container-low px-3 py-1.5 rounded-lg">
+<span class="material-symbols-outlined text-base text-tertiary-fixed-variant">check_circle</span>
+            Actualizado en tiempo real
+          </span>
+</div>
+<div class="relative pl-4 sm:pl-6 space-y-10">
+<!-- Timeline Vertical Track -->
+<div class="absolute left-9 sm:left-11 top-4 bottom-6 w-0.5 bg-surface-container-high pointer-events-none"></div>
+<!-- NODO 1: Radicación e Ingreso Digital (COMPLETADO) -->
+<div class="relative flex items-start gap-4 sm:gap-6 group">
+<div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0 ring-4 ring-surface-container-lowest z-10 shadow-sm">
+<span class="material-symbols-outlined text-xl">check</span>
+</div>
+<div class="flex-1 bg-surface-container-low/70 hover:bg-surface-container-low p-5 rounded-xl transition-all space-y-2">
+<div class="flex flex-wrap items-center justify-between gap-2">
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold">1. Radicación e Ingreso Digital</span>
+<span class="inline-flex items-center gap-1 font-label-sm text-label-sm text-emerald-800 font-semibold bg-emerald-50 px-2.5 py-0.5 rounded-full">
+<span class="material-symbols-outlined text-xs">verified</span>
+                  Completado • 14 Oct, 10:15 AM
+                </span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                Tu solicitud fue recibida exitosamente en nuestra mesa de partes digital con sello de tiempo institucional y código criptográfico de ingreso <code class="font-code-sm text-code-sm text-on-surface font-semibold bg-surface-container px-1 py-0.5 rounded">T-0982-HASH</code>.
+              </p>
+<div class="flex items-center gap-4 pt-1 font-label-sm text-label-sm text-on-surface-variant">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">drafts</span> Acuse de recibo generado</span>
+<span class="text-outline-variant">•</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">schedule</span> Tiempo de respuesta: 4 min</span>
+</div>
+</div>
+</div>
+<!-- NODO 2: Validación de Identidad y Poderes (COMPLETADO) -->
+<div class="relative flex items-start gap-4 sm:gap-6 group">
+<div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0 ring-4 ring-surface-container-lowest z-10 shadow-sm">
+<span class="material-symbols-outlined text-xl">check</span>
+</div>
+<div class="flex-1 bg-surface-container-low/70 hover:bg-surface-container-low p-5 rounded-xl transition-all space-y-2">
+<div class="flex flex-wrap items-center justify-between gap-2">
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold">2. Validación de Identidad y Poderes</span>
+<span class="inline-flex items-center gap-1 font-label-sm text-label-sm text-emerald-800 font-semibold bg-emerald-50 px-2.5 py-0.5 rounded-full">
+<span class="material-symbols-outlined text-xs">verified</span>
+                  Completado • 16 Oct, 02:40 PM
+                </span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                Verificamos tu representación legal en línea de forma automática conectando con los servicios interoperables de RENIEC y SUNARP (Partida Registral Electrónica N° 11492039).
+              </p>
+<div class="flex items-center gap-2 pt-1 font-label-sm text-label-sm text-on-surface-variant">
+<span class="inline-flex items-center gap-1 bg-surface-container px-2 py-0.5 rounded text-xs">
+<span class="material-symbols-outlined text-xs text-secondary">sync_alt</span>
+                  Interoperabilidad Gov-ID Exitosa
+                </span>
+</div>
+</div>
+</div>
+<!-- NODO 3: Cotejo Técnico y Jurídico (ACTUAL / REQUIERE ACCIÓN) -->
+<div class="relative flex items-start gap-4 sm:gap-6 group">
+<div class="w-10 h-10 rounded-full bg-amber-500 text-white flex items-center justify-center shrink-0 ring-4 ring-amber-100 z-10 shadow-md animate-bounce">
+<span class="material-symbols-outlined text-xl">priority_high</span>
+</div>
+<div class="flex-1 bg-amber-50/60 p-5 rounded-xl space-y-3 shadow-sm">
+<div class="flex flex-wrap items-center justify-between gap-2">
+<div>
+<span class="font-headline-sm text-headline-sm text-amber-950 font-bold">3. Cotejo Técnico y Jurídico</span>
+<span class="block font-label-sm text-label-sm text-amber-800 mt-0.5 font-medium">Fase en desarrollo activo (Revisión de Recaudos)</span>
+</div>
+<span class="inline-flex items-center gap-1.5 font-label-sm text-label-sm text-amber-900 font-bold bg-amber-200/80 px-3 py-1 rounded-full">
+<span class="material-symbols-outlined text-sm">error</span>
+                  Requiere tu atención • 24 Octubre
+                </span>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-lg space-y-2">
+<span class="font-label-md text-label-md text-on-surface font-semibold flex items-center gap-1.5">
+<span class="material-symbols-outlined text-secondary text-base">visibility</span>
+                  ¿Qué ocurre tras bambalinas en este momento?
+                </span>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                  El equipo de la Subgerencia revisó tu carpeta completa. <strong class="text-on-surface">Ya aprobaron 3 de 4 recaudos presentados</strong> (DNI del representante, memoria técnica y pago de arancel). Solo falta corregir el comprobante de domicilio para emitir el dictamen favorable y derivar al inspector.
+                </p>
+</div>
+<div class="flex flex-wrap items-center gap-3 pt-1">
+<button class="px-4 py-2 rounded-lg bg-secondary text-white font-label-md text-label-md font-semibold hover:bg-secondary-container transition-colors shadow-sm flex items-center gap-1.5" onclick="document.getElementById('upload-modal').classList.remove('hidden')">
+<span class="material-symbols-outlined text-sm">upload_file</span>
+                  Subir Comprobante Actualizado
+                </button>
+<span class="font-body-sm text-body-sm text-amber-900 font-medium">El trámite se reanudará en menos de 2 horas tras subirlo.</span>
+</div>
+</div>
+</div>
+<!-- NODO 4: Inspección Técnica ITSE o Cita Presencial (PROGRAMADO) -->
+<div class="relative flex items-start gap-4 sm:gap-6 group">
+<div class="w-10 h-10 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center shrink-0 ring-4 ring-surface-container-lowest z-10 shadow-sm">
+<span class="material-symbols-outlined text-xl">event_available</span>
+</div>
+<div class="flex-1 bg-surface-container-low/40 p-5 rounded-xl space-y-2">
+<div class="flex flex-wrap items-center justify-between gap-2">
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold">4. Inspección Técnica ITSE o Cita Presencial</span>
+<span class="inline-flex items-center gap-1 font-label-sm text-label-sm text-secondary font-semibold bg-surface-container px-2.5 py-0.5 rounded-full">
+<span class="material-symbols-outlined text-xs">calendar_today</span>
+                  Programado • 30 Oct, 10:30 AM
+                </span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                Tu cita técnica ya está pre-reservada en los calendarios municipales para inspección de seguridad en local comercial. Lugar: <span class="font-semibold text-on-surface">Ventanilla 08 / Módulo Central de Fiscalización</span> (o visita en campo según aforo).
+              </p>
+<div class="flex items-center gap-2 font-label-sm text-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-sm">pin_drop</span>
+<span>Av. Los Libertadores 1420, Sede Central</span>
+</div>
+</div>
+</div>
+<!-- NODO 5: Emisión de Licencia y Resolución Digital (PENDIENTE FINAL) -->
+<div class="relative flex items-start gap-4 sm:gap-6 group">
+<div class="w-10 h-10 rounded-full bg-surface-container text-outline-variant flex items-center justify-center shrink-0 ring-4 ring-surface-container-lowest z-10">
+<span class="material-symbols-outlined text-xl">verified_user</span>
+</div>
+<div class="flex-1 bg-surface-container-low/20 p-5 rounded-xl space-y-2">
+<div class="flex flex-wrap items-center justify-between gap-2">
+<span class="font-headline-sm text-headline-sm text-on-surface-variant font-medium">5. Emisión de Licencia y Resolución Digital</span>
+<span class="inline-flex items-center gap-1 font-label-sm text-label-sm text-on-surface-variant bg-surface-container px-2.5 py-0.5 rounded-full">
+                  Pendiente de etapas previas
+                </span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                Una vez completada y suscrita el acta de inspección, tu licencia definitiva con código QR institucional y firma electrónica avanzada se depositará en tu Casilla Electrónica lista para descargar e imprimir.
+              </p>
+</div>
+</div>
+</div>
+</section>
+<!-- 4. Panel Lateral: Documentos y Soporte Asistido -->
+<aside class="lg:col-span-4 space-y-6">
+<!-- Recaudos y Documentos -->
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-sm space-y-5" id="documentos-panel">
+<div class="flex items-center justify-between">
+<h3 class="font-headline-sm text-headline-sm text-primary font-bold">Recaudos del Trámite</h3>
+<span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container px-2 py-0.5 rounded font-semibold">4 recaudos</span>
+</div>
+<ul class="space-y-3">
+<!-- Doc 1: DNI -->
+<li class="flex items-center justify-between p-3 rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-3 min-w-0">
+<span class="material-symbols-outlined text-emerald-700 shrink-0">check_circle</span>
+<div class="min-w-0">
+<span class="font-label-md text-label-md text-on-surface font-medium block truncate">DNI Representante Legal</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant text-xs">Validado con RENIEC</span>
+</div>
+</div>
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-emerald-100 text-emerald-800 shrink-0">
+                Aprobado
+              </span>
+</li>
+<!-- Doc 2: Comprobante Domicilio (OBSERVADO) -->
+<li class="flex items-center justify-between p-3 rounded-lg bg-amber-50 ring-1 ring-amber-300 transition-colors">
+<div class="flex items-center gap-3 min-w-0">
+<span class="material-symbols-outlined text-amber-700 shrink-0">error</span>
+<div class="min-w-0">
+<span class="font-label-md text-label-md text-amber-950 font-semibold block truncate">Comprobante de Domicilio</span>
+<span class="font-body-sm text-body-sm text-amber-900 text-xs">Sello ilegible en esquina</span>
+</div>
+</div>
+<button class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-amber-900 hover:bg-amber-950 text-white font-label-sm text-label-sm font-semibold shrink-0 transition-colors shadow-sm" onclick="document.getElementById('upload-modal').classList.remove('hidden')">
+<span>Subir</span>
+<span class="material-symbols-outlined text-xs">arrow_upward</span>
+</button>
+</li>
+<!-- Doc 3: Memoria Técnica -->
+<li class="flex items-center justify-between p-3 rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-3 min-w-0">
+<span class="material-symbols-outlined text-emerald-700 shrink-0">check_circle</span>
+<div class="min-w-0">
+<span class="font-label-md text-label-md text-on-surface font-medium block truncate">Memoria Técnica y Planos</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant text-xs">Colegiatura CIP N° 78129</span>
+</div>
+</div>
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-emerald-100 text-emerald-800 shrink-0">
+                Aprobado
+              </span>
+</li>
+<!-- Doc 4: Tasa Bancaria -->
+<li class="flex items-center justify-between p-3 rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-3 min-w-0">
+<span class="material-symbols-outlined text-emerald-700 shrink-0">check_circle</span>
+<div class="min-w-0">
+<span class="font-label-md text-label-md text-on-surface font-medium block truncate">Comprobante de Pago Arancel</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant text-xs">Operación BN N° 4492-23</span>
+</div>
+</div>
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-emerald-100 text-emerald-800 shrink-0">
+                Validada
+              </span>
+</li>
+</ul>
+<div class="pt-2">
+<a class="inline-flex items-center gap-1.5 font-label-md text-label-md text-secondary hover:underline" href="#">
+<span class="material-symbols-outlined text-base">folder_zip</span>
+<span>Descargar expediente comprimido (.ZIP)</span>
+</a>
+</div>
+</div>
+<!-- Bloque de Asistencia Humana & Empática -->
+<div class="bg-surface-container p-6 rounded-xl space-y-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-secondary text-white flex items-center justify-center font-bold">
+<span class="material-symbols-outlined text-xl">support_agent</span>
+</div>
+<div>
+<h4 class="font-headline-sm text-headline-sm text-primary font-bold">¿Dudas con la observación?</h4>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Estamos aquí para ayudarte a resolver</span>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+            No te preocupes: nuestro equipo orientador puede revisar tu archivo antes de que lo reenvíes para asegurarte de que cumpla con el estándar a la primera.
+          </p>
+<div class="space-y-2.5 pt-1">
+<button class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-secondary hover:bg-secondary-container text-white font-label-md text-label-md font-semibold transition-all shadow-sm" onclick="document.getElementById('chat-modal').classList.remove('hidden')">
+<span class="material-symbols-outlined text-base">forum</span>
+<span>Iniciar chat de ayuda en vivo</span>
+</button>
+<button class="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-surface-container-lowest hover:bg-surface-container-high text-on-surface font-label-md text-label-md font-medium transition-colors" onclick="alert('Solicitud enviada: Un orientador se comunicará al teléfono registrado en los próximos 15 minutos.');">
+<span class="material-symbols-outlined text-base">call</span>
+<span>Pedir llamada telefónica (5 min)</span>
+</button>
+</div>
+<div class="flex items-center gap-2 pt-2 text-on-surface-variant font-label-sm text-label-sm">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+<span>3 asesores telemáticos disponibles ahora</span>
+</div>
+</div>
+<!-- Módulo de Resumen de Inspectoría / Locación -->
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm space-y-3">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Ubicación del Establecimiento</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">Zonificación CZ</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            Jr. Las Camelias 450, Urb. Jardines del Norte, Distrito Central.
+          </p>
+<div class="w-full h-36 bg-cover bg-center rounded-lg shadow-inner relative overflow-hidden" data-location="Lima, Peru" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAyrJS5ahQIbaT6hHCcqGSvncsLQ--oqcPLUlQ1nbPkeov1E9TTFV86cgmwoMG--BMfAN2JCKqzn3g1LCpOwBl8KewzTmmd4ZS21SxEFnfTKJN7O9M028xxtvZ6Bbr9EpqsCdvAkXJiOjtL_H5DcADJAkHgjpC2G4oxj_RbZcbvPESISjpQX4xfp0UmJ4FdbXuXh5RzE9CCP1j4q2Rez_b-3rJF2zdO0zkGUn0XQG87')">
+<div class="absolute bottom-2 left-2 px-2.5 py-1 rounded bg-inverse-surface/90 text-inverse-on-surface font-label-sm text-label-sm backdrop-blur flex items-center gap-1">
+<span class="material-symbols-outlined text-xs text-secondary">location_on</span>
+              Sector Urbano 04
+            </div>
+</div>
+</div>
+</aside>
+</div>
+</div>
+<!-- Modal de Corrección de Documento (Subsanación Inmediata) -->
+<div class="fixed inset-0 z-50 bg-primary/40 backdrop-blur-sm flex items-center justify-center p-4 hidden" id="upload-modal">
+<div class="bg-surface-container-lowest rounded-xl max-w-lg w-full p-6 shadow-2xl space-y-6">
+<div class="flex items-start justify-between gap-4">
+<div>
+<span class="font-label-sm text-label-sm text-secondary font-bold uppercase">Subsanación Rápida</span>
+<h3 class="font-headline-sm text-headline-sm text-primary font-bold">Adjuntar Comprobante de Domicilio</h3>
+</div>
+<button class="p-1 rounded-lg text-on-surface-variant hover:bg-surface-container" onclick="document.getElementById('upload-modal').classList.add('hidden')">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="bg-amber-50 p-3.5 rounded-lg font-body-sm text-body-sm text-amber-950 flex items-start gap-2.5">
+<span class="material-symbols-outlined text-amber-700 shrink-0 mt-0.5">info</span>
+<span>Asegúrate de que el recibo (agua, luz o telefonía fija) no tenga más de 60 días de antigüedad y sea legible el número de suministro y dirección completa.</span>
+</div>
+<!-- Drag & Drop Zone -->
+<div class="border-2 border-dashed border-outline-variant hover:border-secondary rounded-xl p-8 text-center bg-surface-container-low hover:bg-surface-container transition-colors cursor-pointer group">
+<div class="w-12 h-12 rounded-full bg-surface-container-highest group-hover:bg-secondary-fixed text-secondary flex items-center justify-center mx-auto mb-3">
+<span class="material-symbols-outlined text-2xl">upload</span>
+</div>
+<p class="font-label-md text-label-md text-on-surface font-semibold">Haz clic para seleccionar o arrastra tu archivo</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">PDF, JPG o PNG de alta resolución (Máx. 15 MB)</p>
+</div>
+<div class="flex items-center justify-end gap-3 pt-2">
+<button class="px-4 py-2 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md transition-colors" onclick="document.getElementById('upload-modal').classList.add('hidden')">
+          Cancelar
+        </button>
+<button class="px-5 py-2 rounded-lg bg-secondary text-white font-label-md text-label-md font-semibold hover:bg-secondary-container transition-colors shadow-sm" onclick="alert('Documento cargado exitosamente. La mesa técnica reanudará la validación.'); document.getElementById('upload-modal').classList.add('hidden');">
+          Confirmar y Enviar a Revisión
+        </button>
+</div>
+</div>
+</div>
+<!-- Modal de Chat Asistido en Vivo -->
+<div class="fixed inset-0 z-50 bg-primary/40 backdrop-blur-sm flex items-center justify-center p-4 hidden" id="chat-modal">
+<div class="bg-surface-container-lowest rounded-xl max-w-md w-full shadow-2xl overflow-hidden flex flex-col h-[520px]">
+<!-- Chat Header -->
+<div class="bg-primary p-4 text-on-primary flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-secondary flex items-center justify-center font-bold text-white text-sm">
+            AS
+          </div>
+<div>
+<h4 class="font-label-md text-label-md font-semibold leading-tight">Andrea Silva (Orientadora SETC)</h4>
+<span class="font-label-sm text-label-sm text-tertiary-fixed text-xs flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed inline-block"></span> En línea para asistirte
+            </span>
+</div>
+</div>
+<button class="p-1 rounded-lg text-on-primary/80 hover:bg-surface-container-highest/20" onclick="document.getElementById('chat-modal').classList.add('hidden')">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<!-- Chat Body -->
+<div class="flex-1 p-4 overflow-y-auto space-y-3 bg-surface-container-low font-body-sm text-body-sm">
+<div class="flex items-start gap-2.5">
+<div class="w-7 h-7 rounded-full bg-secondary text-white flex items-center justify-center text-xs shrink-0 font-bold">AS</div>
+<div class="bg-surface-container-lowest p-3 rounded-xl rounded-tl-none shadow-sm max-w-[85%] text-on-surface">
+            Hola Mariana, veo que estás consultando el Expediente <strong>SETC-2025-8841</strong>. ¿Necesitas orientación para el comprobante de domicilio observado?
+          </div>
+</div>
+<div class="flex items-end justify-end gap-2.5">
+<div class="bg-secondary text-white p-3 rounded-xl rounded-tr-none shadow-sm max-w-[85%]">
+            Hola Andrea, sí. ¿Puedo adjuntar el recibo digital que descargo de la app de Luz del Sur en PDF o debe ser foto física?
+          </div>
+</div>
+<div class="flex items-start gap-2.5">
+<div class="w-7 h-7 rounded-full bg-secondary text-white flex items-center justify-center text-xs shrink-0 font-bold">AS</div>
+<div class="bg-surface-container-lowest p-3 rounded-xl rounded-tl-none shadow-sm max-w-[85%] text-on-surface">
+            ¡Totalmente válido! El PDF original de Luz del Sur es perfecto porque tiene el código QR nativo y no pierde nitidez. Súbelo directo en el botón ámbar.
+          </div>
+</div>
+</div>
+<!-- Chat Input -->
+<div class="p-3 bg-surface-container-lowest flex items-center gap-2">
+<input class="flex-1 px-3 py-2 rounded-lg bg-surface-container font-body-sm text-body-sm focus:outline-none focus:ring-2 focus:ring-secondary text-on-surface" placeholder="Escribe tu mensaje aquí..." type="text"/>
+<button class="p-2 rounded-lg bg-secondary text-white hover:bg-secondary-container transition-colors">
+<span class="material-symbols-outlined text-base">send</span>
+</button>
+</div>
+</div>
+</div>
+</div></main><footer class="w-full bg-surface-container-low mt-20"><div class="max-w-7xl mx-auto px-6 lg:px-12 py-12"><div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8"><div class="space-y-3"><div class="flex items-center gap-2"><span class="font-headline-sm text-headline-sm text-primary font-bold tracking-tight">SETC</span><span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-surface-container text-on-surface font-medium">Oficial</span></div><p class="font-body-sm text-body-sm text-on-surface-variant">Sistema Institucional de Gestión de Citas, Trámites y Expedientes Digitales. Plataforma interoperable del Gobierno Digital.</p></div><div><h4 class="font-label-md text-label-md text-on-surface font-semibold mb-3">Atención Ciudadana</h4><ul class="space-y-2 font-body-sm text-body-sm text-on-surface-variant"><li><a class="hover:text-on-surface transition-colors" href="#">Línea Directa 800-SETC-01</a></li><li><a class="hover:text-on-surface transition-colors" href="#">Mesa de Ayuda Telemática</a></li><li><a class="hover:text-on-surface transition-colors" href="#">Módulos Presenciales</a></li><li><a class="hover:text-on-surface transition-colors" href="#">Guía de Trámites y Requisitos</a></li></ul></div><div><h4 class="font-label-md text-label-md text-on-surface font-semibold mb-3">Normatividad y Transparencia</h4><ul class="space-y-2 font-body-sm text-body-sm text-on-surface-variant"><li><a class="hover:text-on-surface transition-colors" href="#">Aviso de Privacidad Integral</a></li><li><a class="hover:text-on-surface transition-colors" href="#">Términos de Servicio Gov-ID</a></li><li><a class="hover:text-on-surface transition-colors" href="#">Marco Jurídico de Actuación</a></li><li><a class="hover:text-on-surface transition-colors" href="#">Portal Nacional de Transparencia</a></li></ul></div><div><h4 class="font-label-md text-label-md text-on-surface font-semibold mb-3">Certificaciones</h4><div class="space-y-2 font-body-sm text-body-sm text-on-surface-variant"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-base text-secondary">verified_user</span><span>Encriptación Criptográfica SHA-256</span></div><div class="flex items-center gap-2"><span class="material-symbols-outlined text-base text-secondary">accessibility_new</span><span>Conformidad Accesibilidad WCAG 2.1 AA</span></div></div></div></div><div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 font-body-sm text-body-sm text-on-surface-variant"><p>© 2025 Sistema Estatal de Citas, Trámites y Expedientes (SETC). Todos los derechos reservados.</p><div class="flex items-center gap-6 font-label-sm text-label-sm"><a class="hover:text-on-surface transition-colors" href="#">Accesibilidad</a><a class="hover:text-on-surface transition-colors" href="#">Privacidad</a><a class="hover:text-on-surface transition-colors" href="#">Mapa del Sitio</a></div></div></div></footer></body></html>

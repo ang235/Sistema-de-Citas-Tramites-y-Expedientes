@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+
+<html lang="es"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Plus+Jakarta+Sans:wght@100..900&display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={"darkMode":"class","theme":{"extend":{"colors":{"inverse-surface":"#213145","on-tertiary":"#ffffff","primary-fixed":"#d4e3ff","on-secondary-fixed":"#00174b","on-primary":"#ffffff","secondary-container":"#316bf3","on-tertiary-fixed":"#002114","on-tertiary-fixed-variant":"#005137","on-secondary-fixed-variant":"#003ea8","on-surface-variant":"#44474d","surface-container-low":"#eff4ff","surface-container-high":"#dce9ff","secondary-fixed":"#dbe1ff","error-container":"#ffdad6","secondary-fixed-dim":"#b4c5ff","on-primary-fixed":"#021c39","surface-bright":"#f8f9ff","on-primary-container":"#798fb1","background":"#f8f9ff","on-background":"#0b1c30","error":"#ba1a1a","on-error":"#ffffff","tertiary-fixed":"#85f8c4","on-secondary-container":"#fefcff","surface":"#f8f9ff","primary":"#001229","secondary":"#0051d5","on-error-container":"#93000a","tertiary-fixed-dim":"#68dba9","outline":"#74777e","on-surface":"#0b1c30","on-tertiary-container":"#1fa072","on-primary-fixed-variant":"#324866","primary-fixed-dim":"#b2c8ed","surface-dim":"#cbdbf5","surface-container-highest":"#d3e4fe","surface-container":"#e5eeff","surface-container-lowest":"#ffffff","outline-variant":"#c4c6ce","inverse-primary":"#b2c8ed","inverse-on-surface":"#eaf1ff","surface-tint":"#4a5f7f","on-secondary":"#ffffff","primary-container":"#0f2744","surface-variant":"#d3e4fe","tertiary-container":"#002d1d","tertiary":"#00160c"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"space-lg":"1.5rem","gutter-sm":"1rem","margin":"2rem","space-md":"1rem","gutter":"1.5rem","space-xl":"2rem","space-xs":"0.25rem","space-sm":"0.5rem","margin-sm":"1rem"},"fontFamily":{"code-sm":["Inter"],"label-sm":["Inter"],"headline-xl":["Plus Jakarta Sans"],"headline-lg":["Plus Jakarta Sans"],"headline-xl-mobile":["Plus Jakarta Sans"],"body-sm":["Inter"],"label-md":["Inter"],"body-md":["Inter"],"body-lg":["Inter"],"headline-md":["Plus Jakarta Sans"],"headline-sm":["Plus Jakarta Sans"],"headline-lg-mobile":["Plus Jakarta Sans"]},"fontSize":{"code-sm":["13px",{"lineHeight":"18px","fontWeight":"500"}],"label-sm":["12px",{"lineHeight":"16px","fontWeight":"600"}],"headline-xl":["36px",{"lineHeight":"44px","fontWeight":"700"}],"headline-lg":["30px",{"lineHeight":"38px","fontWeight":"600"}],"headline-xl-mobile":["28px",{"lineHeight":"36px","fontWeight":"700"}],"body-sm":["14px",{"lineHeight":"20px","fontWeight":"400"}],"label-md":["14px",{"lineHeight":"20px","fontWeight":"500"}],"body-md":["16px",{"lineHeight":"24px","fontWeight":"400"}],"body-lg":["18px",{"lineHeight":"28px","fontWeight":"400"}],"headline-md":["22px",{"lineHeight":"28px","fontWeight":"600"}],"headline-sm":["18px",{"lineHeight":"24px","fontWeight":"600"}],"headline-lg-mobile":["24px",{"lineHeight":"32px","fontWeight":"600"}]}}}};</script></head><body class="bg-background font-body-md text-on-surface antialiased"><aside class="fixed left-0 top-0 h-full w-72 bg-primary-container z-50 flex flex-col shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-6 flex items-center justify-between bg-primary shrink-0"><div class="flex items-center gap-3"><img alt="SETC Portal Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UsFh0iBLpJECHGgFWUMEi4XQfxZ24TXd4lISUs6FdBtSbxBlkwCEe90wQN-FIdyc9TUssUAVXEaMa4jRH5sU1EaDlhNHUSVWSX6ufdHbVVAFS8mI0tIbt5jAqqEiZvP_ayNszEdF590RMIz047XlnirGUODEDOnva_V2YOeNLv_Aj5Mj9t0rxOoOAsQh8DrKkO04EXe7NuWWtnvjDIGD_BVRutZWKwRTgj232sS2sG"/><div class="flex flex-col"><span class="font-headline-sm text-headline-sm text-on-primary font-bold tracking-tight leading-none">SETC</span><span class="font-label-sm text-label-sm text-on-primary-container leading-tight">Módulo Operativo</span></div></div><span class="material-symbols-outlined text-on-primary-container text-lg cursor-pointer hover:text-on-primary transition-colors">dock_to_left</span></div><div class="px-4 py-3 bg-inverse-surface/40 mx-3 my-3 rounded-lg flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-tertiary-fixed"></span><span class="font-label-sm text-label-sm text-inverse-on-surface font-semibold">Auditoría Fiscal Activa</span></div><nav class="flex-1 px-3 space-y-1 overflow-y-auto" data-active-classes="bg-secondary-container text-on-secondary-container font-semibold rounded-lg"><a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-primary-container hover:bg-inverse-surface hover:text-on-primary transition-colors font-label-md text-label-md" data-path="panel-revisor" href="#"><span class="material-symbols-outlined text-lg">dashboard</span><span>Panel Revisor</span></a><a class="flex items-center justify-between px-3 py-2.5 rounded-lg text-on-primary-container hover:bg-inverse-surface hover:text-on-primary transition-colors font-label-md text-label-md" data-path="expedientes-en-cola" href="#"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-lg">folder_special</span><span>Expedientes en Cola</span></div><span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-secondary text-on-secondary font-bold">18</span></a><a aria-current="page" class="flex items-center gap-3 px-3 py-2.5 transition-colors bg-secondary-container text-on-secondary-container font-semibold rounded-lg" data-path="mesa-de-dictamen" href="#"><span class="material-symbols-outlined text-lg">gavel</span><span>Mesa de Dictamen</span></a><a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-primary-container hover:bg-inverse-surface hover:text-on-primary transition-colors font-label-md text-label-md" data-path="citas-y-agenda" href="#"><span class="material-symbols-outlined text-lg">calendar_today</span><span>Citas y Agenda</span></a><a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-primary-container hover:bg-inverse-surface hover:text-on-primary transition-colors font-label-md text-label-md" data-path="metricas-de-despacho" href="#"><span class="material-symbols-outlined text-lg">monitoring</span><span>Métricas de Despacho</span></a><a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-primary-container hover:bg-inverse-surface hover:text-on-primary transition-colors font-label-md text-label-md" data-path="configuracion" href="#"><span class="material-symbols-outlined text-lg">settings</span><span>Configuración</span></a></nav><div class="p-4 mx-3 mb-4 rounded-xl bg-inverse-surface/60 flex items-center justify-between"><div class="flex items-center gap-3 overflow-hidden"><img alt="Profile" class="w-8 h-8 rounded-full object-cover shrink-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZGJRrhlPogvmNGSbktezZIaAwZpLFEg-ebIsrqInz3lwswvl7xtxzPR-zVT830JnoDGQbLGgT3x0s6vtZ2IrsiPv3KYT8ZFz-FFzACf_PDwm_z5zV8sk7iiTdJle-a1NzueLjkgSls3hvKY-KeiHhJke8IvyPVKe5LV90jSW9mnjo2GWvWJC61OTJSe6L1UPcTvJgLFmJap-ub0gre4GlwJ0hUgz9KzDn-PtCrnkk"/><div class="min-w-0 flex flex-col"><span class="font-label-sm text-label-sm text-on-primary truncate font-semibold">Lic. Arturo Salas</span><span class="font-label-sm text-label-sm text-on-primary-container text-xs truncate">Dictaminador Sr.</span></div></div><span class="material-symbols-outlined text-on-primary-container hover:text-on-primary cursor-pointer text-lg">logout</span></div></aside><div class="pl-72"><header class="fixed top-0 left-72 right-0 z-40 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 w-full px-8 flex items-center justify-between gap-4"><div class="flex items-center gap-4 flex-1"><div class="flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm font-semibold"><span class="material-symbols-outlined text-sm text-secondary">lock</span><span>Conexión Encriptada Gov-ID</span></div><div class="relative max-w-sm w-full"><span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm pointer-events-none">manage_search</span><input class="w-full pl-9 pr-4 py-1.5 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-secondary transition-all" placeholder="Buscar por folio, RFC o expediente..." type="text"/></div></div><div class="flex items-center gap-3 shrink-0"><div class="hidden md:flex flex-col text-right font-label-sm text-label-sm"><span class="text-on-surface font-medium">Oficina Regional Metropolitana</span><span class="text-on-surface-variant font-code-sm text-code-sm">Sala Dictamen #04</span></div><div class="h-6 w-px bg-surface-container hidden md:block"></div><button class="relative p-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" type="button"><span class="material-symbols-outlined">notifications</span><span class="absolute top-1 right-1 px-1.5 py-0.2 rounded-full font-label-sm text-[10px] bg-secondary text-on-secondary font-bold">5</span></button><button class="p-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" type="button"><span class="material-symbols-outlined">help</span></button><img alt="Profile" class="w-8 h-8 rounded-full object-cover ml-1" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZGJRrhlPogvmNGSbktezZIaAwZpLFEg-ebIsrqInz3lwswvl7xtxzPR-zVT830JnoDGQbLGgT3x0s6vtZ2IrsiPv3KYT8ZFz-FFzACf_PDwm_z5zV8sk7iiTdJle-a1NzueLjkgSls3hvKY-KeiHhJke8IvyPVKe5LV90jSW9mnjo2GWvWJC61OTJSe6L1UPcTvJgLFmJap-ub0gre4GlwJ0hUgz9KzDn-PtCrnkk"/></div></div></header><main class="relative w-full pt-16 bg-background"><div class="flex flex-col w-full">
+<div class="px-8 py-5 bg-surface-container-lowest shadow-sm flex flex-col gap-4">
+<div class="flex flex-wrap items-center justify-between gap-4">
+<div class="flex flex-col gap-1">
+<nav class="flex items-center gap-2 font-label-sm text-label-sm text-on-surface-variant">
+<span>Operaciones</span>
+<span class="material-symbols-outlined text-xs">chevron_right</span>
+<span>Mesa de Dictamen</span>
+<span class="material-symbols-outlined text-xs">chevron_right</span>
+<span class="text-secondary font-semibold">Expediente Activo</span>
+</nav>
+<div class="flex items-center gap-3">
+<h1 class="font-headline-md text-headline-md text-on-surface tracking-tight">Mesa Técnica de Calificación y Dictamen</h1>
+<span class="px-2.5 py-0.5 rounded-full bg-surface-container-high text-on-surface font-label-sm text-label-sm">Sala V-04</span>
+</div>
+</div>
+<div class="flex items-center gap-4 bg-surface-container-low px-4 py-2 rounded-xl">
+<div class="relative flex items-center justify-center">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-secondary animate-ping absolute opacity-75"></span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">Revisor Jurídico L2: Ing. Carlos Ruiz</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">Turno Ordinario • Ventanilla Digital Metropolitana</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-3 pt-1">
+<div class="flex items-center gap-3 p-3 bg-surface-container-low rounded-xl">
+<div class="p-2 rounded-lg bg-surface-container-highest text-secondary flex items-center justify-center">
+<span class="material-symbols-outlined text-base">assignment</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold leading-none">12</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Expedientes asignados</span>
+</div>
+</div>
+<div class="flex items-center gap-3 p-3 bg-surface-container-low rounded-xl">
+<div class="p-2 rounded-lg bg-surface-container-highest text-on-tertiary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-base">check_circle</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold leading-none">8</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Revisados hoy</span>
+</div>
+</div>
+<div class="flex items-center gap-3 p-3 bg-surface-container-low rounded-xl">
+<div class="p-2 rounded-lg bg-surface-container-highest text-secondary flex items-center justify-center">
+<span class="material-symbols-outlined text-base">sync_problem</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold leading-none">3</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">En subsanación</span>
+</div>
+</div>
+<div class="flex items-center gap-3 p-3 bg-surface-container-low rounded-xl">
+<div class="p-2 rounded-lg bg-surface-container-highest text-error flex items-center justify-center">
+<span class="material-symbols-outlined text-base">timer</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold leading-none">1</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Prioritario SLA < 4h</span>
+</div>
+</div>
+</div>
+<div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+<div class="flex items-center gap-2 overflow-x-auto">
+<span class="font-label-sm text-label-sm text-on-surface-variant mr-1">Filtros:</span>
+<button class="px-3 py-1.5 rounded-full bg-error-container text-on-error-container font-label-sm text-label-sm font-semibold flex items-center gap-1.5" type="button">
+<span class="w-2 h-2 rounded-full bg-error"></span>
+<span>Crítico (1)</span>
+</button>
+<button class="px-3 py-1.5 rounded-full bg-surface-container-high text-on-surface font-label-sm text-label-sm flex items-center gap-1.5 hover:bg-surface-container-highest transition-colors" type="button">
+<span class="w-2 h-2 rounded-full bg-secondary-container"></span>
+<span>Ámbar SLA (2)</span>
+</button>
+<button class="px-3 py-1.5 rounded-full bg-surface-container-high text-on-surface font-label-sm text-label-sm flex items-center gap-1.5 hover:bg-surface-container-highest transition-colors" type="button">
+<span class="w-2 h-2 rounded-full bg-on-tertiary-container"></span>
+<span>Tiempo Óptimo (9)</span>
+</button>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-2 bg-surface-container-low px-3 py-1.5 rounded-lg">
+<span class="material-symbols-outlined text-base text-on-surface-variant">category</span>
+<select aria-label="Filtrar por tipo de trámite" class="bg-transparent font-label-sm text-label-sm text-on-surface focus:outline-none cursor-pointer">
+<option>Todos los trámites</option>
+<option>Licencia Comercial Tipo A</option>
+<option>Habilitación Urbana</option>
+<option>Inspección ITSE</option>
+</select>
+</div>
+<div class="flex items-center gap-2 bg-surface-container-low px-3 py-1.5 rounded-lg">
+<span class="material-symbols-outlined text-base text-on-surface-variant">calendar_month</span>
+<span class="font-label-sm text-label-sm text-on-surface">Radicación: Hoy (24 Mar)</span>
+</div>
+</div>
+</div>
+</div>
+<div class="px-8 py-6 grid grid-cols-12 gap-6 items-start">
+<section class="col-span-12 xl:col-span-4 flex flex-col gap-4">
+<div class="p-4 bg-surface-container-lowest rounded-xl shadow-sm flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Expedientes en Cola</h2>
+<span class="px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface font-code-sm text-code-sm font-semibold">4 visibles</span>
+</div>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-base pointer-events-none">search</span>
+<input class="w-full pl-9 pr-3 py-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:bg-surface-container-lowest shadow-sm transition-all" placeholder="Buscar expediente, razón social o RUC..." type="text"/>
+</div>
+</div>
+<div class="flex flex-col gap-3">
+<div class="p-4 bg-surface-container-lowest rounded-xl shadow-md transition-all cursor-pointer relative overflow-hidden flex flex-col gap-3">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-error"></div>
+<div class="flex items-start justify-between gap-2 pl-1">
+<div class="flex flex-col">
+<span class="font-code-sm text-code-sm text-secondary font-bold">SETC-2025-8841</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold leading-tight">Mendoza & Asociados S.A.C.</h3>
+<span class="font-body-sm text-body-sm text-on-surface-variant">RUC: 20491823901 • Licencia Comercial Tipo A</span>
+</div>
+<span class="px-2.5 py-1 rounded-full bg-error-container text-on-error-container font-label-sm text-label-sm font-bold shrink-0 flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">alarm</span>
+              3h 15m
+            </span>
+</div>
+<div class="grid grid-cols-2 gap-2 bg-surface-container-low p-2.5 rounded-lg text-left">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Precalif. PIDE</span>
+<span class="font-label-md text-label-md text-on-surface font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-sm text-on-tertiary-container">verified</span>
+                SUNAT OK
+              </span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Compatibilidad</span>
+<span class="font-label-md text-label-md text-secondary font-bold">95% Documental</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-1">
+<span class="px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface font-label-sm text-label-sm font-semibold">En Revisión Activa</span>
+<div class="flex items-center gap-1 text-secondary font-label-sm text-label-sm font-semibold">
+<span>Examinando</span>
+<span class="material-symbols-outlined text-sm">arrow_forward</span>
+</div>
+</div>
+</div>
+<div class="p-4 bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col gap-3 relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-secondary-container"></div>
+<div class="flex items-start justify-between gap-2 pl-1">
+<div class="flex flex-col">
+<span class="font-code-sm text-code-sm text-on-surface-variant">SETC-2025-9921</span>
+<h3 class="font-label-md text-label-md text-on-surface font-bold leading-tight">Consorcio Inmobiliario Lima Sur</h3>
+<span class="font-body-sm text-body-sm text-on-surface-variant">RUC: 20601928371 • Habilitación Urbana</span>
+</div>
+<span class="px-2.5 py-1 rounded-full bg-surface-container-high text-on-surface font-label-sm text-label-sm font-semibold shrink-0 flex items-center gap-1">
+<span class="material-symbols-outlined text-xs text-secondary">schedule</span>
+              5h 40m
+            </span>
+</div>
+<div class="grid grid-cols-2 gap-2 bg-surface-container-low p-2 rounded-lg">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">PIDE / RENIEC</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold">Validado</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Compatibilidad</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold">88%</span>
+</div>
+</div>
+</div>
+<div class="p-4 bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col gap-3 relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-on-tertiary-container"></div>
+<div class="flex items-start justify-between gap-2 pl-1">
+<div class="flex flex-col">
+<span class="font-code-sm text-code-sm text-on-surface-variant">SETC-2025-9904</span>
+<h3 class="font-label-md text-label-md text-on-surface font-bold leading-tight">Boticas del Centro E.I.R.L.</h3>
+<span class="font-body-sm text-body-sm text-on-surface-variant">RUC: 20112349018 • Licencia Tipo B</span>
+</div>
+<span class="px-2.5 py-1 rounded-full bg-surface-container-high text-on-surface font-label-sm text-label-sm font-semibold shrink-0">
+              24h Restantes
+            </span>
+</div>
+<div class="grid grid-cols-2 gap-2 bg-surface-container-low p-2 rounded-lg">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">PIDE / SUNARP</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold">Copia Literal OK</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Compatibilidad</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold">98%</span>
+</div>
+</div>
+</div>
+<div class="p-4 bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col gap-3 relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-on-tertiary-container"></div>
+<div class="flex items-start justify-between gap-2 pl-1">
+<div class="flex flex-col">
+<span class="font-code-sm text-code-sm text-on-surface-variant">SETC-2025-9892</span>
+<h3 class="font-label-md text-label-md text-on-surface font-bold leading-tight">Transportes TransPac S.A.</h3>
+<span class="font-body-sm text-body-sm text-on-surface-variant">RUC: 20556218902 • Almacén Central</span>
+</div>
+<span class="px-2.5 py-1 rounded-full bg-surface-container-high text-on-surface font-label-sm text-label-sm font-semibold shrink-0">
+              28h Restantes
+            </span>
+</div>
+<div class="grid grid-cols-2 gap-2 bg-surface-container-low p-2 rounded-lg">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Plano Catastral</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold">Georeferenciado</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Compatibilidad</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold">92%</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="col-span-12 xl:col-span-8 flex flex-col gap-5">
+<div class="p-5 bg-surface-container-lowest rounded-xl shadow-sm flex flex-col gap-4">
+<div class="flex flex-wrap items-center justify-between gap-3 bg-surface-container-low p-2 rounded-xl">
+<div class="flex items-center gap-1 overflow-x-auto">
+<button class="px-3.5 py-2 rounded-lg bg-surface-container-lowest text-secondary font-label-md text-label-md font-bold shadow-sm flex items-center gap-2" type="button">
+<span class="material-symbols-outlined text-sm">verified_user</span>
+<span>Comprobante Domicilio</span>
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+</button>
+<button class="px-3.5 py-2 rounded-lg text-on-surface-variant hover:text-on-surface font-label-md text-label-md flex items-center gap-2 transition-colors" type="button">
+<span class="material-symbols-outlined text-sm">badge</span>
+<span>DNI Representante</span>
+</button>
+<button class="px-3.5 py-2 rounded-lg text-on-surface-variant hover:text-on-surface font-label-md text-label-md flex items-center gap-2 transition-colors" type="button">
+<span class="material-symbols-outlined text-sm">architecture</span>
+<span>Plano ITSE</span>
+</button>
+<button class="px-3.5 py-2 rounded-lg text-on-surface-variant hover:text-on-surface font-label-md text-label-md flex items-center gap-2 transition-colors" type="button">
+<span class="material-symbols-outlined text-sm">receipt_long</span>
+<span>Voucher de Pago</span>
+</button>
+</div>
+<div class="flex items-center gap-1 px-2">
+<button aria-label="Acercar documento" class="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface" type="button">
+<span class="material-symbols-outlined text-base">zoom_in</span>
+</button>
+<button aria-label="Alejar documento" class="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface" type="button">
+<span class="material-symbols-outlined text-base">zoom_out</span>
+</button>
+<button aria-label="Rotar a la derecha" class="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface" type="button">
+<span class="material-symbols-outlined text-base">rotate_right</span>
+</button>
+<button aria-label="Ver en pantalla completa" class="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface" type="button">
+<span class="material-symbols-outlined text-base">fullscreen</span>
+</button>
+<div class="h-4 w-px bg-outline-variant mx-1"></div>
+<button aria-label="Herramienta lápiz" class="p-1.5 rounded-lg bg-surface-container-high text-secondary" type="button">
+<span class="material-symbols-outlined text-base">edit</span>
+</button>
+<button aria-label="Añadir nota de observación" class="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface" type="button">
+<span class="material-symbols-outlined text-base">sticky_note_2</span>
+</button>
+<button aria-label="Regla técnica" class="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface" type="button">
+<span class="material-symbols-outlined text-base">straighten</span>
+</button>
+</div>
+</div>
+<div class="relative w-full h-[460px] bg-surface-container-low rounded-xl overflow-hidden flex items-center justify-center p-6">
+<div class="relative w-full max-w-xl h-full bg-surface-container-lowest rounded-lg shadow-md p-8 flex flex-col justify-between overflow-hidden">
+<div class="flex items-center justify-between pb-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-primary-container text-on-primary flex items-center justify-center font-bold">
+                  SETC
+                </div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface font-bold uppercase tracking-wider">Constancia de Domicilio Fiscal</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">Expediente: SETC-2025-8841-DOC01</span>
+</div>
+</div>
+<span class="px-2 py-1 rounded bg-surface-container text-on-surface font-code-sm text-code-sm">Página 1 / 1</span>
+</div>
+<div class="space-y-4 my-auto">
+<div class="h-3 bg-surface-container rounded w-3/4"></div>
+<div class="h-3 bg-surface-container rounded w-full"></div>
+<div class="h-3 bg-surface-container rounded w-5/6"></div>
+<div class="p-4 bg-surface-container-low rounded-lg space-y-2">
+<div class="flex justify-between font-label-sm text-label-sm">
+<span class="text-on-surface-variant">Titular Catastral:</span>
+<span class="text-on-surface font-bold">Mendoza & Asociados S.A.C.</span>
+</div>
+<div class="flex justify-between font-label-sm text-label-sm">
+<span class="text-on-surface-variant">Dirección Declarada:</span>
+<span class="text-on-surface font-semibold">Av. El Sol 450, Interior 3B, Surco</span>
+</div>
+<div class="flex justify-between font-label-sm text-label-sm">
+<span class="text-on-surface-variant">Zonificación:</span>
+<span class="text-on-surface font-semibold">Comercio Vecinal (CV-Z3)</span>
+</div>
+</div>
+<div class="h-3 bg-surface-container rounded w-2/3"></div>
+</div>
+<div class="relative mt-4 pt-4 flex items-end justify-between">
+<div class="flex flex-col gap-1">
+<span class="font-code-sm text-code-sm text-on-surface-variant">Huella Criptográfica SHA-256</span>
+<span class="font-code-sm text-code-sm text-on-surface font-mono">e8a9...4b12_VALIDATED</span>
+</div>
+<div class="relative p-3 bg-surface-container-high rounded-lg flex flex-col items-center">
+<span class="material-symbols-outlined text-secondary text-2xl">verified</span>
+<span class="font-label-sm text-label-sm text-on-surface font-bold">Sello Notarial</span>
+<div class="absolute -top-12 -right-4 bg-surface-container-lowest p-2.5 rounded-lg shadow-lg flex items-center gap-2 z-10">
+<span class="material-symbols-outlined text-secondary text-base">priority_high</span>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface font-bold leading-none">Anotación Técnica</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">Sello con bajo contraste en margen inf.</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="p-6 bg-surface-container-lowest rounded-xl shadow-sm flex flex-col gap-5">
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">Consola de Dictamen y Notificación Directa</h2>
+<span class="font-body-sm text-body-sm text-on-surface-variant">La decisión generará una cédula formal y un mensaje accesible en el buzón ciudadano.</span>
+</div>
+<span class="px-3 py-1 rounded-full bg-surface-container-high text-on-surface font-label-sm text-label-sm font-semibold">
+            Paso 3 de 3: Pronunciamiento
+          </span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+<button class="p-3.5 rounded-xl bg-surface-container-low text-left flex items-start gap-3 hover:bg-surface-container transition-all" id="btn-favorable" onclick="selectDecision('favorable')" type="button">
+<span class="material-symbols-outlined text-on-tertiary-container text-xl mt-0.5">check_circle</span>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-bold">Dictamen Favorable</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant text-xs">Cumple requisitos y normativa</span>
+</div>
+</button>
+<button class="p-3.5 rounded-xl bg-surface-container-high text-left flex items-start gap-3 shadow-sm transition-all" id="btn-correccion" onclick="selectDecision('correccion')" type="button">
+<span class="material-symbols-outlined text-secondary text-xl mt-0.5">rule</span>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-bold">Solicitar Subsanación</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant text-xs">Requiere aclarar o reemplazar</span>
+</div>
+</button>
+<button class="p-3.5 rounded-xl bg-surface-container-low text-left flex items-start gap-3 hover:bg-surface-container transition-all" id="btn-rechazo" onclick="selectDecision('rechazo')" type="button">
+<span class="material-symbols-outlined text-error text-xl mt-0.5">cancel</span>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-bold">Observar con Rechazo</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant text-xs">Incumplimiento irrecuperable</span>
+</div>
+</button>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+<div class="flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<label class="font-label-sm text-label-sm text-on-surface font-bold" for="dictamen-editor">Mensaje Empático al Administrado</label>
+<span class="font-label-sm text-label-sm text-secondary font-semibold cursor-pointer">Cargar plantilla de cortesía</span>
+</div>
+<textarea class="w-full p-3.5 bg-surface-container-low rounded-xl font-body-sm text-body-sm text-on-surface focus:outline-none focus:bg-surface-container-lowest shadow-sm resize-none leading-relaxed" id="dictamen-editor" rows="5">Estimado administrado de Mendoza & Asociados: 
+Al revisar su "Comprobante de Domicilio", advertimos que el sello notarial inferior presenta baja legibilidad. Para evitar demoras en su licencia definitiva, por favor adjunte una copia escaneada nítida o fotografía con luz directa antes del 26 de marzo. ¡Estamos para apoyarle en su trámite!</textarea>
+<span class="font-code-sm text-code-sm text-on-surface-variant">Variables activas: [Nombre_Empresa], [Documento_Faltante], [Fecha_Limite]</span>
+</div>
+<div class="flex flex-col gap-2">
+<span class="font-label-sm text-label-sm text-on-surface font-bold">Vista Previa Móvil del Administrado</span>
+<div class="h-full bg-surface-container-low p-4 rounded-xl flex flex-col justify-between">
+<div class="flex items-center gap-3 pb-3">
+<div class="w-7 h-7 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-bold text-xs">
+                  S
+                </div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface font-bold">Notificación Municipal SETC</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">Buzón Electrónico Oficial</span>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant italic leading-normal bg-surface-container-lowest p-3 rounded-lg shadow-sm">
+                “Estimado administrado: Advertimos que el sello notarial inferior presenta baja legibilidad. Por favor adjunte una copia nítida...”
+              </p>
+<div class="flex items-center justify-between pt-2">
+<span class="font-label-sm text-label-sm text-secondary font-semibold">Botón en app: [Subir Subsanación]</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">Plazo: 48 horas</span>
+</div>
+</div>
+</div>
+</div>
+<div class="flex flex-wrap items-center justify-between gap-3 pt-3">
+<div class="flex items-center gap-2">
+<button class="px-4 py-2.5 rounded-lg bg-surface-container-low text-on-surface hover:bg-surface-container font-label-md text-label-md font-semibold transition-colors flex items-center gap-2" type="button">
+<span class="material-symbols-outlined text-base">save</span>
+<span>Guardar Borrador</span>
+</button>
+<button class="px-4 py-2.5 rounded-lg bg-surface-container-low text-on-surface-variant hover:text-on-surface font-label-md text-label-md transition-colors" type="button">
+              Historial de Revisiones
+            </button>
+</div>
+<div class="flex items-center gap-3">
+<button class="px-6 py-2.5 rounded-lg bg-secondary-container text-on-secondary-container hover:bg-secondary font-label-md text-label-md font-bold transition-all shadow-md flex items-center gap-2" type="button">
+<span class="material-symbols-outlined text-base">verified</span>
+<span>Firmar y Notificar Resolución (PKI / FIDO2)</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+<script>
+  function selectDecision(tipo) {
+    const btnF = document.getElementById('btn-favorable');
+    const btnC = document.getElementById('btn-correccion');
+    const btnR = document.getElementById('btn-rechazo');
+    const editor = document.getElementById('dictamen-editor');
+
+    [btnF, btnC, btnR].forEach(b => {
+      b.classList.remove('bg-surface-container-high', 'shadow-sm');
+      b.classList.add('bg-surface-container-low');
+    });
+
+    if (tipo === 'favorable') {
+      btnF.classList.remove('bg-surface-container-low');
+      btnF.classList.add('bg-surface-container-high', 'shadow-sm');
+      editor.value = "Estimado titular de Mendoza & Asociados S.A.C.:\nNos complace informarle que la evaluación técnica ha concluido satisfactoriamente. Su solicitud cumple plenamente con la normativa comercial vigente. Su certificado de Licencia Comercial Tipo A ha sido firmado digitalmente y se encuentra adjunto para descarga inmediata.";
+    } else if (tipo === 'correccion') {
+      btnC.classList.remove('bg-surface-container-low');
+      btnC.classList.add('bg-surface-container-high', 'shadow-sm');
+      editor.value = "Estimado administrado de Mendoza & Asociados:\nAl revisar su 'Comprobante de Domicilio', advertimos que el sello notarial inferior presenta baja legibilidad. Para evitar demoras en su licencia definitiva, por favor adjunte una copia escaneada nítida o fotografía con luz directa antes del 26 de marzo. ¡Estamos para apoyarle en su trámite!";
+    } else if (tipo === 'rechazo') {
+      btnR.classList.remove('bg-surface-container-low');
+      btnR.classList.add('bg-surface-container-high', 'shadow-sm');
+      editor.value = "RESOLUCIÓN DENEGATORIA:\nSe observa formalmente la solicitud de Licencia Comercial Tipo A por incompatibilidad estricta con la zonificación comercial reglamentaria según Ord. 1029-SETC. De acuerdo a ley, se otorga un plazo de 15 días hábiles para la interposición de recurso de reconsideración o apelación.";
+    }
+  }
+</script></main></div></body></html>

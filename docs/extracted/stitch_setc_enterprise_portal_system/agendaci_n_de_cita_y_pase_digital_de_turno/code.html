@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+
+<html lang="es"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Plus+Jakarta+Sans:wght@100..900&display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={"darkMode":"class","theme":{"extend":{"colors":{"inverse-surface":"#213145","on-tertiary":"#ffffff","primary-fixed":"#d4e3ff","on-secondary-fixed":"#00174b","on-primary":"#ffffff","secondary-container":"#316bf3","on-tertiary-fixed":"#002114","on-tertiary-fixed-variant":"#005137","on-secondary-fixed-variant":"#003ea8","on-surface-variant":"#44474d","surface-container-low":"#eff4ff","surface-container-high":"#dce9ff","secondary-fixed":"#dbe1ff","error-container":"#ffdad6","secondary-fixed-dim":"#b4c5ff","on-primary-fixed":"#021c39","surface-bright":"#f8f9ff","on-primary-container":"#798fb1","background":"#f8f9ff","on-background":"#0b1c30","error":"#ba1a1a","on-error":"#ffffff","tertiary-fixed":"#85f8c4","on-secondary-container":"#fefcff","surface":"#f8f9ff","primary":"#001229","secondary":"#0051d5","on-error-container":"#93000a","tertiary-fixed-dim":"#68dba9","outline":"#74777e","on-surface":"#0b1c30","on-tertiary-container":"#1fa072","on-primary-fixed-variant":"#324866","primary-fixed-dim":"#b2c8ed","surface-dim":"#cbdbf5","surface-container-highest":"#d3e4fe","surface-container":"#e5eeff","surface-container-lowest":"#ffffff","outline-variant":"#c4c6ce","inverse-primary":"#b2c8ed","inverse-on-surface":"#eaf1ff","surface-tint":"#4a5f7f","on-secondary":"#ffffff","primary-container":"#0f2744","surface-variant":"#d3e4fe","tertiary-container":"#002d1d","tertiary":"#00160c"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"space-lg":"1.5rem","gutter-sm":"1rem","margin":"2rem","space-md":"1rem","gutter":"1.5rem","space-xl":"2rem","space-xs":"0.25rem","space-sm":"0.5rem","margin-sm":"1rem"},"fontFamily":{"code-sm":["Inter"],"label-sm":["Inter"],"headline-xl":["Plus Jakarta Sans"],"headline-lg":["Plus Jakarta Sans"],"headline-xl-mobile":["Plus Jakarta Sans"],"body-sm":["Inter"],"label-md":["Inter"],"body-md":["Inter"],"body-lg":["Inter"],"headline-md":["Plus Jakarta Sans"],"headline-sm":["Plus Jakarta Sans"],"headline-lg-mobile":["Plus Jakarta Sans"]},"fontSize":{"code-sm":["13px",{"lineHeight":"18px","fontWeight":"500"}],"label-sm":["12px",{"lineHeight":"16px","fontWeight":"600"}],"headline-xl":["36px",{"lineHeight":"44px","fontWeight":"700"}],"headline-lg":["30px",{"lineHeight":"38px","fontWeight":"600"}],"headline-xl-mobile":["28px",{"lineHeight":"36px","fontWeight":"700"}],"body-sm":["14px",{"lineHeight":"20px","fontWeight":"400"}],"label-md":["14px",{"lineHeight":"20px","fontWeight":"500"}],"body-md":["16px",{"lineHeight":"24px","fontWeight":"400"}],"body-lg":["18px",{"lineHeight":"28px","fontWeight":"400"}],"headline-md":["22px",{"lineHeight":"28px","fontWeight":"600"}],"headline-sm":["18px",{"lineHeight":"24px","fontWeight":"600"}],"headline-lg-mobile":["24px",{"lineHeight":"32px","fontWeight":"600"}]}}}};</script></head><body class="bg-background font-body-md text-on-surface antialiased"><header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-20 max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between gap-6"><div class="flex items-center gap-4 shrink-0"><img alt="SETC Portal Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UsFh0iBLpJECHGgFWUMEi4XQfxZ24TXd4lISUs6FdBtSbxBlkwCEe90wQN-FIdyc9TUssUAVXEaMa4jRH5sU1EaDlhNHUSVWSX6ufdHbVVAFS8mI0tIbt5jAqqEiZvP_ayNszEdF590RMIz047XlnirGUODEDOnva_V2YOeNLv_Aj5Mj9t0rxOoOAsQh8DrKkO04EXe7NuWWtnvjDIGD_BVRutZWKwRTgj232sS2sG"/><div class="flex flex-col"><span class="font-headline-sm text-headline-sm text-primary font-bold tracking-tight">SETC</span><span class="font-label-sm text-label-sm text-on-surface-variant">Portal Ciudadano</span></div></div><div class="hidden xl:flex items-center flex-1 max-w-md mx-4"><div class="relative w-full"><span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm pointer-events-none">search</span><input class="w-full pl-9 pr-4 py-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-secondary transition-all" placeholder="Buscar trámites, requisitos o folios..." type="text"/></div></div><nav class="hidden lg:flex items-center gap-1 shrink-0" data-active-classes="bg-surface-container text-on-surface font-semibold"><a class="px-3 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="inicio" href="#">Inicio</a><a class="px-3 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="tramites-y-servicios" href="#">Trámites y Servicios</a><a class="px-3 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="mis-expedientes" href="#">Mis Expedientes</a><a aria-current="page" class="px-3 py-2 rounded-lg transition-colors bg-surface-container text-on-surface font-semibold" data-path="agendar-cita" href="#">Agendar Cita</a><a class="px-3 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="mesa-de-ayuda" href="#">Mesa de Ayuda</a></nav><div class="flex items-center gap-3 shrink-0"><button class="relative p-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" type="button"><span class="material-symbols-outlined">notifications</span><span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-secondary ring-2 ring-surface-container-lowest"></span></button><div class="flex items-center gap-3 pl-2"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZGJRrhlPogvmNGSbktezZIaAwZpLFEg-ebIsrqInz3lwswvl7xtxzPR-zVT830JnoDGQbLGgT3x0s6vtZ2IrsiPv3KYT8ZFz-FFzACf_PDwm_z5zV8sk7iiTdJle-a1NzueLjkgSls3hvKY-KeiHhJke8IvyPVKe5LV90jSW9mnjo2GWvWJC61OTJSe6L1UPcTvJgLFmJap-ub0gre4GlwJ0hUgz9KzDn-PtCrnkk"/><div class="hidden sm:flex flex-col text-left"><span class="font-label-md text-label-md text-on-surface font-semibold leading-none">C. Morales</span><span class="font-label-sm text-label-sm text-on-surface-variant leading-tight">CURP: MORM84...</span></div></div></div></div></header><main class="w-full pt-20 bg-background"><div class="max-w-7xl mx-auto px-6 lg:px-12 pt-6"><div class="flex items-center gap-2 font-label-sm text-label-sm text-on-surface-variant"><span class="hover:text-on-surface cursor-pointer">SETC</span><span class="material-symbols-outlined text-xs">chevron_right</span><span class="hover:text-on-surface cursor-pointer">Servicios al Ciudadano</span><span class="material-symbols-outlined text-xs">chevron_right</span><span class="text-on-surface font-semibold">Ventanilla Digital</span></div></div><div class="flex flex-col w-full">
+<div class="max-w-7xl mx-auto w-full px-6 lg:px-12 py-8 space-y-10">
+<!-- Top Notice & Empathy Header -->
+<div class="relative overflow-hidden rounded-xl bg-surface-container-lowest p-8 shadow-sm">
+<div class="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-secondary-fixed/30 blur-3xl pointer-events-none"></div>
+<div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+<div class="space-y-3 max-w-3xl">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm">
+<span class="w-2 h-2 rounded-full bg-tertiary-fixed-variant"></span>
+<span>Módulo de Gestión de Turnos Ciudadanos</span>
+<span class="text-on-surface-variant">•</span>
+<span class="text-secondary font-code-sm text-code-sm">Expediente #SETC-2025-8841</span>
+</div>
+<h1 class="font-headline-xl text-headline-xl text-primary font-bold tracking-tight">
+            Agenda tu turno presencial o virtual
+          </h1>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+            Elige la fecha y horario que mejor te convenga para la revisión presencial o inspección técnica ITSE de tu expediente. ¡Solo te tomará 2 minutos!
+          </p>
+</div>
+<div class="flex lg:flex-col items-center lg:items-end justify-between gap-4 p-4 rounded-xl bg-surface-container-low shrink-0">
+<div class="flex items-center gap-2 text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-secondary text-base">timer</span>
+<span>Tiempo promedio</span>
+</div>
+<span class="font-headline-sm text-headline-sm text-primary font-semibold">~2 min de trámite</span>
+<span class="font-label-sm text-label-sm text-on-tertiary-container font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">verified</span> Validación instantánea
+          </span>
+</div>
+</div>
+<!-- Linear Accessible Stepper -->
+<div class="mt-10 pt-8 bg-surface-container-low/60 -mx-8 -mb-8 px-8 py-6 rounded-b-xl">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<!-- Step 1 (Completed) -->
+<div class="flex items-center gap-4 bg-surface-container-lowest p-3 rounded-lg shadow-sm">
+<div class="w-9 h-9 rounded-full bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center font-label-md text-label-md font-bold">
+<span class="material-symbols-outlined text-base">check</span>
+</div>
+<div class="min-w-0">
+<span class="block font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Paso 1</span>
+<span class="block font-label-md text-label-md text-on-surface font-semibold truncate">Tipo de cita y trámite</span>
+</div>
+</div>
+<!-- Step 2 (Active) -->
+<div class="flex items-center gap-4 bg-primary text-on-primary p-3 rounded-lg shadow-md">
+<div class="w-9 h-9 rounded-full bg-secondary text-on-secondary flex items-center justify-center font-label-md text-label-md font-bold">
+              2
+            </div>
+<div class="min-w-0">
+<span class="block font-label-sm text-label-sm text-primary-fixed uppercase tracking-wider">Paso 2 (Actual)</span>
+<span class="block font-label-md text-label-md font-on-primary font-semibold truncate">Fecha y Horario de Turno</span>
+</div>
+</div>
+<!-- Step 3 (Upcoming) -->
+<div class="flex items-center gap-4 bg-surface-container-low p-3 rounded-lg opacity-80">
+<div class="w-9 h-9 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center font-label-md text-label-md font-semibold">
+              3
+            </div>
+<div class="min-w-0">
+<span class="block font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Paso 3</span>
+<span class="block font-label-md text-label-md text-on-surface-variant font-medium truncate">Pase Digital y Confirmación</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Main Workspace: Selection Grid (Left) + Digital Pass Preview (Right) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<!-- Selection Column -->
+<div class="lg:col-span-7 space-y-8">
+<!-- Modality Cards Switcher -->
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm space-y-5">
+<div class="flex items-center justify-between">
+<h2 class="font-headline-sm text-headline-sm text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">domain</span>
+              1. Modalidad de Atención
+            </h2>
+<span class="font-label-sm text-label-sm px-2.5 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed font-semibold">Requerido</span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="modalityContainer">
+<!-- In-Person Option (Selected) -->
+<button class="text-left p-5 rounded-xl bg-surface-container-low transition-all duration-200 relative group hover:shadow-md" id="btnModalityPresencial" onclick="selectModality('presencial')" type="button">
+<div class="absolute top-4 right-4 w-6 h-6 rounded-full bg-secondary text-on-secondary flex items-center justify-center" id="iconCheckPresencial">
+<span class="material-symbols-outlined text-sm font-bold">check</span>
+</div>
+<div class="w-10 h-10 rounded-lg bg-surface-container-lowest flex items-center justify-center text-secondary mb-3 shadow-sm">
+<span class="material-symbols-outlined">apartment</span>
+</div>
+<h3 class="font-label-md text-label-md text-on-surface font-semibold">Presencial en Sede Central</h3>
+<p class="mt-1 font-body-sm text-body-sm text-on-surface-variant">Ventanilla 08 • Mesa Técnica de Obras e ITSE. Atención cara a cara.</p>
+<div class="mt-3 flex items-center gap-2 font-label-sm text-label-sm text-tertiary-fixed-variant">
+<span class="material-symbols-outlined text-xs">nest_eco_leaf</span> Acceso preferencial verificado
+              </div>
+</button>
+<!-- Virtual Option -->
+<button class="text-left p-5 rounded-xl bg-surface-container-lowest transition-all duration-200 relative group hover:bg-surface-container-low hover:shadow-sm" id="btnModalityVirtual" onclick="selectModality('virtual')" type="button">
+<div class="absolute top-4 right-4 w-6 h-6 rounded-full bg-surface-container text-transparent flex items-center justify-center" id="iconCheckVirtual">
+<span class="material-symbols-outlined text-sm">check</span>
+</div>
+<div class="w-10 h-10 rounded-lg bg-surface-container-low flex items-center justify-center text-on-surface-variant mb-3">
+<span class="material-symbols-outlined">videocam</span>
+</div>
+<h3 class="font-label-md text-label-md text-on-surface font-semibold">Asesoría Virtual ITSE</h3>
+<p class="mt-1 font-body-sm text-body-sm text-on-surface-variant">Videollamada cifrada GovMeet. Presentación digital de planos en vivo.</p>
+<div class="mt-3 flex items-center gap-2 font-label-sm text-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-xs">cloud_done</span> Sin traslado físico
+              </div>
+</button>
+</div>
+</div>
+<!-- Month Calendar Selector -->
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm space-y-6">
+<div class="flex items-center justify-between pb-4">
+<div>
+<h2 class="font-headline-sm text-headline-sm text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">calendar_month</span>
+                2. Selecciona el Día
+              </h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Muestra disponibilidad oficial en tiempo real para Octubre 2025</p>
+</div>
+<div class="flex items-center gap-2">
+<button aria-label="Mes anterior" class="p-2 rounded-lg bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-colors" type="button">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<span class="font-label-md text-label-md text-on-surface font-semibold px-3 py-1 bg-surface-container rounded-lg">Octubre 2025</span>
+<button aria-label="Siguiente mes" class="p-2 rounded-lg bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-colors" type="button">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Calendar Grid -->
+<div class="space-y-2">
+<!-- Day labels -->
+<div class="grid grid-cols-7 gap-2 text-center font-label-sm text-label-sm text-on-surface-variant font-medium py-1">
+<div>Lun</div>
+<div>Mar</div>
+<div>Mié</div>
+<div>Jue</div>
+<div>Vie</div>
+<div class="text-outline">Sáb</div>
+<div class="text-outline">Dom</div>
+</div>
+<!-- Days -->
+<div class="grid grid-cols-7 gap-2">
+<!-- Inactive past days -->
+<div class="aspect-square flex flex-col items-center justify-center rounded-lg bg-surface-container-low/40 text-outline text-body-sm font-body-sm">
+                27
+              </div>
+<div class="aspect-square flex flex-col items-center justify-center rounded-lg bg-surface-container-low/40 text-outline text-body-sm font-body-sm">
+                28
+              </div>
+<div class="aspect-square flex flex-col items-center justify-center rounded-lg bg-surface-container-low/40 text-outline text-body-sm font-body-sm">
+                29
+              </div>
+<!-- Available slots -->
+<button class="aspect-square flex flex-col items-center justify-center rounded-lg bg-secondary text-on-secondary shadow-md relative transition-transform transform scale-105" id="day-30" onclick="selectDay(30, 'Jueves, 30 de Octubre de 2025')" type="button">
+<span class="font-headline-sm text-headline-sm font-bold">30</span>
+<span class="font-label-sm text-label-sm px-1.5 py-0.2 rounded-full bg-secondary-container text-on-secondary-container mt-0.5 text-[10px]">Elegido</span>
+</button>
+<button class="aspect-square flex flex-col items-center justify-center rounded-lg bg-surface-container-low text-on-surface hover:bg-surface-container transition-colors" id="day-31" onclick="selectDay(31, 'Viernes, 31 de Octubre de 2025')" type="button">
+<span class="font-headline-sm text-headline-sm font-semibold">31</span>
+<span class="font-label-sm text-label-sm text-tertiary-fixed-variant text-[10px]">4 cupos</span>
+</button>
+<div class="aspect-square flex flex-col items-center justify-center rounded-lg bg-surface-container-low/40 text-outline text-body-sm font-body-sm">
+                01
+              </div>
+<div class="aspect-square flex flex-col items-center justify-center rounded-lg bg-surface-container-low/40 text-outline text-body-sm font-body-sm">
+                02
+              </div>
+</div>
+<!-- Calendar Key -->
+<div class="flex flex-wrap items-center gap-4 pt-3 font-label-sm text-label-sm text-on-surface-variant">
+<div class="flex items-center gap-1.5">
+<span class="w-3 h-3 rounded-full bg-secondary"></span>
+<span>Seleccionado</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-3 h-3 rounded-full bg-surface-container-high"></span>
+<span>Disponible</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-3 h-3 rounded-full bg-surface-container-low opacity-60"></span>
+<span>No laborable / Lleno</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Available Time Slots Panel -->
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm space-y-6">
+<div class="flex items-center justify-between">
+<h2 class="font-headline-sm text-headline-sm text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">schedule</span>
+              3. Horarios Disponibles para <span class="text-secondary" id="activeDayLabel">Jueves 30 de Octubre</span>
+</h2>
+<span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-xs text-secondary">sync</span> Actualizado hace 1m
+            </span>
+</div>
+<!-- Morning Shift -->
+<div class="space-y-3">
+<div class="flex items-center gap-2 text-on-surface font-label-md text-label-md font-semibold">
+<span class="material-symbols-outlined text-amber-500 text-sm">light_mode</span>
+<span>Turno Mañana (08:30 AM – 12:00 PM)</span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+<!-- Slot 1: 08:30 AM (Available) -->
+<button class="p-3.5 rounded-lg bg-surface-container-low text-on-surface hover:bg-surface-container text-left transition-all relative flex flex-col justify-between" id="slot-0830" onclick="selectSlot('08:30 AM')" type="button">
+<div class="flex items-center justify-between w-full">
+<span class="font-headline-sm text-headline-sm font-semibold">08:30 AM</span>
+<span class="slot-check hidden material-symbols-outlined text-tertiary-fixed-variant text-base">check_circle</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-1">2 cupos libres</span>
+</button>
+<!-- Slot 2: 10:30 AM (Active Selected) -->
+<button class="p-3.5 rounded-lg bg-secondary text-on-secondary text-left shadow-sm relative flex flex-col justify-between" id="slot-1030" onclick="selectSlot('10:30 AM')" type="button">
+<div class="flex items-center justify-between w-full">
+<span class="font-headline-sm text-headline-sm font-bold">10:30 AM</span>
+<span class="material-symbols-outlined text-tertiary-fixed text-base font-bold">check_circle</span>
+</div>
+<span class="font-label-sm text-label-sm text-secondary-fixed mt-1">Tu turno elegido</span>
+</button>
+<!-- Slot 3: 11:30 AM (Last spot warning) -->
+<button class="p-3.5 rounded-lg bg-surface-container-low text-on-surface hover:bg-surface-container text-left transition-all relative flex flex-col justify-between" id="slot-1130" onclick="selectSlot('11:30 AM')" type="button">
+<div class="flex items-center justify-between w-full">
+<span class="font-headline-sm text-headline-sm font-semibold">11:30 AM</span>
+<span class="slot-check hidden material-symbols-outlined text-tertiary-fixed-variant text-base">check_circle</span>
+</div>
+<div class="mt-1 flex items-center justify-between">
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-error-container text-on-error-container font-semibold text-[11px]">Último cupo</span>
+</div>
+</button>
+</div>
+</div>
+<!-- Afternoon Shift -->
+<div class="space-y-3 pt-2">
+<div class="flex items-center gap-2 text-on-surface font-label-md text-label-md font-semibold">
+<span class="material-symbols-outlined text-indigo-500 text-sm">wb_twilight</span>
+<span>Turno Tarde (02:00 PM – 05:00 PM)</span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+<!-- Slot 4: 02:00 PM (Available) -->
+<button class="p-3.5 rounded-lg bg-surface-container-low text-on-surface hover:bg-surface-container text-left transition-all relative flex flex-col justify-between" id="slot-0200" onclick="selectSlot('02:00 PM')" type="button">
+<div class="flex items-center justify-between w-full">
+<span class="font-headline-sm text-headline-sm font-semibold">02:00 PM</span>
+<span class="slot-check hidden material-symbols-outlined text-tertiary-fixed-variant text-base">check_circle</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-1">3 cupos libres</span>
+</button>
+<!-- Slot 5: 03:30 PM (Disabled / Filled) -->
+<div class="p-3.5 rounded-lg bg-surface-container text-outline opacity-60 cursor-not-allowed flex flex-col justify-between">
+<div class="flex items-center justify-between w-full">
+<span class="font-headline-sm text-headline-sm font-semibold line-through">03:30 PM</span>
+<span class="material-symbols-outlined text-outline text-base">block</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-1">Agotado</span>
+</div>
+<!-- Slot 6: 04:30 PM (Available) -->
+<button class="p-3.5 rounded-lg bg-surface-container-low text-on-surface hover:bg-surface-container text-left transition-all relative flex flex-col justify-between" id="slot-0430" onclick="selectSlot('04:30 PM')" type="button">
+<div class="flex items-center justify-between w-full">
+<span class="font-headline-sm text-headline-sm font-semibold">04:30 PM</span>
+<span class="slot-check hidden material-symbols-outlined text-tertiary-fixed-variant text-base">check_circle</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-1">1 cupo libre</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Digital Pass ("Pase Digital") Floating Card -->
+<div class="lg:col-span-5 space-y-6">
+<!-- Ticket Card Component -->
+<div class="bg-surface-container-lowest rounded-xl shadow-xl overflow-hidden relative">
+<!-- Top Accent Ribbon -->
+<div class="h-3 w-full bg-gradient-to-r from-secondary via-secondary-container to-tertiary-fixed"></div>
+<div class="p-6 sm:p-7 space-y-6">
+<!-- Header with Official Pill -->
+<div class="flex items-start justify-between gap-4 pb-4">
+<div>
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-secondary font-bold">Pase de Acceso Oficial</span>
+<h3 class="font-headline-md text-headline-md text-primary font-bold">Resumen de tu Cita SETC</h3>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-code-sm text-code-sm px-2.5 py-1 rounded bg-surface-container text-primary font-bold">#CTA-2025-4921</span>
+<span class="font-label-sm text-label-sm text-tertiary-fixed-variant flex items-center gap-1 mt-1">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed-variant"></span> Confirmada
+                </span>
+</div>
+</div>
+<!-- Pass Body Details with Icons -->
+<div class="space-y-4 bg-surface-container-low p-4 rounded-xl">
+<!-- Item 1: Fecha y Hora -->
+<div class="flex items-start gap-3">
+<div class="w-9 h-9 rounded-lg bg-surface-container-lowest text-secondary flex items-center justify-center shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-lg">event_available</span>
+</div>
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Fecha programada</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold block" id="ticketDateDisplay">Jueves, 30 de Octubre de 2025</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant" id="ticketTimeDisplay">Horario: 10:30 AM (Llegar con 10 min de anticipación)</span>
+</div>
+</div>
+<!-- Item 2: Trámite -->
+<div class="flex items-start gap-3">
+<div class="w-9 h-9 rounded-lg bg-surface-container-lowest text-secondary flex items-center justify-center shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-lg">description</span>
+</div>
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Trámite vinculado</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold block">Expediente SETC-2025-8841</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Inspección Técnica de Seguridad en Edificaciones (ITSE)</span>
+</div>
+</div>
+<!-- Item 3: Revisor Asignado -->
+<div class="flex items-start gap-3">
+<div class="w-9 h-9 rounded-lg bg-surface-container-lowest text-secondary flex items-center justify-center shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-lg">badge</span>
+</div>
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Especialista Técnico</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold block">Ing. Carlos Ruiz S.</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Mesa Técnica de Verificación Colegiada #4</span>
+</div>
+</div>
+<!-- Item 4: Ubicación -->
+<div class="flex items-start gap-3">
+<div class="w-9 h-9 rounded-lg bg-surface-container-lowest text-secondary flex items-center justify-center shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-lg">location_on</span>
+</div>
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Sede y Punto de Encuentro</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold block" id="ticketLocationTitle">Ventanilla 08 - Sede Central</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant" id="ticketLocationAddress">Av. República 450, Piso 1, Centro Cívico</span>
+</div>
+</div>
+</div>
+<!-- QR Code Section & Security Hash -->
+<div class="flex items-center gap-5 p-4 rounded-xl bg-surface-container-lowest">
+<!-- Crisp SVG QR Code Representation -->
+<div class="w-24 h-24 bg-surface-container-lowest p-1 rounded-lg shrink-0 flex items-center justify-center shadow-sm">
+<svg class="w-full h-full text-primary" fill="currentColor" viewbox="0 0 100 100">
+<!-- Outer corners -->
+<rect height="28" rx="4" width="28" x="0" y="0"></rect>
+<rect fill="white" height="20" rx="2" width="20" x="4" y="4"></rect>
+<rect fill="currentColor" height="12" rx="1" width="12" x="8" y="8"></rect>
+<rect height="28" rx="4" width="28" x="72" y="0"></rect>
+<rect fill="white" height="20" rx="2" width="20" x="76" y="4"></rect>
+<rect fill="currentColor" height="12" rx="1" width="12" x="80" y="8"></rect>
+<rect height="28" rx="4" width="28" x="0" y="72"></rect>
+<rect fill="white" height="20" rx="2" width="20" x="4" y="76"></rect>
+<rect fill="currentColor" height="12" rx="1" width="12" x="8" y="80"></rect>
+<!-- Data bit blocks -->
+<rect height="8" rx="1" width="8" x="36" y="8"></rect>
+<rect height="8" rx="1" width="8" x="48" y="8"></rect>
+<rect height="8" rx="1" width="8" x="36" y="24"></rect>
+<rect height="8" rx="1" width="8" x="52" y="24"></rect>
+<rect height="8" rx="1" width="8" x="8" y="36"></rect>
+<rect height="8" rx="1" width="8" x="20" y="48"></rect>
+<rect height="12" rx="2" width="12" x="36" y="40"></rect>
+<rect height="8" rx="1" width="8" x="56" y="44"></rect>
+<rect height="8" rx="1" width="8" x="76" y="36"></rect>
+<rect height="8" rx="1" width="8" x="88" y="48"></rect>
+<rect height="8" rx="1" width="8" x="36" y="64"></rect>
+<rect height="8" rx="1" width="8" x="48" y="72"></rect>
+<rect height="8" rx="1" width="8" x="64" y="64"></rect>
+<rect height="8" rx="1" width="12" x="80" y="76"></rect>
+<rect height="8" rx="1" width="8" x="68" y="88"></rect>
+</svg>
+</div>
+<div class="space-y-1 text-left min-w-0">
+<span class="inline-flex items-center gap-1 font-label-sm text-label-sm text-tertiary-fixed-variant font-semibold">
+<span class="material-symbols-outlined text-xs">qr_code_scanner</span> QR de Acceso Dinámico
+                </span>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-snug">
+                  Muestra este código desde tu celular al guardia de entrada y en la ventanilla técnica.
+                </p>
+<span class="font-code-sm text-code-sm text-on-surface-variant block font-mono">TOKEN: 4921-ITSE-8841</span>
+</div>
+</div>
+<!-- Action Buttons for Citizen convenience -->
+<div class="space-y-2.5 pt-2">
+<button class="w-full h-11 px-4 rounded-lg bg-primary text-on-primary font-label-md text-label-md font-medium hover:bg-primary-container transition-colors flex items-center justify-center gap-2 shadow-sm" type="button">
+<span class="material-symbols-outlined text-lg">calendar_add_on</span>
+                Añadir a Google Calendar / iCal
+              </button>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+<button class="h-10 px-3 rounded-lg bg-surface-container-low text-on-surface hover:bg-surface-container font-label-md text-label-md font-medium transition-colors flex items-center justify-center gap-2" type="button">
+<span class="material-symbols-outlined text-lg text-secondary">download</span>
+                  Descargar PDF
+                </button>
+<button class="h-10 px-3 rounded-lg bg-surface-container-low text-on-surface hover:bg-surface-container font-label-md text-label-md font-medium transition-colors flex items-center justify-center gap-2" type="button">
+<span class="material-symbols-outlined text-lg text-tertiary-fixed-variant">chat</span>
+                  WhatsApp / SMS
+                </button>
+</div>
+</div>
+<!-- Human Friendly Advice Callout -->
+<div class="p-4 rounded-xl bg-surface-container-low/70 flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary shrink-0 mt-0.5">help</span>
+<div class="space-y-1">
+<h4 class="font-label-md text-label-md text-on-surface font-semibold">¿Qué debes llevar contigo?</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+                  Solo tu <strong>DNI físico</strong> y el código QR de este pase. <strong>No es necesario imprimir documentos</strong> si ya los cargaste previamente en el portal digital.
+                </p>
+</div>
+</div>
+</div>
+</div>
+<!-- Visual Venue / Support Card -->
+<div class="p-5 rounded-xl bg-surface-container-lowest shadow-sm flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined">info</span>
+</div>
+<div class="min-w-0">
+<h4 class="font-label-md text-label-md text-on-surface font-semibold">¿Necesitas reprogramar o cancelar?</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Puedes cambiar tu horario hasta 2 horas antes de la cita sin penalidad alguna.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+  // Simple interaction for slot selection
+  function selectSlot(timeStr) {
+    const slots = ['slot-0830', 'slot-1030', 'slot-1130', 'slot-0200', 'slot-0430'];
+    slots.forEach(slotId => {
+      const el = document.getElementById(slotId);
+      if (el) {
+        el.classList.remove('bg-secondary', 'text-on-secondary', 'shadow-sm');
+        el.classList.add('bg-surface-container-low', 'text-on-surface');
+        const checkIcon = el.querySelector('.slot-check');
+        if (checkIcon) checkIcon.classList.add('hidden');
+      }
+    });
+
+    const activeMap = {
+      '08:30 AM': 'slot-0830',
+      '10:30 AM': 'slot-1030',
+      '11:30 AM': 'slot-1130',
+      '02:00 PM': 'slot-0200',
+      '04:30 PM': 'slot-0430'
+    };
+
+    const targetEl = document.getElementById(activeMap[timeStr]);
+    if (targetEl) {
+      targetEl.classList.remove('bg-surface-container-low', 'text-on-surface');
+      targetEl.classList.add('bg-secondary', 'text-on-secondary', 'shadow-sm');
+      const checkIcon = targetEl.querySelector('.slot-check');
+      if (checkIcon) checkIcon.classList.remove('hidden');
+    }
+
+    const timeDisplay = document.getElementById('ticketTimeDisplay');
+    if (timeDisplay) {
+      timeDisplay.textContent = 'Horario: ' + timeStr + ' (Llegar con 10 min de anticipación)';
+    }
+  }
+
+  // Modality switcher
+  function selectModality(type) {
+    const btnPresencial = document.getElementById('btnModalityPresencial');
+    const btnVirtual = document.getElementById('btnModalityVirtual');
+    const checkPresencial = document.getElementById('iconCheckPresencial');
+    const checkVirtual = document.getElementById('iconCheckVirtual');
+    const ticketLocTitle = document.getElementById('ticketLocationTitle');
+    const ticketLocAddress = document.getElementById('ticketLocationAddress');
+
+    if (type === 'presencial') {
+      btnPresencial.className = "text-left p-5 rounded-xl bg-surface-container-low transition-all duration-200 relative group hover:shadow-md";
+      btnVirtual.className = "text-left p-5 rounded-xl bg-surface-container-lowest transition-all duration-200 relative group hover:bg-surface-container-low hover:shadow-sm";
+      checkPresencial.className = "absolute top-4 right-4 w-6 h-6 rounded-full bg-secondary text-on-secondary flex items-center justify-center";
+      checkVirtual.className = "absolute top-4 right-4 w-6 h-6 rounded-full bg-surface-container text-transparent flex items-center justify-center";
+      ticketLocTitle.textContent = "Ventanilla 08 - Sede Central";
+      ticketLocAddress.textContent = "Av. República 450, Piso 1, Centro Cívico";
+    } else {
+      btnVirtual.className = "text-left p-5 rounded-xl bg-surface-container-low transition-all duration-200 relative group hover:shadow-md";
+      btnPresencial.className = "text-left p-5 rounded-xl bg-surface-container-lowest transition-all duration-200 relative group hover:bg-surface-container-low hover:shadow-sm";
+      checkVirtual.className = "absolute top-4 right-4 w-6 h-6 rounded-full bg-secondary text-on-secondary flex items-center justify-center";
+      checkPresencial.className = "absolute top-4 right-4 w-6 h-6 rounded-full bg-surface-container text-transparent flex items-center justify-center";
+      ticketLocTitle.textContent = "Sesión GovMeet Cifrada (Virtual)";
+      ticketLocAddress.textContent = "Enlace seguro enviado por correo y SMS 15m antes";
+    }
+  }
+
+  // Calendar Day Switcher
+  function selectDay(dayNum, fullString) {
+    const day30 = document.getElementById('day-30');
+    const day31 = document.getElementById('day-31');
+    const label = document.getElementById('activeDayLabel');
+    const ticketDate = document.getElementById('ticketDateDisplay');
+
+    if (dayNum === 30) {
+      day30.className = "aspect-square flex flex-col items-center justify-center rounded-lg bg-secondary text-on-secondary shadow-md relative transition-transform transform scale-105";
+      day31.className = "aspect-square flex flex-col items-center justify-center rounded-lg bg-surface-container-low text-on-surface hover:bg-surface-container transition-colors";
+    } else {
+      day31.className = "aspect-square flex flex-col items-center justify-center rounded-lg bg-secondary text-on-secondary shadow-md relative transition-transform transform scale-105";
+      day30.className = "aspect-square flex flex-col items-center justify-center rounded-lg bg-surface-container-low text-on-surface hover:bg-surface-container transition-colors";
+    }
+
+    if (label) label.textContent = fullString;
+    if (ticketDate) ticketDate.textContent = fullString;
+  }
+</script></main><footer class="w-full bg-surface-container-low mt-20"><div class="max-w-7xl mx-auto px-6 lg:px-12 py-12"><div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8"><div class="space-y-3"><div class="flex items-center gap-2"><span class="font-headline-sm text-headline-sm text-primary font-bold tracking-tight">SETC</span><span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-surface-container text-on-surface font-medium">Oficial</span></div><p class="font-body-sm text-body-sm text-on-surface-variant">Sistema Institucional de Gestión de Citas, Trámites y Expedientes Digitales. Plataforma interoperable del Gobierno Digital.</p></div><div><h4 class="font-label-md text-label-md text-on-surface font-semibold mb-3">Atención Ciudadana</h4><ul class="space-y-2 font-body-sm text-body-sm text-on-surface-variant"><li><a class="hover:text-on-surface transition-colors" href="#">Línea Directa 800-SETC-01</a></li><li><a class="hover:text-on-surface transition-colors" href="#">Mesa de Ayuda Telemática</a></li><li><a class="hover:text-on-surface transition-colors" href="#">Módulos Presenciales</a></li><li><a class="hover:text-on-surface transition-colors" href="#">Guía de Trámites y Requisitos</a></li></ul></div><div><h4 class="font-label-md text-label-md text-on-surface font-semibold mb-3">Normatividad y Transparencia</h4><ul class="space-y-2 font-body-sm text-body-sm text-on-surface-variant"><li><a class="hover:text-on-surface transition-colors" href="#">Aviso de Privacidad Integral</a></li><li><a class="hover:text-on-surface transition-colors" href="#">Términos de Servicio Gov-ID</a></li><li><a class="hover:text-on-surface transition-colors" href="#">Marco Jurídico de Actuación</a></li><li><a class="hover:text-on-surface transition-colors" href="#">Portal Nacional de Transparencia</a></li></ul></div><div><h4 class="font-label-md text-label-md text-on-surface font-semibold mb-3">Certificaciones</h4><div class="space-y-2 font-body-sm text-body-sm text-on-surface-variant"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-base text-secondary">verified_user</span><span>Encriptación Criptográfica SHA-256</span></div><div class="flex items-center gap-2"><span class="material-symbols-outlined text-base text-secondary">accessibility_new</span><span>Conformidad Accesibilidad WCAG 2.1 AA</span></div></div></div></div><div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 font-body-sm text-body-sm text-on-surface-variant"><p>© 2025 Sistema Estatal de Citas, Trámites y Expedientes (SETC). Todos los derechos reservados.</p><div class="flex items-center gap-6 font-label-sm text-label-sm"><a class="hover:text-on-surface transition-colors" href="#">Accesibilidad</a><a class="hover:text-on-surface transition-colors" href="#">Privacidad</a><a class="hover:text-on-surface transition-colors" href="#">Mapa del Sitio</a></div></div></div></footer></body></html>

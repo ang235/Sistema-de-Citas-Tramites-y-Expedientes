@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+
+<html lang="es"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Plus+Jakarta+Sans:wght@100..900&display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={"darkMode":"class","theme":{"extend":{"colors":{"inverse-surface":"#213145","on-tertiary":"#ffffff","primary-fixed":"#d4e3ff","on-secondary-fixed":"#00174b","on-primary":"#ffffff","secondary-container":"#316bf3","on-tertiary-fixed":"#002114","on-tertiary-fixed-variant":"#005137","on-secondary-fixed-variant":"#003ea8","on-surface-variant":"#44474d","surface-container-low":"#eff4ff","surface-container-high":"#dce9ff","secondary-fixed":"#dbe1ff","error-container":"#ffdad6","secondary-fixed-dim":"#b4c5ff","on-primary-fixed":"#021c39","surface-bright":"#f8f9ff","on-primary-container":"#798fb1","background":"#f8f9ff","on-background":"#0b1c30","error":"#ba1a1a","on-error":"#ffffff","tertiary-fixed":"#85f8c4","on-secondary-container":"#fefcff","surface":"#f8f9ff","primary":"#001229","secondary":"#0051d5","on-error-container":"#93000a","tertiary-fixed-dim":"#68dba9","outline":"#74777e","on-surface":"#0b1c30","on-tertiary-container":"#1fa072","on-primary-fixed-variant":"#324866","primary-fixed-dim":"#b2c8ed","surface-dim":"#cbdbf5","surface-container-highest":"#d3e4fe","surface-container":"#e5eeff","surface-container-lowest":"#ffffff","outline-variant":"#c4c6ce","inverse-primary":"#b2c8ed","inverse-on-surface":"#eaf1ff","surface-tint":"#4a5f7f","on-secondary":"#ffffff","primary-container":"#0f2744","surface-variant":"#d3e4fe","tertiary-container":"#002d1d","tertiary":"#00160c"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"space-lg":"1.5rem","gutter-sm":"1rem","margin":"2rem","space-md":"1rem","gutter":"1.5rem","space-xl":"2rem","space-xs":"0.25rem","space-sm":"0.5rem","margin-sm":"1rem"},"fontFamily":{"code-sm":["Inter"],"label-sm":["Inter"],"headline-xl":["Plus Jakarta Sans"],"headline-lg":["Plus Jakarta Sans"],"headline-xl-mobile":["Plus Jakarta Sans"],"body-sm":["Inter"],"label-md":["Inter"],"body-md":["Inter"],"body-lg":["Inter"],"headline-md":["Plus Jakarta Sans"],"headline-sm":["Plus Jakarta Sans"],"headline-lg-mobile":["Plus Jakarta Sans"]},"fontSize":{"code-sm":["13px",{"lineHeight":"18px","fontWeight":"500"}],"label-sm":["12px",{"lineHeight":"16px","fontWeight":"600"}],"headline-xl":["36px",{"lineHeight":"44px","fontWeight":"700"}],"headline-lg":["30px",{"lineHeight":"38px","fontWeight":"600"}],"headline-xl-mobile":["28px",{"lineHeight":"36px","fontWeight":"700"}],"body-sm":["14px",{"lineHeight":"20px","fontWeight":"400"}],"label-md":["14px",{"lineHeight":"20px","fontWeight":"500"}],"body-md":["16px",{"lineHeight":"24px","fontWeight":"400"}],"body-lg":["18px",{"lineHeight":"28px","fontWeight":"400"}],"headline-md":["22px",{"lineHeight":"28px","fontWeight":"600"}],"headline-sm":["18px",{"lineHeight":"24px","fontWeight":"600"}],"headline-lg-mobile":["24px",{"lineHeight":"32px","fontWeight":"600"}]}}}};</script></head><body class="bg-background font-body-md text-on-surface antialiased"><header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-20 max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between gap-6"><div class="flex items-center gap-4 shrink-0"><img alt="SETC Portal Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UsFh0iBLpJECHGgFWUMEi4XQfxZ24TXd4lISUs6FdBtSbxBlkwCEe90wQN-FIdyc9TUssUAVXEaMa4jRH5sU1EaDlhNHUSVWSX6ufdHbVVAFS8mI0tIbt5jAqqEiZvP_ayNszEdF590RMIz047XlnirGUODEDOnva_V2YOeNLv_Aj5Mj9t0rxOoOAsQh8DrKkO04EXe7NuWWtnvjDIGD_BVRutZWKwRTgj232sS2sG"/><div class="flex flex-col"><span class="font-headline-sm text-headline-sm text-primary font-bold tracking-tight">SETC</span><span class="font-label-sm text-label-sm text-on-surface-variant">Portal Ciudadano</span></div></div><div class="hidden xl:flex items-center flex-1 max-w-md mx-4"><div class="relative w-full"><span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm pointer-events-none">search</span><input class="w-full pl-9 pr-4 py-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-secondary transition-all" placeholder="Buscar trámites, requisitos o folios..." type="text"/></div></div><nav class="hidden lg:flex items-center gap-1 shrink-0" data-active-classes="bg-surface-container text-on-surface font-semibold"><a aria-current="page" class="px-3 py-2 rounded-lg transition-colors bg-surface-container text-on-surface font-semibold" data-path="inicio" href="#">Inicio</a><a class="px-3 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="tramites-y-servicios" href="#">Trámites y Servicios</a><a class="px-3 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="mis-expedientes" href="#">Mis Expedientes</a><a class="px-3 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="agendar-cita" href="#">Agendar Cita</a><a class="px-3 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="mesa-de-ayuda" href="#">Mesa de Ayuda</a></nav><div class="flex items-center gap-3 shrink-0"><button class="relative p-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" type="button"><span class="material-symbols-outlined">notifications</span><span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-secondary ring-2 ring-surface-container-lowest"></span></button><div class="flex items-center gap-3 pl-2"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZGJRrhlPogvmNGSbktezZIaAwZpLFEg-ebIsrqInz3lwswvl7xtxzPR-zVT830JnoDGQbLGgT3x0s6vtZ2IrsiPv3KYT8ZFz-FFzACf_PDwm_z5zV8sk7iiTdJle-a1NzueLjkgSls3hvKY-KeiHhJke8IvyPVKe5LV90jSW9mnjo2GWvWJC61OTJSe6L1UPcTvJgLFmJap-ub0gre4GlwJ0hUgz9KzDn-PtCrnkk"/><div class="hidden sm:flex flex-col text-left"><span class="font-label-md text-label-md text-on-surface font-semibold leading-none">C. Morales</span><span class="font-label-sm text-label-sm text-on-surface-variant leading-tight">CURP: MORM84...</span></div></div></div></div></header><main class="w-full pt-20 bg-background"><div class="max-w-7xl mx-auto px-6 lg:px-12 pt-6"><div class="flex items-center gap-2 font-label-sm text-label-sm text-on-surface-variant"><span class="hover:text-on-surface cursor-pointer">SETC</span><span class="material-symbols-outlined text-xs">chevron_right</span><span class="hover:text-on-surface cursor-pointer">Servicios al Ciudadano</span><span class="material-symbols-outlined text-xs">chevron_right</span><span class="text-on-surface font-semibold">Ventanilla Digital</span></div></div><div class="flex flex-col w-full">
+<div class="max-w-7xl mx-auto px-6 lg:px-12 py-8 w-full space-y-12">
+<!-- Hero & Contextual Welcome Section -->
+<section class="relative overflow-hidden rounded-xl bg-surface-container-low shadow-sm p-8 lg:p-10">
+<div class="absolute -right-16 -top-16 w-80 h-80 rounded-full bg-secondary-container/10 blur-3xl pointer-events-none"></div>
+<div class="relative z-10 max-w-4xl space-y-6">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container-lowest shadow-sm">
+<span class="inline-block w-2 h-2 rounded-full bg-tertiary-fixed-variant animate-pulse"></span>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-medium">Ventanilla Única Digital Gov-ID</span>
+</div>
+<div class="space-y-2">
+<h1 class="font-headline-lg text-headline-lg lg:font-headline-xl lg:text-headline-xl text-primary font-bold tracking-tight">
+            Hola de nuevo, Mariana. <span class="text-secondary font-semibold">¿Qué gestión deseas realizar hoy?</span>
+</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">
+            Acompañamos cada etapa de tus trámites institucionales con transparencia, sin intermediarios y con resolución ágil.
+          </p>
+</div>
+<!-- Quick Search Bar with Instant Suggestions -->
+<div class="relative max-w-2xl pt-2">
+<div class="relative flex items-center shadow-sm rounded-lg bg-surface-container-lowest overflow-hidden transition-all focus-within:shadow-md">
+<span class="material-symbols-outlined text-secondary ml-4 mr-2 text-xl select-none">search</span>
+<input class="w-full py-3.5 pr-4 bg-transparent font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant focus:outline-none" placeholder="Buscar por trámite, norma legal o palabra clave (ej. Inspección ITSE, Licencia)..." type="text"/>
+<button class="m-1.5 px-4 py-2 bg-primary text-on-primary rounded-lg font-label-md text-label-md hover:bg-primary-container transition-colors shrink-0">
+              Buscar
+            </button>
+</div>
+<!-- Chips / Quick Tags -->
+<div class="flex items-center gap-2 mt-3 flex-wrap font-label-sm text-label-sm">
+<span class="text-on-surface-variant font-medium">Búsquedas habituales:</span>
+<button class="px-2.5 py-1 rounded-full bg-surface-container-lowest text-on-surface hover:bg-surface-container transition-colors shadow-sm">
+              Licencia de Funcionamiento
+            </button>
+<button class="px-2.5 py-1 rounded-full bg-surface-container-lowest text-on-surface hover:bg-surface-container transition-colors shadow-sm">
+              Inspección Técnica ITSE
+            </button>
+<button class="px-2.5 py-1 rounded-full bg-surface-container-lowest text-on-surface hover:bg-surface-container transition-colors shadow-sm">
+              Permiso Ambiental
+            </button>
+<button class="px-2.5 py-1 rounded-full bg-surface-container-lowest text-on-surface hover:bg-surface-container transition-colors shadow-sm">
+              Copia Certificada
+            </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Quick Access Hub Cards -->
+<section class="space-y-4">
+<div class="flex items-center justify-between">
+<div>
+<h2 class="font-headline-sm text-headline-sm text-primary font-bold">Trámites destacados y recomendados</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Inicia solicitudes de alta demanda con validación paramétrica inmediata.</p>
+</div>
+<a class="hidden sm:inline-flex items-center gap-1 font-label-md text-label-md text-secondary hover:underline font-semibold" href="#">
+          Ver catálogo completo
+          <span class="material-symbols-outlined text-base">arrow_forward</span>
+</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+<!-- Card 1 -->
+<div class="group bg-surface-container-lowest p-5 rounded-xl shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+<div class="space-y-3">
+<div class="flex items-start justify-between">
+<div class="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center text-primary group-hover:bg-secondary group-hover:text-on-secondary transition-colors">
+<span class="material-symbols-outlined">store</span>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-surface-container-low text-secondary font-label-sm text-label-sm font-semibold">
+                100% digital
+              </span>
+</div>
+<div>
+<h3 class="font-headline-sm text-body-lg font-bold text-on-surface group-hover:text-secondary transition-colors">
+                Licencia Comercial
+              </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2 mt-1">
+                Autorización municipal definitiva para establecimientos comerciales y profesionales.
+              </p>
+</div>
+</div>
+<div class="pt-4 mt-2 flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">schedule</span>
+              Respuesta en 48h
+            </span>
+<span class="material-symbols-outlined text-lg text-primary opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all">chevron_right</span>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="group bg-surface-container-lowest p-5 rounded-xl shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+<div class="space-y-3">
+<div class="flex items-start justify-between">
+<div class="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center text-primary group-hover:bg-secondary group-hover:text-on-secondary transition-colors">
+<span class="material-symbols-outlined">verified_user</span>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-surface-container-low text-tertiary-fixed-variant font-label-sm text-label-sm font-semibold">
+                Pre-calificado
+              </span>
+</div>
+<div>
+<h3 class="font-headline-sm text-body-lg font-bold text-on-surface group-hover:text-secondary transition-colors">
+                Inspección ITSE
+              </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2 mt-1">
+                Certificado de seguridad en edificaciones para riesgo bajo y medio con visita programada.
+              </p>
+</div>
+</div>
+<div class="pt-4 mt-2 flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">event_available</span>
+              Cita en 72h
+            </span>
+<span class="material-symbols-outlined text-lg text-primary opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all">chevron_right</span>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="group bg-surface-container-lowest p-5 rounded-xl shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+<div class="space-y-3">
+<div class="flex items-start justify-between">
+<div class="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center text-primary group-hover:bg-secondary group-hover:text-on-secondary transition-colors">
+<span class="material-symbols-outlined">nature</span>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-surface-container-low text-secondary font-label-sm text-label-sm font-semibold">
+                Normativa 2025
+              </span>
+</div>
+<div>
+<h3 class="font-headline-sm text-body-lg font-bold text-on-surface group-hover:text-secondary transition-colors">
+                Permiso Ambiental
+              </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2 mt-1">
+                Evaluación técnica simplificada y registro de manejo de residuos no peligrosos.
+              </p>
+</div>
+</div>
+<div class="pt-4 mt-2 flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">schedule</span>
+              Respuesta en 5 días
+            </span>
+<span class="material-symbols-outlined text-lg text-primary opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all">chevron_right</span>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="group bg-surface-container-lowest p-5 rounded-xl shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+<div class="space-y-3">
+<div class="flex items-start justify-between">
+<div class="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center text-primary group-hover:bg-secondary group-hover:text-on-secondary transition-colors">
+<span class="material-symbols-outlined">assignment</span>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-surface-container-low text-secondary font-label-sm text-label-sm font-semibold">
+                Inmediato
+              </span>
+</div>
+<div>
+<h3 class="font-headline-sm text-body-lg font-bold text-on-surface group-hover:text-secondary transition-colors">
+                Copias Certificadas
+              </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2 mt-1">
+                Expedición con firma electrónica y código QR de validez nacional instantánea.
+              </p>
+</div>
+</div>
+<div class="pt-4 mt-2 flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">bolt</span>
+              Descarga al instante
+            </span>
+<span class="material-symbols-outlined text-lg text-primary opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all">chevron_right</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Main Workspace: Active Dossier Submission & Humanized File Intake -->
+<section class="bg-surface-container-lowest rounded-xl shadow-sm p-6 lg:p-10 space-y-8">
+<!-- Transaction Header & Meta Banner -->
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6">
+<div class="space-y-1">
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm font-semibold">
+              Expediente en curso
+            </span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">Folio: EXP-2025-08492-CD</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-primary font-bold">
+            Solicitud de Licencia de Funcionamiento Comercial (Tipo A)
+          </h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            Giro comercial: Consultoría y Servicios Digitales • Superficie declarada: 85.00 m²
+          </p>
+</div>
+<div class="flex items-center gap-3 shrink-0">
+<button class="px-3.5 py-2 rounded-lg bg-surface-container font-label-md text-label-md text-on-surface hover:bg-surface-container-high transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-base">help</span>
+            Guía de requisitos
+          </button>
+<button class="px-3.5 py-2 rounded-lg bg-surface-container font-label-md text-label-md text-on-surface hover:bg-surface-container-high transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-base">print</span>
+            Resumen
+          </button>
+</div>
+</div>
+<!-- Progressive Stepper -->
+<div class="bg-surface-container-low p-5 rounded-xl space-y-3">
+<div class="flex items-center justify-between text-on-surface font-label-md text-label-md">
+<span class="font-bold flex items-center gap-2">
+<span class="w-6 h-6 rounded-full bg-secondary text-on-secondary flex items-center justify-center text-xs">2</span>
+            Paso 2 de 4: Carga de Documentación Obligatoria
+          </span>
+<span class="text-on-surface-variant font-medium">Progreso general: 50%</span>
+</div>
+<div class="w-full bg-surface-container-highest rounded-full h-2 overflow-hidden">
+<div class="bg-secondary h-2 rounded-full transition-all duration-500" style="width: 50%;"></div>
+</div>
+<!-- Step Markers -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-2 pt-2 text-left font-label-sm text-label-sm">
+<div class="flex items-center gap-1.5 text-on-tertiary-container font-semibold">
+<span class="material-symbols-outlined text-base">check_circle</span>
+<span>1. Datos Generales</span>
+</div>
+<div class="flex items-center gap-1.5 text-secondary font-bold">
+<span class="w-4 h-4 rounded-full bg-secondary text-on-secondary flex items-center justify-center text-[10px]">2</span>
+<span>2. Documentación</span>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface-variant font-medium">
+<span class="w-4 h-4 rounded-full bg-surface-container-high flex items-center justify-center text-[10px]">3</span>
+<span>3. Declaración y Firma</span>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface-variant font-medium">
+<span class="w-4 h-4 rounded-full bg-surface-container-high flex items-center justify-center text-[10px]">4</span>
+<span>4. Pago y Constancia</span>
+</div>
+</div>
+</div>
+<!-- Humanized Drag & Drop Area -->
+<div class="group relative rounded-xl p-8 lg:p-10 text-center transition-all bg-surface-container-low hover:bg-surface-container cursor-pointer flex flex-col items-center justify-center">
+<div class="w-16 h-16 rounded-full bg-surface-container-lowest shadow-sm flex items-center justify-center text-secondary group-hover:scale-105 transition-transform mb-4">
+<span class="material-symbols-outlined text-3xl">cloud_upload</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm font-bold text-primary mb-1">
+          Arrastra tus documentos aquí o presiona para examinar tus archivos
+        </h3>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-lg mb-3">
+          Detectamos automáticamente a qué requisito corresponde cada archivo gracias a nuestra verificación inteligente.
+        </p>
+<div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-container-lowest text-on-surface-variant font-label-sm text-label-sm shadow-sm">
+<span class="material-symbols-outlined text-sm text-secondary">info</span>
+          Formatos PDF, JPG o PNG • Hasta 15 MB por archivo • Optimización automática incluida
+        </div>
+<input aria-label="Cargar archivos de expediente" class="absolute inset-0 opacity-0 cursor-pointer" multiple="" type="file"/>
+</div>
+<!-- Interactive Required Documents Checklist -->
+<div class="space-y-4">
+<div class="flex items-center justify-between">
+<h4 class="font-headline-sm text-body-lg font-bold text-primary flex items-center gap-2">
+<span>Documentos obligatorios para este trámite</span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container font-label-sm text-label-sm font-medium text-on-surface-variant">3 de 4 completados o en proceso</span>
+</h4>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Revisión preliminar automatizada</span>
+</div>
+<div class="space-y-3">
+<!-- Doc 1: DNI (Cargado con éxito) -->
+<div class="p-4 rounded-xl bg-surface-container-low hover:bg-surface-container transition-all flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex items-start gap-4">
+<div class="relative w-12 h-14 rounded-lg bg-surface-container-lowest shadow-sm flex items-center justify-center text-secondary shrink-0 overflow-hidden">
+<span class="material-symbols-outlined text-2xl">picture_as_pdf</span>
+<span class="absolute bottom-0 inset-x-0 bg-primary text-[9px] text-on-primary text-center font-bold">PDF</span>
+</div>
+<div class="space-y-1">
+<div class="flex items-center gap-2 flex-wrap">
+<span class="font-label-md text-label-md font-bold text-on-surface">1. Documento de Identidad del Titular (DNI / Cédula)</span>
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed-variant font-label-sm text-label-sm font-semibold">
+<span class="material-symbols-outlined text-xs">check</span>
+                    Cargado con éxito
+                  </span>
+</div>
+<div class="flex items-center gap-3 font-code-sm text-code-sm text-on-surface-variant">
+<span>dni_representante_2025.pdf</span>
+<span>•</span>
+<span>1.8 MB</span>
+<span>•</span>
+<span class="text-on-tertiary-container font-medium">Validado contra Registro Nacional</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2 self-end md:self-center shrink-0">
+<button class="px-3 py-1.5 rounded-lg bg-surface-container-lowest hover:bg-surface-container-high text-on-surface font-label-md text-label-md shadow-sm transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-base">visibility</span>
+                Ver
+              </button>
+<button class="px-3 py-1.5 rounded-lg bg-surface-container-lowest hover:bg-surface-container-high text-on-surface font-label-md text-label-md shadow-sm transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-base">sync</span>
+                Reemplazar
+              </button>
+</div>
+</div>
+<!-- Doc 2: Comprobante de Domicilio Fiscal (Pendiente de adjuntar) -->
+<div class="p-4 rounded-xl bg-surface-container-low hover:bg-surface-container transition-all flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex items-start gap-4">
+<div class="w-12 h-14 rounded-lg bg-surface-container-high flex items-center justify-center text-on-surface-variant shrink-0">
+<span class="material-symbols-outlined text-2xl">receipt_long</span>
+</div>
+<div class="space-y-1">
+<div class="flex items-center gap-2 flex-wrap">
+<span class="font-label-md text-label-md font-bold text-on-surface">2. Comprobante de Domicilio Fiscal</span>
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm font-semibold">
+<span class="material-symbols-outlined text-xs">pending</span>
+                    Pendiente de adjuntar
+                  </span>
+</div>
+<div class="flex items-center gap-1.5 font-body-sm text-body-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-sm text-secondary">info</span>
+<span>Recibo de luz, agua o contrato de arrendamiento (no mayor a 3 meses de antigüedad).</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2 self-end md:self-center shrink-0">
+<label class="cursor-pointer px-4 py-2 rounded-lg bg-secondary text-on-secondary font-label-md text-label-md hover:bg-secondary-container transition-colors flex items-center gap-2 shadow-sm">
+<span class="material-symbols-outlined text-base">upload_file</span>
+                Adjuntar archivo
+                <input accept=".pdf,.png,.jpg,.jpeg" class="hidden" type="file"/>
+</label>
+</div>
+</div>
+<!-- Doc 3: Plano de Distribución Visado (En validación OCR 85%) -->
+<div class="p-4 rounded-xl bg-surface-container-low hover:bg-surface-container transition-all flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex items-start gap-4 flex-1">
+<div class="relative w-12 h-14 rounded-lg bg-surface-container-lowest shadow-sm flex items-center justify-center text-secondary shrink-0 overflow-hidden">
+<span class="material-symbols-outlined text-2xl">architecture</span>
+<span class="absolute bottom-0 inset-x-0 bg-secondary text-[9px] text-on-secondary text-center font-bold">DWG-PDF</span>
+</div>
+<div class="space-y-2 w-full max-w-xl">
+<div class="flex items-center gap-2 flex-wrap">
+<span class="font-label-md text-label-md font-bold text-on-surface">3. Plano de Distribución y Evacuación</span>
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm font-semibold">
+<span class="material-symbols-outlined text-xs animate-spin">refresh</span>
+                    En validación automática OCR (85%)
+                  </span>
+</div>
+<!-- Tiny Progress Bar -->
+<div class="space-y-1">
+<div class="w-full bg-surface-container-highest rounded-full h-1.5 overflow-hidden">
+<div class="bg-secondary h-1.5 rounded-full transition-all duration-300" style="width: 85%;"></div>
+</div>
+<p class="font-code-sm text-code-sm text-on-surface-variant">plano_arquitectura_local_v2.pdf (12.4 MB) • Comprobando sellos colegiados...</p>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2 self-end md:self-center shrink-0">
+<button class="px-3 py-1.5 rounded-lg bg-surface-container-lowest hover:bg-surface-container-high text-on-surface-variant font-label-md text-label-md transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-base">pause</span>
+                Pausar
+              </button>
+</div>
+</div>
+<!-- Doc 4: Declaración Jurada de Cumplimiento -->
+<div class="p-4 rounded-xl bg-surface-container-low hover:bg-surface-container transition-all flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex items-start gap-4">
+<div class="w-12 h-14 rounded-lg bg-surface-container-high flex items-center justify-center text-on-surface-variant shrink-0">
+<span class="material-symbols-outlined text-2xl">draw</span>
+</div>
+<div class="space-y-1">
+<div class="flex items-center gap-2 flex-wrap">
+<span class="font-label-md text-label-md font-bold text-on-surface">4. Declaración Jurada de Cumplimiento de Condiciones</span>
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm font-semibold">
+                    Listo para firma
+                  </span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                  Aceptación de estándares de zonificación, compatibilidad de uso y seguridad no estructural.
+                </p>
+</div>
+</div>
+<div class="flex items-center gap-2 self-end md:self-center shrink-0">
+<a class="px-3 py-1.5 rounded-lg bg-surface-container-lowest hover:bg-surface-container-high text-on-surface font-label-md text-label-md shadow-sm transition-colors flex items-center gap-1" href="#">
+<span class="material-symbols-outlined text-base">download</span>
+                Descargar plantilla
+              </a>
+<button class="px-3 py-1.5 rounded-lg bg-primary text-on-primary font-label-md text-label-md hover:bg-primary-container transition-colors flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-base">fingerprint</span>
+                Firmar en línea
+              </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Empathetic Citizen Guidance Note / Tooltip Alert -->
+<div class="p-4 rounded-xl bg-surface-container-low flex items-start gap-3.5">
+<span class="material-symbols-outlined text-secondary text-2xl shrink-0 mt-0.5">lightbulb</span>
+<div class="space-y-1">
+<span class="font-label-md text-label-md font-bold text-primary">¿No cuentas con certificado o firma digital instalada?</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            No te preocupes. Puedes validar este documento y la declaración jurada utilizando únicamente tu <strong>Clave Digital Ciudadana (Gov-ID)</strong> mediante un código de seguridad enviado a tu móvil en el siguiente paso.
+          </p>
+</div>
+</div>
+<!-- Bottom Action Bar & Institutional Guarantee -->
+<div class="pt-6 space-y-6">
+<div class="flex flex-col-reverse sm:flex-row items-center justify-between gap-4">
+<button class="w-full sm:w-auto px-5 py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-base">save</span>
+            Guardar borrador para continuar después
+          </button>
+<div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+<div class="hidden md:flex flex-col text-right font-label-sm text-label-sm">
+<span class="text-on-surface font-bold">3 de 4 documentos listos</span>
+<span class="text-on-surface-variant">Falta subir recibo fiscal</span>
+</div>
+<button class="w-full sm:w-auto px-6 py-3 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md font-semibold transition-all flex items-center justify-center gap-2 shadow-sm">
+<span>Continuar a Revisión y Firma</span>
+<span class="material-symbols-outlined text-lg">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Security & Legal Footer -->
+<div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 font-body-sm text-body-sm text-on-surface-variant">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-base text-tertiary-fixed-variant">lock</span>
+<span>Tus datos y expedientes están protegidos bajo cifrado de grado bancario (TLS 1.3 y AES-256).</span>
+</div>
+<div class="flex items-center gap-4 font-label-sm text-label-sm">
+<span class="hover:underline cursor-pointer">Ley de Protección de Datos</span>
+<span>•</span>
+<span class="hover:underline cursor-pointer">Soporte SETC 24/7</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div></main><footer class="w-full bg-surface-container-low mt-20"><div class="max-w-7xl mx-auto px-6 lg:px-12 py-12"><div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8"><div class="space-y-3"><div class="flex items-center gap-2"><span class="font-headline-sm text-headline-sm text-primary font-bold tracking-tight">SETC</span><span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-surface-container text-on-surface font-medium">Oficial</span></div><p class="font-body-sm text-body-sm text-on-surface-variant">Sistema Institucional de Gestión de Citas, Trámites y Expedientes Digitales. Plataforma interoperable del Gobierno Digital.</p></div><div><h4 class="font-label-md text-label-md text-on-surface font-semibold mb-3">Atención Ciudadana</h4><ul class="space-y-2 font-body-sm text-body-sm text-on-surface-variant"><li><a class="hover:text-on-surface transition-colors" href="#">Línea Directa 800-SETC-01</a></li><li><a class="hover:text-on-surface transition-colors" href="#">Mesa de Ayuda Telemática</a></li><li><a class="hover:text-on-surface transition-colors" href="#">Módulos Presenciales</a></li><li><a class="hover:text-on-surface transition-colors" href="#">Guía de Trámites y Requisitos</a></li></ul></div><div><h4 class="font-label-md text-label-md text-on-surface font-semibold mb-3">Normatividad y Transparencia</h4><ul class="space-y-2 font-body-sm text-body-sm text-on-surface-variant"><li><a class="hover:text-on-surface transition-colors" href="#">Aviso de Privacidad Integral</a></li><li><a class="hover:text-on-surface transition-colors" href="#">Términos de Servicio Gov-ID</a></li><li><a class="hover:text-on-surface transition-colors" href="#">Marco Jurídico de Actuación</a></li><li><a class="hover:text-on-surface transition-colors" href="#">Portal Nacional de Transparencia</a></li></ul></div><div><h4 class="font-label-md text-label-md text-on-surface font-semibold mb-3">Certificaciones</h4><div class="space-y-2 font-body-sm text-body-sm text-on-surface-variant"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-base text-secondary">verified_user</span><span>Encriptación Criptográfica SHA-256</span></div><div class="flex items-center gap-2"><span class="material-symbols-outlined text-base text-secondary">accessibility_new</span><span>Conformidad Accesibilidad WCAG 2.1 AA</span></div></div></div></div><div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 font-body-sm text-body-sm text-on-surface-variant"><p>© 2025 Sistema Estatal de Citas, Trámites y Expedientes (SETC). Todos los derechos reservados.</p><div class="flex items-center gap-6 font-label-sm text-label-sm"><a class="hover:text-on-surface transition-colors" href="#">Accesibilidad</a><a class="hover:text-on-surface transition-colors" href="#">Privacidad</a><a class="hover:text-on-surface transition-colors" href="#">Mapa del Sitio</a></div></div></div></footer></body></html>
