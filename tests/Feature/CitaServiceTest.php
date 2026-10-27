@@ -70,3 +70,14 @@ test('cancelarCita actualiza estado y registra auditoria en bitacora', function 
     expect($citaCancelada->Estado_Citas)->toBe('Cancelada');
     expect(Bitacora::where('Accion', 'Cancelación de Cita')->exists())->toBeTrue();
 });
+
+test('agendarCita rechaza fechas u horas en el pasado', function () {
+    $usuario = Usuario::create(['Nombre' => 'Test', 'Email' => 'test_pasado@setc.gob', 'Contrasena' => '123']);
+    $service = new CitaService;
+
+    // Fecha en el pasado (hace 2 días)
+    $fechaPasada = now()->subDays(2)->toDateString();
+
+    expect(fn () => $service->agendarCita($usuario, null, $fechaPasada, '10:00'))
+        ->toThrow(DomainException::class, 'No se pueden agendar citas en fechas u horas pasadas.');
+});

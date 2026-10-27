@@ -44,6 +44,11 @@ class CitaService
             // Normalizar hora de la nueva cita (ej: 09:30:00)
             $horaInicioCandidata = Carbon::parse($fechaString.' '.$hora);
 
+            // Regla: No permitir agendar citas en fechas u horas pasadas
+            if ($horaInicioCandidata->isPast()) {
+                throw new DomainException('No se pueden agendar citas en fechas u horas pasadas.');
+            }
+
             // Regla: Aislamiento del solicitante en caso de vincularse a un expediente
             if ($solicitud !== null && (int) $solicitud->ID_Solicitante !== (int) $usuario->ID_Usuarios) {
                 if (! $usuario->relationLoaded('roles')) {
