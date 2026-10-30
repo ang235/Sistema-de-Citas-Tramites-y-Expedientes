@@ -1,3 +1,4 @@
+%!TEX root = Proeycto.tex
 \documentclass[12pt, oneside,openright]{report} %Letter,
 \usepackage[colorlinks=true, linkcolor=black, citecolor=blue, urlcolor = blue]{hyperref}
 \usepackage[left=2.54cm, right=2.54cm, top=2.54cm, bottom=2.54cm]{geometry}
@@ -24,9 +25,10 @@
 \usepackage{array}
 \usepackage{tabularx}
 \usepackage{textcomp}
+\usepackage{float}
 \usepackage[utf8]{inputenc}
-\usepackage[backend=biber,style=ieee, sorting=none, style=numeric]{biblatex}
-\bibliography{Referencias}
+\usepackage[backend=biber,style=ieee,sorting=none]{biblatex}
+\addbibresource{Referencias.bib}
 
     
 \lstdefinestyle{mystyle}{
@@ -73,11 +75,11 @@
 \renewcommand{\tablename}{Tabla}
 
 \begin{titlepage}
-\begin{minipage}[l]{3.5cm}
+\begin{minipage}[c]{3.5cm}
 \includegraphics[width=5cm, height=22.0cm]{imagenes/Imagen_front_UPTex.jpg}
 \end{minipage}
 \vspace*{-3.0cm}
-\begin{minipage}[r]{13.0cm}
+\begin{minipage}[c]{13.0cm}
 \begin{center}
 \textbf{\LARGE{UNIVERSIDAD POLIT\'{E}CNICA }}\\
 \vspace*{0.5cm}
