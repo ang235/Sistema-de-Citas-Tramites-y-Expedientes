@@ -30,11 +30,30 @@ Desarrollar el sistema de citas trámites y expedientes como una plataforma web,
 
 \section{Alcance}
 
+\begin{itemize}
+    \item \textbf{Módulo de Autenticación y Usuarios:} Gestión de registro, inicio de sesión e identificación de perfiles institucionales (Ciudadano, Revisor, Supervisor, Administrador).
+    \item \textbf{Módulo de Gestión de Expedientes y Citas:} Programación de citas y procesamiento del ciclo de vida de los trámites (creación, seguimiento, revisión y dictamen).
+    \item \textbf{Seguridad y Control de Acceso:} Restricción de permisos por roles (\texttt{CheckRole}) y validación de acceso a expedientes por propiedad o asignación (\texttt{VerificarAccesoSolicitud}).
+    \item \textbf{Módulo de Auditoría y Trazabilidad:} Registro automático en bitácora con marcas de tiempo, usuarios, ID y cargas útiles de operaciones de cambio (\texttt{RegistrarBitacora}).
+\end{itemize}
 
-\section{Limitación}
+\section{Limitaciones}
+
+\begin{itemize}
+    \item \textbf{Procesamiento de Pagos:} El sistema no contempla pasarelas de pago electrónico integradas; la validación de derechos y comprobantes se realiza de forma externa o presencial.
+    \item \textbf{Infraestructura Tecnológica:} La disponibilidad operativa depende directamente de los servidores institucionales asignados y de la estabilidad de la red interna de la dependencia gubernamental.
+    \item \textbf{Firma Electrónica:} No incluye certificación criptográfica avanzada ni integración con servicios federales de firma electrónica avanzada (FEA).
+    \item \textbf{Canales de Acceso:} El acceso está estrictamente limitado a navegadores web estándar en plataformas de escritorio y dispositivos móviles, excluyendo el desarrollo de aplicaciones nativas.
+    \item \textbf{Notificaciones por SMS o WhatsApp:} El envío de alertas y avisos de estatus sobre las citas y trámites se limita exclusivamente al correo electrónico institucional, omitiendo servicios de mensajería instantánea por red celular.
+    \item \textbf{Almacenamiento de Archivos Adjuntos:} El tamaño de los archivos adjuntos en los expedientes (identificaciones, comprobantes, documentos de soporte) está restringido por las cuotas de almacenamiento configuradas en el servidor web.
+    \item \textbf{Respaldo Externo:} El sistema manejará el resguardo de información únicamente mediante la bitácora.
+\end{itemize}
 
 \section{Problemática}
 
+La problemática se centra en que la gestión presencial o mediante sistemas obsoletos provoca aglomeraciones en ventanillas, tiempos prolongados de atención, una deficiente distribución de las cargas de trabajo y la acumulación de documentación en papel a falta de un expediente digital centralizado, con lo cual incrementan los costos de archivo, consumo de insumos y riesgo de deterioro o pérdida de información física; asimismo, la ausencia de mecanismos de auditoría automatizados impide conocer con exactitud qué usuario o servidor público realizó modificaciones sobre un expediente, dificultando la rendición de cuentas y la transparencia institucional.
 
 \section{Justificación}
+
+El desarrollo del sistema se justifica como una solución integral que elimina la saturación en ventanillas, los tiempos de espera y el uso excesivo de papel mediante un expediente digital centralizado. Asimismo, incorpora un sistema de auditoría automatizado que garantiza la transparencia y la rendición de cuentas al registrar con exactitud cada modificación realizada por los usuarios.
 
