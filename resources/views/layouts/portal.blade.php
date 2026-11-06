@@ -21,6 +21,10 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+    {{-- Alpine.js --}}
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>[x-cloak] { display: none !important; }</style>
+
     {{-- Tailwind Stitch Civic Scheme Engine --}}
     <script src="https://cdn.tailwindcss.com"></script>
     <script id="tailwind-config">
@@ -154,61 +158,30 @@
             </div>
         </div>
 
-        {{-- Navegación scrollable --}}
+        {{-- Navegación scrollable según rol --}}
         <nav class="flex-1 overflow-y-auto px-3 pb-4 space-y-0.5" aria-label="Menú operativo" style="scrollbar-width:none;">
 
             @hasSection('sidebar')
                 @yield('sidebar')
             @else
-                {{-- ─── OPERACIÓN & DICTAMEN ──────────────────────────────────── --}}
-                <div class="sidebar-section-label">Operación & Dictamen</div>
+                @php
+                    $u = auth()->user();
+                    $isAdmin = $u ? $u->esAdministrador() : false;
+                    $isRevisor = $u ? $u->esRevisor() : false;
+                    $isSupervisor = $u ? $u->esSupervisor() : false;
+                @endphp
 
-                <a href="{{ route('portal.dashboard') }}"
-                   class="sidebar-item {{ Request::routeIs('portal.dashboard') ? 'active' : '' }}"
-                   @if(Request::routeIs('portal.dashboard')) aria-current="page" @endif>
-                    <span class="material-symbols-outlined text-base">dashboard</span>
-                    Dashboard Operativo
-                </a>
-                <a href="{{ route('portal.mesa-dictamen') }}"
-                   class="sidebar-item {{ Request::routeIs('portal.mesa-dictamen*') ? 'active' : '' }}">
-                    <span class="material-symbols-outlined text-base">gavel</span>
-                    Mesa de Dictamen
-                </a>
-                <a href="{{ route('portal.expedientes') }}"
-                   class="sidebar-item {{ Request::routeIs('portal.expedientes*') ? 'active' : '' }}">
-                    <span class="material-symbols-outlined text-base">folder_open</span>
-                    Expedientes Observados
-                    @if(($observedCount ?? 0) > 0)
-                        <span class="ml-auto px-2 py-0.5 rounded-full text-white font-bold"
-                              style="font-size: 11px; background-color: var(--color-warning); min-width: 1.25rem; text-align:center;">
-                            {{ $observedCount }}
-                        </span>
-                    @endif
-                </a>
-                <a href="{{ route('portal.citas') }}"
-                   class="sidebar-item {{ Request::routeIs('portal.citas*') ? 'active' : '' }}">
-                    <span class="material-symbols-outlined text-base">calendar_month</span>
-                    Agenda de Citas
-                </a>
+                @if($isAdmin)
+                    {{-- ─── ADMINISTRADOR ────────────────────────────────────────── --}}
+                    <div class="sidebar-section-label">Panel Principal</div>
+                    <a href="{{ route('portal.dashboard') }}"
+                       class="sidebar-item {{ Request::routeIs('portal.dashboard') ? 'active' : '' }}"
+                       @if(Request::routeIs('portal.dashboard')) aria-current="page" @endif>
+                        <span class="material-symbols-outlined text-base">dashboard</span>
+                        Dashboard Operativo
+                    </a>
 
-                {{-- ─── SUPERVISIÓN & SLA ─────────────────────────────────────── --}}
-                <div class="sidebar-section-label">Supervisión & SLA</div>
-
-                <a href="{{ route('portal.matriz-cargas') }}"
-                   class="sidebar-item {{ Request::routeIs('portal.matriz-cargas*') ? 'active' : '' }}">
-                    <span class="material-symbols-outlined text-base">balance</span>
-                    Matriz de Cargas
-                </a>
-                <a href="{{ route('portal.metricas') }}"
-                   class="sidebar-item {{ Request::routeIs('portal.metricas*') ? 'active' : '' }}">
-                    <span class="material-symbols-outlined text-base">monitoring</span>
-                    Métricas y Desempeño
-                </a>
-
-                {{-- ─── ADMINISTRACIÓN GOVTECH ────────────────────────────────── --}}
-                @can('manage-users')
-                    <div class="sidebar-section-label">Administración GovTech</div>
-
+                    <div class="sidebar-section-label">Configuración & Seguridad</div>
                     <a href="{{ route('portal.usuarios') }}"
                        class="sidebar-item {{ Request::routeIs('portal.usuarios*') ? 'active' : '' }}">
                         <span class="material-symbols-outlined text-base">manage_accounts</span>
@@ -217,14 +190,110 @@
                     <a href="{{ route('portal.parametros') }}"
                        class="sidebar-item {{ Request::routeIs('portal.parametros*') ? 'active' : '' }}">
                         <span class="material-symbols-outlined text-base">tune</span>
-                        Parámetros y Requisitos
+                        Trámites y Requisitos
                     </a>
                     <a href="{{ route('portal.auditoria') }}"
                        class="sidebar-item {{ Request::routeIs('portal.auditoria*') ? 'active' : '' }}">
                         <span class="material-symbols-outlined text-base">policy</span>
                         Auditoría & Logs PIDE
                     </a>
-                @endcan
+
+                    <div class="sidebar-section-label">Control Operativo</div>
+                    <a href="{{ route('portal.matriz-cargas') }}"
+                       class="sidebar-item {{ Request::routeIs('portal.matriz-cargas*') ? 'active' : '' }}">
+                        <span class="material-symbols-outlined text-base">balance</span>
+                        Matriz de Cargas
+                    </a>
+                    <a href="{{ route('portal.metricas') }}"
+                       class="sidebar-item {{ Request::routeIs('portal.metricas*') ? 'active' : '' }}">
+                        <span class="material-symbols-outlined text-base">monitoring</span>
+                        Métricas Globales
+                    </a>
+                    <a href="{{ route('portal.citas') }}"
+                       class="sidebar-item {{ Request::routeIs('portal.citas*') ? 'active' : '' }}">
+                        <span class="material-symbols-outlined text-base">calendar_month</span>
+                        Agenda de Citas
+                    </a>
+
+                @elseif($isRevisor)
+                    {{-- ─── REVISOR TÉCNICO ──────────────────────────────────────── --}}
+                    <div class="sidebar-section-label">Mesa Técnica</div>
+                    <a href="{{ route('portal.mesa-dictamen') }}"
+                       class="sidebar-item {{ Request::routeIs('portal.mesa-dictamen*') ? 'active' : '' }}"
+                       @if(Request::routeIs('portal.mesa-dictamen*')) aria-current="page" @endif>
+                        <span class="material-symbols-outlined text-base">gavel</span>
+                        Mesa de Dictamen
+                    </a>
+                    <a href="{{ route('portal.expedientes') }}"
+                       class="sidebar-item {{ Request::routeIs('portal.expedientes*') ? 'active' : '' }}">
+                        <span class="material-symbols-outlined text-base">folder_open</span>
+                        Expedientes Asignados
+                        @if(($observedCount ?? 0) > 0)
+                            <span class="ml-auto px-2 py-0.5 rounded-full text-white font-bold"
+                                  style="font-size: 11px; background-color: var(--color-secondary); min-width: 1.25rem; text-align:center;">
+                                {{ $observedCount }}
+                            </span>
+                        @endif
+                    </a>
+
+                    <div class="sidebar-section-label">Atención</div>
+                    <a href="{{ route('portal.citas') }}"
+                       class="sidebar-item {{ Request::routeIs('portal.citas*') ? 'active' : '' }}">
+                        <span class="material-symbols-outlined text-base">calendar_month</span>
+                        Agenda de Citas
+                    </a>
+
+                @elseif($isSupervisor)
+                    {{-- ─── SUPERVISOR / DICTAMINADOR ────────────────────────────── --}}
+                    <div class="sidebar-section-label">Supervisión & Cargas</div>
+                    <a href="{{ route('portal.matriz-cargas') }}"
+                       class="sidebar-item {{ Request::routeIs('portal.matriz-cargas*') ? 'active' : '' }}"
+                       @if(Request::routeIs('portal.matriz-cargas*')) aria-current="page" @endif>
+                        <span class="material-symbols-outlined text-base">balance</span>
+                        Matriz de Cargas
+                    </a>
+                    <a href="{{ route('portal.metricas') }}"
+                       class="sidebar-item {{ Request::routeIs('portal.metricas*') ? 'active' : '' }}">
+                        <span class="material-symbols-outlined text-base">monitoring</span>
+                        Métricas y Desempeño
+                    </a>
+                    <a href="{{ route('portal.mesa-dictamen') }}"
+                       class="sidebar-item {{ Request::routeIs('portal.mesa-dictamen*') ? 'active' : '' }}">
+                        <span class="material-symbols-outlined text-base">gavel</span>
+                        Mesa de Dictamen
+                    </a>
+                    <a href="{{ route('portal.expedientes') }}"
+                       class="sidebar-item {{ Request::routeIs('portal.expedientes*') ? 'active' : '' }}">
+                        <span class="material-symbols-outlined text-base">folder_open</span>
+                        Expedientes Supervisados
+                    </a>
+
+                    <div class="sidebar-section-label">Atención</div>
+                    <a href="{{ route('portal.citas') }}"
+                       class="sidebar-item {{ Request::routeIs('portal.citas*') ? 'active' : '' }}">
+                        <span class="material-symbols-outlined text-base">calendar_month</span>
+                        Agenda de Citas
+                    </a>
+
+                @else
+                    {{-- ─── GENERAL / OPERATIVO ──────────────────────────────────── --}}
+                    <div class="sidebar-section-label">Operación</div>
+                    <a href="{{ route('portal.dashboard') }}"
+                       class="sidebar-item {{ Request::routeIs('portal.dashboard') ? 'active' : '' }}">
+                        <span class="material-symbols-outlined text-base">dashboard</span>
+                        Dashboard Operativo
+                    </a>
+                    <a href="{{ route('portal.expedientes') }}"
+                       class="sidebar-item {{ Request::routeIs('portal.expedientes*') ? 'active' : '' }}">
+                        <span class="material-symbols-outlined text-base">folder_open</span>
+                        Expedientes
+                    </a>
+                    <a href="{{ route('portal.citas') }}"
+                       class="sidebar-item {{ Request::routeIs('portal.citas*') ? 'active' : '' }}">
+                        <span class="material-symbols-outlined text-base">calendar_month</span>
+                        Agenda de Citas
+                    </a>
+                @endif
             @endif
         </nav>
 
@@ -285,18 +354,20 @@
                 </button>
 
                 {{-- Global search --}}
-                <div class="relative flex-1 max-w-sm hidden sm:block">
+                <form action="{{ route('portal.expedientes') }}" method="GET" class="relative flex-1 max-w-sm hidden sm:flex items-center" role="search">
                     <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-sm pointer-events-none"
                           style="color: var(--color-on-surface-variant);">search</span>
                     <input type="text"
-                           class="input pl-9 text-sm"
+                           name="q"
+                           class="input pl-9 text-sm w-full"
                            style="height: 36px;"
-                           placeholder="Buscar por Folio, Administrado, RFC o Expediente..."
+                           placeholder="Buscar por Folio, Administrado, RFC..."
                            aria-label="Búsqueda global"
-                           id="topbar-search">
+                           id="topbar-search"
+                           value="{{ request('q') }}">
                     <span class="absolute right-2 top-1/2 -translate-y-1/2 px-1.5 py-0.5 rounded text-xs font-mono"
                           style="background-color: var(--color-surface-container-high); color: var(--color-on-surface-variant);">⌘K</span>
-                </div>
+                </form>
             </div>
 
             {{-- Indicadores de estado del sistema --}}
@@ -316,21 +387,89 @@
                     {{ auth()->user()->sede ?? 'Sede Central Metropolitana' }}
                 </div>
 
-                {{-- Notificaciones --}}
-                <div class="relative">
-                    <button class="btn-ghost" aria-label="Notificaciones" id="btn-topbar-notifications">
+                {{-- Notificaciones con Dropdown --}}
+                <div class="relative" x-data="{ openNotif: false }">
+                    <button @click="openNotif = !openNotif" class="btn-ghost relative" aria-label="Notificaciones" id="btn-topbar-notifications">
                         <span class="material-symbols-outlined">notifications</span>
                         @if(($notificationCount ?? 0) > 0)
-                            <span class="absolute top-1 right-1 w-2 h-2 rounded-full ring-2"
-                                  style="background-color: var(--color-secondary); ring-color: var(--color-surface-container-lowest);"></span>
+                            <span class="absolute top-1 right-1 w-2.5 h-2.5 rounded-full ring-2 ring-white"
+                                  style="background-color: var(--color-secondary);"></span>
                         @endif
                     </button>
+                    <div x-show="openNotif" @click.outside="openNotif = false"
+                         x-transition
+                         class="dropdown-menu absolute right-0 top-full mt-2 w-80 z-50 bg-white rounded-xl shadow-lg border border-slate-200" role="dialog" aria-label="Panel de notificaciones" style="display: none;">
+                        <div class="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+                            <span class="text-sm font-bold text-[#0b1c30]">Notificaciones</span>
+                            <span class="text-xs text-slate-400 font-mono">{{ now()->format('d/m/Y') }}</span>
+                        </div>
+                        <div class="py-1 max-h-72 overflow-y-auto divide-y divide-slate-100">
+                            @php
+                                $bitacorasRecientes = auth()->check() ? auth()->user()->bitacoras()->latest('Fecha_Hora')->take(5)->get() : collect();
+                            @endphp
+                            @forelse($bitacorasRecientes as $bit)
+                                <div class="p-3 hover:bg-slate-50 transition-colors flex items-start gap-2.5">
+                                    <div class="w-7 h-7 rounded-full bg-[#eff4ff] text-[#0051d5] flex items-center justify-center shrink-0 mt-0.5">
+                                        <span class="material-symbols-outlined text-sm">info</span>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-xs font-semibold text-[#0b1c30] truncate">{{ $bit->Accion ?? 'Actividad' }}</p>
+                                        <p class="text-[11px] text-slate-400">{{ $bit->Fecha_Hora ? \Carbon\Carbon::parse($bit->Fecha_Hora)->diffForHumans() : '' }}</p>
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="px-4 py-6 text-center text-xs text-slate-400">
+                                    <span class="material-symbols-outlined text-2xl block mb-1 opacity-30">notifications_none</span>
+                                    Sin notificaciones recientes
+                                </div>
+                            @endforelse
+                        </div>
+                        <div class="border-t border-slate-100 px-4 py-2.5 bg-slate-50 rounded-b-xl flex justify-between items-center">
+                            <a href="{{ route('portal.auditoria') }}" class="text-xs text-[#0051d5] font-semibold hover:underline">Ver auditoría completa →</a>
+                            <button @click="openNotif = false" class="text-xs text-slate-400 hover:text-slate-600">Cerrar</button>
+                        </div>
+                    </div>
                 </div>
 
-                {{-- Ayuda --}}
-                <button class="btn-ghost" aria-label="Ayuda y documentación">
-                    <span class="material-symbols-outlined">help_outline</span>
-                </button>
+                {{-- Ayuda con Dropdown --}}
+                <div class="relative" x-data="{ openAyuda: false }">
+                    <button @click="openAyuda = !openAyuda" class="btn-ghost" aria-label="Ayuda y documentación">
+                        <span class="material-symbols-outlined">help_outline</span>
+                    </button>
+                    <div x-show="openAyuda" @click.outside="openAyuda = false"
+                         x-transition
+                         class="dropdown-menu absolute right-0 top-full mt-2 w-72 z-50 bg-white rounded-xl shadow-lg border border-slate-200" role="dialog" style="display: none;">
+                        <div class="px-4 py-3 border-b border-slate-100">
+                            <span class="text-sm font-bold text-[#0b1c30]">Mesa de Ayuda SETC</span>
+                        </div>
+                        <div class="p-3 space-y-3">
+                            <div class="space-y-1.5">
+                                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Atajos Rápidos</span>
+                                <div class="flex items-center justify-between text-xs py-1 border-b border-slate-100">
+                                    <span class="text-slate-600">Búsqueda global</span>
+                                    <kbd class="px-1.5 py-0.5 rounded bg-slate-100 text-[11px] font-mono font-bold text-slate-700">⌘K</kbd>
+                                </div>
+                                <div class="flex items-center justify-between text-xs py-1 border-b border-slate-100">
+                                    <span class="text-slate-600">Nueva Cita</span>
+                                    <kbd class="px-1.5 py-0.5 rounded bg-slate-100 text-[11px] font-mono font-bold text-slate-700">C</kbd>
+                                </div>
+                            </div>
+                            <div class="pt-1">
+                                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Canales de Soporte</span>
+                                <div class="space-y-1">
+                                    <a href="mailto:soporte@setc.gob.mx" class="flex items-center gap-2 text-xs text-[#0051d5] hover:underline">
+                                        <span class="material-symbols-outlined text-sm">mail</span>
+                                        soporte@setc.gob.mx
+                                    </a>
+                                    <p class="text-xs text-slate-500 flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-sm">call</span>
+                                        800-SETC-GOB (Ext. 401)
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 {{-- Avatar usuario --}}
                 <div class="relative" x-data="{ open: false }">

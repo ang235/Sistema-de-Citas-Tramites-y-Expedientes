@@ -11,6 +11,27 @@ use Illuminate\View\View;
 
 class TramiteCiudadanoController extends Controller
 {
+    public function home(Request $request): View
+    {
+        $search = $request->query('buscar');
+
+        $tramites = TipoTramite::query()
+            ->where('Estado_Tipo_Tr', 'Activo')
+            ->when($search, function ($query, $term): void {
+                $query->where('Nombre', 'like', "%{$term}%")
+                    ->orWhere('Descripcion', 'like', "%{$term}%");
+            })
+            ->with(['versiones' => function ($query): void {
+                $query->where('Estado_Ver_Tr', 'Vigente')->with('requisitos');
+            }])
+            ->get();
+
+        return view('public.home', [
+            'tramites' => $tramites,
+            'busqueda' => $search,
+        ]);
+    }
+
     public function index(Request $request): View
     {
         $search = $request->query('buscar');

@@ -22,13 +22,11 @@ class ExpedienteCiudadanoController extends Controller
 {
     public function index(Request $request): View
     {
-        $idUsuario = Auth::id();
+        $idUsuario = (int) Auth::id();
         $codigoFolio = $request->query('folio');
 
         $solicitudes = Solicitud::query()
-            ->when($idUsuario, function ($query, $uid): void {
-                $query->where('ID_Solicitante', $uid);
-            })
+            ->where('ID_Solicitante', $idUsuario)
             ->when($codigoFolio, function ($query, $folio): void {
                 $query->whereHas('folio', function ($q) use ($folio): void {
                     $q->where('Codigo_Folio', 'like', "%{$folio}%");
@@ -62,6 +60,12 @@ class ExpedienteCiudadanoController extends Controller
             'citas',
             'resoluciones.supervisor',
         ])->findOrFail($folio->ID_Solicitud);
+
+        /** @var Usuario|null $user */
+        $user = Auth::user();
+        if ($user !== null && ! $user->esAdministrador() && ! $user->esRevisor() && ! $user->esSupervisor()) {
+            abort_if($solicitud->ID_Solicitante !== $user->ID_Usuarios, 403, 'No tiene autorización para consultar este expediente.');
+        }
 
         return view('public.expedientes.show', [
             'solicitud' => $solicitud,

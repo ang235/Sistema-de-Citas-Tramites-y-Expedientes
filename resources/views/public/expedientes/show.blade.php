@@ -58,7 +58,7 @@
             <button onclick="window.print();"
                     class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-[#0b1c30] text-xs font-semibold transition-colors shadow-xs">
                 <span class="material-symbols-outlined text-sm">print</span>
-                <span>Imprimir Hoja de Ruta</span>
+                <span>Imprimir Resumen</span>
             </button>
         </div>
     </div>

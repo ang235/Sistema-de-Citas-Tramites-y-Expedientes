@@ -11,6 +11,12 @@
 
 @section('content')
 
+<div x-data="{
+    showAssignModal: false,
+    selectedRevisorId: null,
+    selectedRevisorName: ''
+}">
+
 {{-- ═══════════════════════════════════ HEADER / TÍTULO ══ --}}
 <div class="mb-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white rounded-xl border border-slate-200/80 shadow-xs p-6">
     <div>
@@ -30,15 +36,21 @@
         </p>
     </div>
     <div class="flex flex-wrap items-center gap-2.5 shrink-0">
-        <button class="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-all shadow-xs">
-            <span class="material-symbols-outlined text-base text-slate-500">sync_alt</span>
-            <span>Rebalancear Cola Activa</span>
-        </button>
-        <button class="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-all shadow-sm">
-            <span class="material-symbols-outlined text-base">bolt</span>
-            <span>Asignación Inteligente</span>
-            <span class="ml-1 px-2 py-0.5 rounded bg-blue-500/40 text-[10px] font-bold">94% Efectividad</span>
-        </button>
+        <form method="POST" action="{{ route('portal.asignaciones.auto') }}" class="inline">
+            @csrf
+            <button type="submit" class="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-all shadow-xs cursor-pointer">
+                <span class="material-symbols-outlined text-base text-slate-500">sync_alt</span>
+                <span>Rebalancear Cola Activa</span>
+            </button>
+        </form>
+        <form method="POST" action="{{ route('portal.asignaciones.auto') }}" class="inline">
+            @csrf
+            <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-[#001229] hover:bg-[#0f2744] rounded-lg transition-all shadow-sm cursor-pointer">
+                <span class="material-symbols-outlined text-base">bolt</span>
+                <span>Asignación Inteligente</span>
+                <span class="ml-1 px-2 py-0.5 rounded bg-blue-500/40 text-[10px] font-bold">Autobalance</span>
+            </button>
+        </form>
     </div>
 </div>
 
@@ -141,18 +153,23 @@
             <h2 class="text-base font-bold text-[#0b1c30]" style="font-family: var(--font-display);">Panel de Revisores y Carga Activa</h2>
             <p class="text-xs text-slate-500 mt-0.5">Distribución en tiempo real de expedientes por revisor técnico L1/L2.</p>
         </div>
-        <div class="flex items-center gap-3">
+        <form method="GET" action="{{ route('portal.matriz-cargas') }}" class="flex items-center gap-3">
             <div class="relative">
                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-base pointer-events-none">search</span>
-                <input class="pl-9 pr-4 py-1.5 border border-slate-200 rounded-lg text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 w-56" placeholder="Buscar revisor..." type="text">
+                <input name="buscar" value="{{ request('buscar') }}"
+                       class="pl-9 pr-4 py-1.5 border border-slate-200 rounded-lg text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 w-56"
+                       placeholder="Buscar revisor..." type="text">
             </div>
-            <select class="px-3 py-1.5 border border-slate-200 rounded-lg text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-600/20 cursor-pointer bg-white">
-                <option>Todos los niveles</option>
-                <option>Revisor L1</option>
-                <option>Revisor L2</option>
-                <option>Supervisor</option>
+            <select name="nivel" onchange="this.form.submit()"
+                    class="px-3 py-1.5 border border-slate-200 rounded-lg text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-600/20 cursor-pointer bg-white">
+                <option value="Todos los niveles" {{ request('nivel') === 'Todos los niveles' ? 'selected' : '' }}>Todos los niveles</option>
+                <option value="Revisor" {{ request('nivel') === 'Revisor' ? 'selected' : '' }}>Revisor Técnico</option>
+                <option value="Supervisor" {{ request('nivel') === 'Supervisor' ? 'selected' : '' }}>Supervisor</option>
             </select>
-        </div>
+            @if(request('buscar') || request('nivel'))
+                <a href="{{ route('portal.matriz-cargas') }}" class="text-xs text-slate-400 hover:text-slate-600">Limpiar</a>
+            @endif
+        </form>
     </div>
 
     <div class="overflow-x-auto">
@@ -210,7 +227,9 @@
                             </span>
                         </td>
                         <td class="py-3.5 px-4 text-right">
-                            <button class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 text-[11px] font-semibold transition-colors">
+                            <button type="button"
+                                    @click="showAssignModal = true; selectedRevisorId = {{ $revisor->ID_Usuarios }}; selectedRevisorName = '{{ addslashes($revisor->Nombre) }}';"
+                                    class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 text-[11px] font-semibold transition-colors cursor-pointer">
                                 <span class="material-symbols-outlined text-xs">add_task</span>
                                 Asignar
                             </button>
@@ -278,4 +297,67 @@
     </div>
 </div>
 
+{{-- ═══════════════════════════════════ MODAL ASIGNAR EXPEDIENTE ══ --}}
+<div x-show="showAssignModal"
+     x-cloak
+     class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4"
+     style="display: none;">
+    <div @click.outside="showAssignModal = false"
+         class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl border border-slate-200 space-y-5">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-[#0051d5]">assignment_ind</span>
+                <h3 class="font-bold text-base text-[#0b1c30]">Asignar Expediente a Revisor</h3>
+            </div>
+            <button @click="showAssignModal = false" class="text-slate-400 hover:text-slate-600">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <p class="text-xs text-slate-600">
+            Revisor seleccionado: <strong class="text-[#0b1c30]" x-text="selectedRevisorName"></strong>
+        </p>
+
+        <form action="{{ route('portal.asignaciones.store') }}" method="POST" class="space-y-4">
+            @csrf
+            <input type="hidden" name="id_revisor" :value="selectedRevisorId">
+
+            <div>
+                <label for="id_solicitud" class="block text-xs font-semibold text-[#0b1c30] mb-1">
+                    Seleccione un Expediente Pendiente en Cola
+                </label>
+                @if(isset($pendientes) && $pendientes->isNotEmpty())
+                    <select name="id_solicitud" id="id_solicitud" required
+                            class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#0051d5]">
+                        <option value="">-- Seleccionar expediente --</option>
+                        @foreach($pendientes as $p)
+                            <option value="{{ $p->ID_Solicitud }}">
+                                {{ $p->folio?->Codigo_Folio ?? "Expediente #{$p->ID_Solicitud}" }} — {{ $p->versionTramite?->tipoTramite?->Nombre ?? 'Trámite' }} ({{ $p->solicitante?->Nombre ?? 'Ciudadano' }})
+                            </option>
+                        @endforeach
+                    </select>
+                @else
+                    <div class="p-3 bg-amber-50 rounded-lg border border-amber-200 text-xs text-amber-800">
+                        No hay expedientes pendientes de asignación en este momento.
+                    </div>
+                @endif
+            </div>
+
+            <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+                <button type="button" @click="showAssignModal = false"
+                        class="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 text-xs font-semibold hover:bg-slate-200 transition-colors">
+                    Cancelar
+                </button>
+                @if(isset($pendientes) && $pendientes->isNotEmpty())
+                    <button type="submit"
+                            class="px-5 py-2 rounded-lg bg-[#001229] hover:bg-[#0f2744] text-white text-xs font-semibold transition-colors">
+                        Confirmar Asignación
+                    </button>
+                @endif
+            </div>
+        </form>
+    </div>
+</div>
+
+</div> {{-- Cierre de x-data --}}
 @endsection

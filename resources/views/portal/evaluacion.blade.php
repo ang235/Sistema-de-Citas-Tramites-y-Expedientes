@@ -219,7 +219,81 @@
                     <p class="text-xs text-slate-500 mt-0.5">El dictamen suscrito emitirá la cédula vinculante con sello institucional.</p>
                 </div>
 
-                @if ($asignacionActiva)
+                @if (auth()->check() && auth()->user()->esSupervisor())
+                    {{-- ── CONSOLA DE SUPERVISOR: EMISIÓN DE RESOLUCIÓN FINAL ── --}}
+                    @php
+                        $ultimaResolucion = $solicitud->resoluciones->last();
+                    @endphp
+
+                    @if ($ultimaResolucion)
+                        <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 space-y-2">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-emerald-600 text-lg">verified</span>
+                                <span class="font-bold">Resolución Oficial Emitida</span>
+                            </div>
+                            <p class="text-[11px] text-emerald-800">
+                                <strong>Sentido:</strong> Resolución {{ $ultimaResolucion->Tipo_Resolucion }}
+                            </p>
+                            <p class="text-[11px] text-emerald-700">
+                                <strong>Fecha de Emisión:</strong> {{ $ultimaResolucion->Fecha_Emision_Resolucion ? \Carbon\Carbon::parse($ultimaResolucion->Fecha_Emision_Resolucion)->format('d/m/Y H:i') : '' }}
+                            </p>
+                            <span class="inline-block px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-mono font-bold">
+                                RES-{{ str_pad($ultimaResolucion->ID_Resolucion, 5, '0', STR_PAD_LEFT) }}-{{ date('Y') }}
+                            </span>
+                        </div>
+                    @else
+                        <form action="{{ route('portal.resoluciones.store', $solicitud->ID_Solicitud) }}" method="POST" class="space-y-4">
+                            @csrf
+                            <div class="p-3 bg-blue-50/70 border border-blue-200 rounded-xl space-y-1">
+                                <span class="font-bold text-xs text-[#001229] flex items-center gap-1.5">
+                                    <span class="material-symbols-outlined text-[#0051d5] text-base">gavel</span>
+                                    Emisión de Resolución de Supervisión
+                                </span>
+                                <p class="text-[11px] text-slate-600">
+                                    Como Supervisor / Dictaminador, usted suscribe el acto administrativo que concluye el expediente.
+                                </p>
+                            </div>
+
+                            <div>
+                                <label for="tipo_resolucion" class="block text-xs font-semibold text-slate-800 mb-1">
+                                    Sentido de la Resolución <span class="text-rose-500">*</span>
+                                </label>
+                                <select name="tipo_resolucion" id="tipo_resolucion" required
+                                        class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#0051d5]">
+                                    <option value="Favorable">Favorable (Aprobación Definitiva del Trámite)</option>
+                                    <option value="Desfavorable">Desfavorable (Denegatoria)</option>
+                                    <option value="Inadmisible">Inadmisible / Archivo</option>
+                                    <option value="Cancelada">Cancelada por el Administrado</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="comentarios" class="block text-xs font-semibold text-slate-800 mb-1">
+                                    Fundamentación y Comentarios Resolutivos
+                                </label>
+                                <textarea name="comentarios" id="comentarios" rows="3"
+                                          placeholder="Indique los antecedentes técnicos de la revisión y la motivación jurídica de la resolución..."
+                                          class="w-full p-3 rounded-lg border border-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#0051d5]"></textarea>
+                            </div>
+
+                            <button type="submit" class="w-full h-11 bg-[#001229] hover:bg-[#0f2744] text-white rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer">
+                                <span class="material-symbols-outlined text-base">verified</span>
+                                <span>Emitir y Firmar Resolución Formal</span>
+                            </button>
+                        </form>
+                    @endif
+
+                @elseif (auth()->check() && auth()->user()->esAdministrador() && !auth()->user()->esRevisor())
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 space-y-1.5">
+                        <span class="font-bold flex items-center gap-1.5 text-slate-800">
+                            <span class="material-symbols-outlined text-base text-[#0051d5]">visibility</span>
+                            Modo Visualización / Auditoría
+                        </span>
+                        <p class="text-[11px] text-slate-500 leading-relaxed">
+                            Como Administrador, usted tiene acceso de solo lectura para auditar el expediente. La calificación técnica y emisión de dictamen corresponde exclusivamente a los Revisores Técnicos periciales asignados.
+                        </p>
+                    </div>
+                @elseif ($asignacionActiva)
                     <form action="{{ route('portal.revisiones.store', $asignacionActiva->ID_Asignacion) }}" method="POST" class="space-y-4">
                         @csrf
 

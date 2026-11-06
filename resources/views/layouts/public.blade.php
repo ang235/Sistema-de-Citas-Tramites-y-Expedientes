@@ -27,6 +27,10 @@
     {{-- Vite assets --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+    {{-- Alpine.js Engine --}}
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>[x-cloak] { display: none !important; }</style>
+
     {{-- Tailwind Stitch Civic Scheme Engine --}}
     <script src="https://cdn.tailwindcss.com"></script>
     <script id="tailwind-config">
@@ -134,17 +138,19 @@
                 </div>
             </a>
 
-            {{-- Buscador (desktop) --}}
-            <div class="hidden xl:flex flex-1 max-w-md mx-6">
+            {{-- Buscador (desktop) funcional --}}
+            <form action="{{ route('tramites.index') }}" method="GET" class="hidden xl:flex flex-1 max-w-md mx-6" role="search">
                 <div class="relative w-full">
                     <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-sm pointer-events-none"
                           style="color: var(--color-on-surface-variant);">search</span>
                     <input type="text"
-                           class="input pl-9"
+                           name="buscar"
+                           value="{{ request('buscar') }}"
+                           class="input pl-9 w-full"
                            placeholder="Buscar trámites, requisitos o folios..."
                            aria-label="Buscador de trámites">
                 </div>
-            </div>
+            </form>
 
             {{-- Navegación principal (desktop) --}}
             <nav class="hidden lg:flex items-center gap-1 shrink-0" role="navigation" aria-label="Navegación principal">
@@ -179,82 +185,136 @@
             {{-- Acciones de usuario --}}
             <div class="flex items-center gap-2 shrink-0">
 
-                {{-- Notificaciones --}}
+                {{-- Notificaciones Ciudadanas Dinámicas --}}
                 @auth
-                    <div class="relative">
-                        <button class="btn-ghost relative" aria-label="Notificaciones" id="btn-notifications">
-                            <span class="material-symbols-outlined">notifications</span>
-                            @if(($notificationCount ?? 0) > 0)
-                                <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full ring-2 ring-white"
-                                      style="background-color: var(--color-secondary);"></span>
+                    @php
+                        $userCitasProximas = auth()->user()->citas()->where('Fecha', '>=', now()->toDateString())->orderBy('Fecha')->take(2)->get();
+                        $userBitacoras = auth()->user()->bitacoras()->latest('Fecha_Hora')->take(3)->get();
+                        $totalAvisos = $userCitasProximas->count() + $userBitacoras->count();
+                    @endphp
+                    <div class="relative" x-data="{ openNotif: false }">
+                        <button @click="openNotif = !openNotif" class="p-2 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors relative cursor-pointer" aria-label="Notificaciones" id="btn-notifications">
+                            <span class="material-symbols-outlined text-xl">notifications</span>
+                            @if($totalAvisos > 0)
+                                <span class="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-[#0051d5] ring-2 ring-white"></span>
                             @endif
                         </button>
+
+                        <div x-show="openNotif" @click.outside="openNotif = false" x-cloak
+                             x-transition class="absolute right-0 top-full mt-2 w-80 bg-white rounded-2xl shadow-xl border border-slate-200/90 py-2 z-50">
+                            <div class="px-4 py-2 border-b border-slate-100 flex items-center justify-between">
+                                <span class="text-xs font-bold text-[#001229]">Buzón de Notificaciones</span>
+                                @if($totalAvisos > 0)
+                                    <span class="text-[10px] font-semibold text-[#0051d5] bg-blue-50 px-2 py-0.5 rounded-full">{{ $totalAvisos }} Avisos</span>
+                                @endif
+                            </div>
+                            <div class="divide-y divide-slate-100 max-h-72 overflow-y-auto">
+                                @forelse ($userCitasProximas as $cita)
+                                    <a href="{{ route('citas.pase', $cita->ID_Citas) }}" class="p-3 hover:bg-slate-50 transition-colors flex items-start gap-2.5 block">
+                                        <span class="material-symbols-outlined text-[#0051d5] text-lg mt-0.5">calendar_month</span>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-xs font-bold text-slate-800 truncate">Turno Programado</p>
+                                            <p class="text-[11px] text-slate-500">Cita para el {{ $cita->Fecha->format('d/m/Y') }} a las {{ $cita->Hora }} hrs.</p>
+                                            <span class="text-[10px] text-[#0051d5] font-semibold mt-1 block">Ver pase digital →</span>
+                                        </div>
+                                    </a>
+                                @empty
+                                @endforelse
+
+                                @forelse ($userBitacoras as $bit)
+                                    <div class="p-3 hover:bg-slate-50 transition-colors flex items-start gap-2.5">
+                                        <span class="material-symbols-outlined text-emerald-600 text-lg mt-0.5">info</span>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-xs font-bold text-slate-800 truncate">{{ $bit->Accion }}</p>
+                                            <p class="text-[11px] text-slate-500 line-clamp-2">{{ $bit->Descripcion }}</p>
+                                            <span class="text-[10px] text-slate-400 mt-0.5 block">{{ $bit->Fecha_Hora ? \Carbon\Carbon::parse($bit->Fecha_Hora)->diffForHumans() : '' }}</span>
+                                        </div>
+                                    </div>
+                                @empty
+                                @endforelse
+
+                                @if($totalAvisos === 0)
+                                    <div class="p-6 text-center text-xs text-slate-400">
+                                        <span class="material-symbols-outlined text-2xl block mb-1 opacity-30">notifications_none</span>
+                                        No tienes notificaciones pendientes
+                                    </div>
+                                @endif
+                            </div>
+                            <div class="p-2 border-t border-slate-100 text-center">
+                                <a href="{{ route('expedientes.index') }}" class="text-[11px] font-semibold text-[#0051d5] hover:underline">
+                                    Ver todos mis expedientes y trámites
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 @endauth
 
-                {{-- Usuario autenticado --}}
+                {{-- Usuario autenticado dropdown --}}
                 @auth
                     <div class="relative" x-data="{ open: false }">
                         <button @click="open = !open"
-                                class="flex items-center gap-2.5 pl-2 rounded-lg py-1.5 pr-3 transition-colors"
-                                style="transition: background-color 150ms ease;"
-                                @mouseenter="$el.style.backgroundColor='var(--color-surface-container-low)'"
-                                @mouseleave="$el.style.backgroundColor='transparent'"
+                                class="flex items-center gap-2.5 pl-2 rounded-lg py-1.5 pr-3 bg-slate-50 hover:bg-slate-100 border border-slate-200 transition-colors cursor-pointer"
                                 id="btn-user-menu"
                                 aria-haspopup="true"
                                 :aria-expanded="open">
-                            <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm"
-                                 style="background-color: var(--color-secondary);">
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs bg-[#001229] shrink-0">
                                 {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                             </div>
                             <div class="hidden sm:flex flex-col text-left">
-                                <span class="text-label-md font-semibold leading-none" style="color: var(--color-on-surface);">
+                                <span class="text-xs font-bold text-slate-900 leading-none">
                                     {{ Str::limit(auth()->user()->name, 18) }}
                                 </span>
-                                <span class="text-label-sm leading-tight" style="color: var(--color-on-surface-variant);">
+                                <span class="text-[11px] text-slate-500 leading-tight">
                                     {{ auth()->user()->email ? Str::limit(auth()->user()->email, 20) : 'Ciudadano' }}
                                 </span>
                             </div>
-                            <span class="material-symbols-outlined text-sm" style="color: var(--color-on-surface-variant);">expand_more</span>
+                            <span class="material-symbols-outlined text-sm text-slate-400">expand_more</span>
                         </button>
 
-                        {{-- Dropdown usuario --}}
-                        <div x-show="open" @click.outside="open = false"
-                             x-transition:enter="transition ease-out duration-150"
-                             x-transition:enter-start="opacity-0 translate-y-1"
-                             x-transition:enter-end="opacity-100 translate-y-0"
-                             class="dropdown-menu absolute right-0 top-full mt-2"
+                        {{-- Dropdown usuario con formato y x-cloak --}}
+                        <div x-show="open" @click.outside="open = false" x-cloak
+                             x-transition
+                             class="absolute right-0 top-full mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-200/90 py-2 z-50"
                              role="menu" aria-labelledby="btn-user-menu">
-                            <a href="{{ route('profile.show') }}" class="dropdown-item" role="menuitem">
-                                <span class="material-symbols-outlined text-base">person</span>
-                                Mi Perfil
-                            </a>
-                            <a href="{{ route('expedientes.index') }}" class="dropdown-item" role="menuitem">
-                                <span class="material-symbols-outlined text-base">folder_open</span>
-                                Mis Expedientes
-                            </a>
-                            <a href="{{ route('citas.index') }}" class="dropdown-item" role="menuitem">
-                                <span class="material-symbols-outlined text-base">calendar_month</span>
-                                Mis Citas
-                            </a>
-                            <div class="dropdown-divider"></div>
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit" class="dropdown-item danger" role="menuitem">
-                                    <span class="material-symbols-outlined text-base">logout</span>
-                                    Cerrar Sesión
-                                </button>
-                            </form>
+                            <div class="px-4 py-2 border-b border-slate-100">
+                                <p class="text-xs font-bold text-slate-900 truncate">{{ auth()->user()->name }}</p>
+                                <p class="text-[11px] text-slate-400 truncate">{{ auth()->user()->email }}</p>
+                            </div>
+
+                            <div class="py-1">
+                                <a href="{{ route('profile.show') }}" class="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-700 hover:bg-blue-50 hover:text-[#0051d5] transition-colors" role="menuitem">
+                                    <span class="material-symbols-outlined text-base text-slate-400">person</span>
+                                    <span>Mi Perfil</span>
+                                </a>
+                                <a href="{{ route('expedientes.index') }}" class="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-700 hover:bg-blue-50 hover:text-[#0051d5] transition-colors" role="menuitem">
+                                    <span class="material-symbols-outlined text-base text-slate-400">folder_open</span>
+                                    <span>Mis Expedientes</span>
+                                </a>
+                                <a href="{{ route('citas.index') }}" class="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-700 hover:bg-blue-50 hover:text-[#0051d5] transition-colors" role="menuitem">
+                                    <span class="material-symbols-outlined text-base text-slate-400">calendar_month</span>
+                                    <span>Mis Citas</span>
+                                </a>
+                            </div>
+
+                            <div class="border-t border-slate-100 pt-1">
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" class="w-full text-left flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 transition-colors" role="menuitem">
+                                        <span class="material-symbols-outlined text-base text-rose-500">logout</span>
+                                        <span>Cerrar Sesión</span>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 @else
-                    <a href="{{ route('login') }}" class="btn-secondary hidden sm:inline-flex">
+                    <a href="{{ route('login') }}" class="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors hidden sm:inline-flex items-center gap-1.5">
                         <span class="material-symbols-outlined text-base">login</span>
-                        Ingresar
+                        <span>Ingresar</span>
                     </a>
-                    <a href="{{ route('register') }}" class="btn-primary">
+                    <a href="{{ route('register') }}" class="px-4 py-2 rounded-lg bg-[#001229] hover:bg-[#0f2744] text-white text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-xs">
                         <span class="material-symbols-outlined text-base">person_add</span>
-                        Registrarse
+                        <span>Registrarse</span>
                     </a>
                 @endauth
 
@@ -342,86 +402,78 @@
     </main>
 
     {{-- ═══════════════════════════════════════════════════════ FOOTER PÚBLICO ══ --}}
-    <footer role="contentinfo" style="background-color: var(--color-primary); color: var(--color-on-primary);" class="mt-16">
+    <footer role="contentinfo" class="bg-[#001229] text-white border-t border-slate-800 mt-16">
         <div class="max-w-screen-xl mx-auto px-6 lg:px-12 py-12">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
 
                 {{-- Identidad --}}
                 <div class="space-y-3">
                     <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-lg flex items-center justify-center"
-                             style="background-color: rgba(255,255,255,0.12);">
-                            <span class="material-symbols-outlined text-white text-base">account_balance</span>
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-white/10 text-blue-200">
+                            <span class="material-symbols-outlined text-base">account_balance</span>
                         </div>
-                        <span class="text-headline-sm text-white" style="font-family: var(--font-display);">SETC</span>
-                        <span class="badge badge-info text-xs">Oficial</span>
+                        <span class="text-xl font-bold text-white" style="font-family: var(--font-display);">SETC</span>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-900/60 text-blue-200 border border-blue-400/30 uppercase">Oficial</span>
                     </div>
-                    <p class="text-body-sm" style="color: rgba(255,255,255,0.6); line-height: 20px;">
+                    <p class="text-xs text-slate-400 leading-relaxed">
                         Sistema Institucional de Gestión de Citas, Trámites y Expedientes Digitales.
-                        Plataforma interoperable del Gobierno Digital.
+                        Plataforma interoperable del Gobierno Digital conforme a la Ley N° 27444.
                     </p>
                 </div>
 
                 {{-- Atención Ciudadana --}}
                 <div class="space-y-3">
-                    <h3 class="text-label-sm uppercase tracking-wider" style="color: rgba(255,255,255,0.5);">Atención Ciudadana</h3>
-                    <ul class="space-y-2">
-                        @foreach([
-                            'Línea Directa 800-SETC-01',
-                            'Mesa de Ayuda Telemática',
-                            'Módulos Presenciales',
-                            'Guía de Trámites y Requisitos',
-                        ] as $link)
-                            <li><a href="#" class="text-body-sm hover:text-white transition-colors" style="color: rgba(255,255,255,0.65);">{{ $link }}</a></li>
-                        @endforeach
+                    <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider">Atención Ciudadana</h3>
+                    <ul class="space-y-2 text-xs">
+                        <li><a href="#" class="text-slate-400 hover:text-white transition-colors">Línea Directa 800-SETC-01</a></li>
+                        <li><a href="{{ route('ayuda.index') }}" class="text-slate-400 hover:text-white transition-colors">Mesa de Ayuda Telemática</a></li>
+                        <li><a href="{{ route('citas.create') }}" class="text-slate-400 hover:text-white transition-colors">Módulos Presenciales</a></li>
+                        <li><a href="{{ route('tramites.index') }}" class="text-slate-400 hover:text-white transition-colors">Guía de Trámites y Requisitos</a></li>
                     </ul>
                 </div>
 
                 {{-- Normatividad --}}
                 <div class="space-y-3">
-                    <h3 class="text-label-sm uppercase tracking-wider" style="color: rgba(255,255,255,0.5);">Normatividad y Transparencia</h3>
-                    <ul class="space-y-2">
-                        @foreach([
-                            'Aviso de Privacidad Integral',
-                            'Términos de Servicio Gov-ID',
-                            'Marco Jurídico de Actuación',
-                            'Portal Nacional de Transparencia',
-                        ] as $link)
-                            <li><a href="#" class="text-body-sm hover:text-white transition-colors" style="color: rgba(255,255,255,0.65);">{{ $link }}</a></li>
-                        @endforeach
+                    <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider">Normatividad y Transparencia</h3>
+                    <ul class="space-y-2 text-xs">
+                        <li><a href="#" class="text-slate-400 hover:text-white transition-colors">Aviso de Privacidad Integral</a></li>
+                        <li><a href="#" class="text-slate-400 hover:text-white transition-colors">Términos de Servicio Gov-ID</a></li>
+                        <li><a href="#" class="text-slate-400 hover:text-white transition-colors">Marco Jurídico de Actuación</a></li>
+                        <li><a href="#" class="text-slate-400 hover:text-white transition-colors">Portal Nacional de Transparencia</a></li>
                     </ul>
                 </div>
 
                 {{-- Certificaciones --}}
                 <div class="space-y-3">
-                    <h3 class="text-label-sm uppercase tracking-wider" style="color: rgba(255,255,255,0.5);">Certificaciones</h3>
-                    <ul class="space-y-2">
-                        <li class="flex items-center gap-2 text-body-sm" style="color: rgba(255,255,255,0.65);">
-                            <span class="material-symbols-outlined text-sm" style="color: var(--color-tertiary-fixed-dim);">verified_user</span>
-                            Encriptación SHA-256
+                    <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider">Certificaciones</h3>
+                    <ul class="space-y-2 text-xs">
+                        <li class="flex items-center gap-2 text-slate-400">
+                            <span class="material-symbols-outlined text-sm text-emerald-400">verified_user</span>
+                            <span>Encriptación SHA-256</span>
                         </li>
-                        <li class="flex items-center gap-2 text-body-sm" style="color: rgba(255,255,255,0.65);">
-                            <span class="material-symbols-outlined text-sm" style="color: var(--color-tertiary-fixed-dim);">lock</span>
-                            Conformidad Accesibilidad WCAG 2.1 AA
+                        <li class="flex items-center gap-2 text-slate-400">
+                            <span class="material-symbols-outlined text-sm text-emerald-400">lock</span>
+                            <span>Conformidad Accesibilidad WCAG 2.1 AA</span>
                         </li>
-                        <li class="flex items-center gap-2 text-body-sm" style="color: rgba(255,255,255,0.65);">
-                            <span class="material-symbols-outlined text-sm" style="color: var(--color-tertiary-fixed-dim);">security</span>
-                            TLS 1.3 Red Gubernamental
+                        <li class="flex items-center gap-2 text-slate-400">
+                            <span class="material-symbols-outlined text-sm text-emerald-400">security</span>
+                            <span>TLS 1.3 Red Gubernamental</span>
                         </li>
                     </ul>
                 </div>
             </div>
 
             {{-- Bottom bar --}}
-            <div class="mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3"
-                 style="border-top: 1px solid rgba(255,255,255,0.12);">
-                <p class="text-body-sm" style="color: rgba(255,255,255,0.5);">
+            <div class="mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-800 text-xs text-slate-500">
+                <p>
                     &copy; {{ date('Y') }} Sistema Estatal de Citas, Trámites y Expedientes (SETC). Todos los derechos reservados.
                 </p>
                 <div class="flex items-center gap-4">
-                    @foreach(['Accesibilidad', 'Privacidad', 'Mapa del Sitio'] as $link)
-                        <a href="#" class="text-label-sm hover:text-white transition-colors" style="color: rgba(255,255,255,0.5);">{{ $link }}</a>
-                    @endforeach
+                    <a href="#" class="hover:text-slate-300 transition-colors">Accesibilidad</a>
+                    <span class="text-slate-700">•</span>
+                    <a href="#" class="hover:text-slate-300 transition-colors">Privacidad</a>
+                    <span class="text-slate-700">•</span>
+                    <a href="#" class="hover:text-slate-300 transition-colors">Mapa del Sitio</a>
                 </div>
             </div>
         </div>

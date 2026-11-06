@@ -37,10 +37,17 @@
                 <span class="material-symbols-outlined text-base">balance</span>
                 <span>Matriz de Cargas</span>
             </a>
-            <a href="{{ route('portal.mesa-dictamen') }}" class="px-4 py-2.5 rounded-xl bg-[#001229] hover:bg-[#0f2744] text-white text-xs font-semibold transition-all flex items-center gap-2 shadow-xs">
-                <span class="material-symbols-outlined text-base">gavel</span>
-                <span>Mesa de Dictamen</span>
-            </a>
+            @if(auth()->check() && auth()->user()->esRevisor())
+                <a href="{{ route('portal.mesa-dictamen') }}" class="px-4 py-2.5 rounded-xl bg-[#001229] hover:bg-[#0f2744] text-white text-xs font-semibold transition-all flex items-center gap-2 shadow-xs">
+                    <span class="material-symbols-outlined text-base">gavel</span>
+                    <span>Mesa de Dictamen</span>
+                </a>
+            @else
+                <a href="{{ route('portal.metricas') }}" class="px-4 py-2.5 rounded-xl bg-[#001229] hover:bg-[#0f2744] text-white text-xs font-semibold transition-all flex items-center gap-2 shadow-xs">
+                    <span class="material-symbols-outlined text-base">monitoring</span>
+                    <span>Métricas Globales</span>
+                </a>
+            @endif
         </div>
     </div>
 
@@ -166,10 +173,17 @@
                                 {{ $sol->Fecha_Creacion_Solicitud ? $sol->Fecha_Creacion_Solicitud->format('d/m/Y H:i') : '' }}
                             </td>
                             <td class="py-3.5 px-3 text-right">
-                                <a href="{{ route('portal.expedientes.evaluar', $sol->ID_Solicitud) }}" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#001229] hover:bg-[#0f2744] text-white font-semibold transition-colors">
-                                    <span>Evaluar</span>
-                                    <span class="material-symbols-outlined text-xs">arrow_forward</span>
-                                </a>
+                                @if (auth()->check() && auth()->user()->esRevisor())
+                                    <a href="{{ route('portal.expedientes.evaluar', $sol->ID_Solicitud) }}" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#001229] hover:bg-[#0f2744] text-white font-semibold text-xs transition-colors">
+                                        <span>Evaluar</span>
+                                        <span class="material-symbols-outlined text-xs">arrow_forward</span>
+                                    </a>
+                                @else
+                                    <a href="{{ route('portal.expedientes.show', $sol->ID_Solicitud) }}" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition-colors">
+                                        <span class="material-symbols-outlined text-xs">visibility</span>
+                                        <span>Ver Detalle</span>
+                                    </a>
+                                @endif
                             </td>
                         </tr>
                     @empty

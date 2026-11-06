@@ -141,6 +141,38 @@ class Usuario extends Authenticatable
      */
     public function tieneRol(string $nombreRol): bool
     {
-        return $this->roles->contains('Nombre', $nombreRol);
+        return $this->roles->contains(fn ($r) => strcasecmp((string) $r->Nombre, $nombreRol) === 0);
+    }
+
+    /**
+     * Comprueba si el usuario tiene rol de Administrador.
+     */
+    public function esAdministrador(): bool
+    {
+        return $this->roles->contains(fn ($r) => str_contains(strtolower((string) $r->Nombre), 'admin'));
+    }
+
+    /**
+     * Comprueba si el usuario tiene rol de Revisor.
+     */
+    public function esRevisor(): bool
+    {
+        return $this->roles->contains(fn ($r) => str_contains(strtolower((string) $r->Nombre), 'revisor'));
+    }
+
+    /**
+     * Comprueba si el usuario tiene rol de Supervisor.
+     */
+    public function esSupervisor(): bool
+    {
+        return $this->roles->contains(fn ($r) => str_contains(strtolower((string) $r->Nombre), 'supervisor'));
+    }
+
+    /**
+     * Comprueba si el usuario es ciudadano/solicitante.
+     */
+    public function esCiudadano(): bool
+    {
+        return ! $this->esAdministrador() && ! $this->esRevisor() && ! $this->esSupervisor();
     }
 }

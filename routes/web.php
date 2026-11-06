@@ -21,25 +21,22 @@ use App\Http\Controllers\Operativo\MesaDictamenController;
 use App\Http\Controllers\Operativo\ResolucionController;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Rutas Públicas & Portal Ciudadano
-|--------------------------------------------------------------------------
-*/
-Route::get('/', [TramiteCiudadanoController::class, 'index'])->name('home');
+// Rutas Públicas & Portal Ciudadano
+Route::get('/', [TramiteCiudadanoController::class, 'home'])->name('home');
 Route::get('/ayuda', fn () => view('public.ayuda.index'))->name('ayuda.index');
 
 // Catálogo de trámites
 Route::get('/tramites', [TramiteCiudadanoController::class, 'index'])->name('tramites.index');
 Route::get('/tramites/{id}', [TramiteCiudadanoController::class, 'show'])->name('tramites.show');
 
-// Expedientes y Seguimiento
-Route::get('/expedientes', [ExpedienteCiudadanoController::class, 'index'])->name('expedientes.index');
-Route::get('/expedientes/{codigoFolio}', [ExpedienteCiudadanoController::class, 'show'])->name('expedientes.show');
-Route::post('/expedientes/observacion/{idObservacion}/solventar', [ExpedienteCiudadanoController::class, 'solventarObservacion'])->name('expedientes.solventar');
-
-// Inicio de solicitud (trámite)
+// Rutas protegidas para Ciudadanos autenticados
 Route::middleware('auth')->group(function (): void {
+    // Expedientes y Seguimiento (sólo trámites propios)
+    Route::get('/expedientes', [ExpedienteCiudadanoController::class, 'index'])->name('expedientes.index');
+    Route::get('/expedientes/{codigoFolio}', [ExpedienteCiudadanoController::class, 'show'])->name('expedientes.show');
+    Route::post('/expedientes/observacion/{idObservacion}/solventar', [ExpedienteCiudadanoController::class, 'solventarObservacion'])->name('expedientes.solventar');
+
+    // Inicio de solicitud (trámite)
     Route::get('/tramites/{idTipoTramite}/iniciar', [SolicitudCiudadanoController::class, 'create'])->name('solicitudes.create');
     Route::post('/solicitudes', [SolicitudCiudadanoController::class, 'store'])->name('solicitudes.store');
 
@@ -88,10 +85,12 @@ Route::prefix('portal')->name('portal.')->middleware('auth')->group(function ():
     // Matriz de Asignaciones y Carga de Trabajo
     Route::get('/matriz-cargas', [AsignacionController::class, 'index'])->name('matriz-cargas');
     Route::post('/asignaciones', [AsignacionController::class, 'store'])->name('asignaciones.store');
+    Route::post('/asignaciones/auto', [AsignacionController::class, 'autoAsignar'])->name('asignaciones.auto');
 
     // Mesa de Dictamen & Evaluación de Expedientes
     Route::get('/mesa-dictamen', [MesaDictamenController::class, 'index'])->name('mesa-dictamen');
     Route::get('/expedientes', [MesaDictamenController::class, 'index'])->name('expedientes');
+    Route::get('/expedientes/{idSolicitud}', [MesaDictamenController::class, 'show'])->name('expedientes.show');
     Route::get('/expedientes/{idSolicitud}/evaluar', [MesaDictamenController::class, 'show'])->name('expedientes.evaluar');
     Route::post('/documentos/{idDocumento}/evaluar', [MesaDictamenController::class, 'evaluarDocumento'])->name('documentos.evaluar');
     Route::post('/asignaciones/{idAsignacion}/revision', [MesaDictamenController::class, 'registrarRevision'])->name('revisiones.store');

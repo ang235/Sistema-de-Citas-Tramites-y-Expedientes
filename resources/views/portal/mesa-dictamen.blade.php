@@ -98,17 +98,22 @@
             <span>Tiempo Óptimo</span>
         </button>
     </div>
-    <div class="flex items-center gap-3">
+    <form method="GET" action="{{ route('portal.mesa-dictamen') }}" class="flex items-center gap-3">
         <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
             <span class="material-symbols-outlined text-base text-slate-400">category</span>
-            <select aria-label="Filtrar por tipo de trámite" class="bg-transparent text-xs text-slate-700 focus:outline-none cursor-pointer">
-                <option>Todos los trámites</option>
+            <select name="id_tipo_tramite" onchange="this.form.submit()" aria-label="Filtrar por tipo de trámite" class="bg-transparent text-xs text-slate-700 focus:outline-none cursor-pointer">
+                <option value="">Todos los trámites</option>
                 @foreach ($tiposTramite ?? [] as $tipo)
-                    <option value="{{ $tipo->ID_Tipo_Tramite }}">{{ $tipo->Nombre }}</option>
+                    <option value="{{ $tipo->ID_Tipo_Tramite }}" {{ (string) request('id_tipo_tramite') === (string) $tipo->ID_Tipo_Tramite ? 'selected' : '' }}>
+                        {{ $tipo->Nombre }}
+                    </option>
                 @endforeach
             </select>
         </div>
-    </div>
+        @if(request('buscar') || request('id_tipo_tramite'))
+            <a href="{{ route('portal.mesa-dictamen') }}" class="text-xs text-slate-400 hover:text-slate-600">Limpiar</a>
+        @endif
+    </form>
 </div>
 
 {{-- ═══════════════════════════════════ WORKSPACE PRINCIPAL ══ --}}
@@ -119,12 +124,14 @@
         <div class="p-4 bg-white rounded-xl border border-slate-200/80 shadow-xs flex flex-col gap-3">
             <div class="flex items-center justify-between">
                 <h2 class="text-base font-semibold text-[#0b1c30]">Expedientes en Cola</h2>
-                <span class="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[11px] font-semibold">{{ $solicitudes->count() ?? 4 }} visibles</span>
+                <span class="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[11px] font-semibold">{{ $solicitudes->total() ?? $solicitudes->count() }} registrados</span>
             </div>
-            <div class="relative">
+            <form method="GET" action="{{ route('portal.mesa-dictamen') }}" class="relative">
                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-base pointer-events-none">search</span>
-                <input class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-[#0b1c30] placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0051d5]/20 shadow-xs transition-all" placeholder="Buscar expediente, razón social o RUC..." type="text"/>
-            </div>
+                <input name="buscar" value="{{ request('buscar') }}"
+                       class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-[#0b1c30] placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0051d5]/20 shadow-xs transition-all"
+                       placeholder="Buscar expediente, solicitante o folio..." type="text"/>
+            </form>
         </div>
 
         <div class="flex flex-col gap-3">

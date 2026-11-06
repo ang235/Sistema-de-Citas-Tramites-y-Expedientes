@@ -49,33 +49,41 @@
             </div>
         </div>
 
-        {{-- Stepper --}}
+        {{-- Stepper Dinámico --}}
         <div class="mt-8 pt-6 border-t border-slate-100">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {{-- Paso 1 --}}
-                <div class="flex items-center gap-3.5 bg-slate-50 p-3.5 rounded-xl border border-slate-200/60">
-                    <div class="w-8 h-8 rounded-full bg-[#ecfdf5] text-[#059669] flex items-center justify-center font-bold text-xs shrink-0">
-                        <span class="material-symbols-outlined text-base">check</span>
+                <div :class="solicitudId ? 'bg-emerald-50 border-emerald-200' : 'bg-slate-50 border-slate-200'"
+                     class="flex items-center gap-3.5 p-3.5 rounded-xl border transition-all">
+                    <div :class="solicitudId ? 'bg-emerald-600 text-white' : 'bg-[#001229] text-white'"
+                         class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shrink-0">
+                        <span class="material-symbols-outlined text-base" x-text="solicitudId ? 'check' : 'looks_one'">looks_one</span>
                     </div>
                     <div class="min-w-0">
-                        <span class="block text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Paso 1</span>
-                        <span class="block text-xs font-bold text-[#0b1c30] truncate">Tipo de cita y trámite</span>
+                        <span class="block text-[11px] font-semibold uppercase tracking-wider"
+                              :class="solicitudId ? 'text-emerald-700' : 'text-slate-400'"
+                              x-text="solicitudId ? 'Completado' : 'Paso 1'">Paso 1</span>
+                        <span class="block text-xs font-bold text-[#0b1c30] truncate">Modalidad y Expediente</span>
                     </div>
                 </div>
 
                 {{-- Paso 2 (Activo) --}}
-                <div class="flex items-center gap-3.5 bg-[#001229] text-white p-3.5 rounded-xl shadow-sm">
-                    <div class="w-8 h-8 rounded-full bg-[#0051d5] text-white flex items-center justify-center font-bold text-xs shrink-0">
-                        2
+                <div :class="fecha && hora ? 'bg-emerald-50 border-emerald-200' : 'bg-[#001229] text-white'"
+                     class="flex items-center gap-3.5 p-3.5 rounded-xl shadow-xs transition-all">
+                    <div :class="fecha && hora ? 'bg-emerald-600 text-white' : 'bg-[#0051d5] text-white'"
+                         class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shrink-0">
+                        <span class="material-symbols-outlined text-base" x-text="fecha && hora ? 'check' : 'looks_two'">looks_two</span>
                     </div>
                     <div class="min-w-0">
-                        <span class="block text-[11px] text-[#d4e3ff] font-semibold uppercase tracking-wider">Paso 2 (Actual)</span>
-                        <span class="block text-xs font-bold text-white truncate">Fecha y Horario de Turno</span>
+                        <span class="block text-[11px] font-semibold uppercase tracking-wider"
+                              :class="fecha && hora ? 'text-emerald-700' : 'text-[#d4e3ff]'">Paso 2</span>
+                        <span class="block text-xs font-bold truncate"
+                              :class="fecha && hora ? 'text-[#0b1c30]' : 'text-white'">Fecha y Horario</span>
                     </div>
                 </div>
 
                 {{-- Paso 3 --}}
-                <div class="flex items-center gap-3.5 bg-slate-50 p-3.5 rounded-xl border border-slate-200/60 opacity-75">
+                <div class="flex items-center gap-3.5 bg-slate-50 p-3.5 rounded-xl border border-slate-200/60 opacity-80">
                     <div class="w-8 h-8 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-xs shrink-0">
                         3
                     </div>
@@ -91,6 +99,7 @@
     {{-- ══════════════════════════════════════════ GRID DE CONFIGURACIÓN & PREVIEW ══ --}}
     <form action="{{ route('citas.store') }}" method="POST">
         @csrf
+        <input type="hidden" name="modalidad" :value="modalidad">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
             {{-- Columna Izquierda: Formulario (7 cols) --}}

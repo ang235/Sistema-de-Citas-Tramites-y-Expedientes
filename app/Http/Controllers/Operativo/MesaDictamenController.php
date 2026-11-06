@@ -22,22 +22,70 @@ class MesaDictamenController extends Controller
 {
     public function index(Request $request): View
     {
-        $idRevisor = (int) Auth::id();
+        /** @var \App\Models\Usuario $usuario */
+        $usuario = Auth::user();
+        $idUsuario = (int) Auth::id();
+        $search = $request->query('buscar');
+        $idTipoTramite = $request->query('id_tipo_tramite');
 
-        $solicitudes = Solicitud::whereHas('asignaciones', function ($q) use ($idRevisor): void {
-            $q->where('ID_Revisor', $idRevisor);
-        })
+        $esRevisor = $usuario->esRevisor();
+        $esSupervisor = $usuario->esSupervisor();
+        $esAdmin = $usuario->esAdministrador();
+
+        $query = Solicitud::query()
             ->with([
                 'solicitante',
                 'versionTramite.tipoTramite',
                 'folio',
+                'documentos',
+                'asignaciones.revisor',
                 'asignaciones.revisiones',
-            ])
-            ->latest('ID_Solicitud')
-            ->paginate(15);
+            ]);
+
+        // Si es revisor y no es supervisor ni admin, filtrar sus asignaciones (o las disponibles si no tiene)
+        if ($esRevisor && ! $esSupervisor && ! $esAdmin) {
+            $tieneAsignadas = AsignacionRevisor::where('ID_Revisor', $idUsuario)->exists();
+            if ($tieneAsignadas) {
+                $query->whereHas('asignaciones', function ($q) use ($idUsuario): void {
+                    $q->where('ID_Revisor', $idUsuario);
+                });
+            }
+        }
+
+        if ($search) {
+            $query->where(function ($q) use ($search): void {
+                $q->whereHas('folio', fn ($f) => $f->where('Codigo_Folio', 'like', "%{$search}%"))
+                  ->orWhereHas('solicitante', fn ($s) => $s->where('Nombre', 'like', "%{$search}%")->orWhere('Email', 'like', "%{$search}%"))
+                  ->orWhereHas('versionTramite.tipoTramite', fn ($t) => $t->where('Nombre', 'like', "%{$search}%"));
+            });
+        }
+
+        if ($idTipoTramite) {
+            $query->whereHas('versionTramite', fn ($v) => $v->where('ID_Tipo_Tramite', $idTipoTramite));
+        }
+
+        $solicitudes = $query->latest('ID_Solicitud')->paginate(15);
+
+        // Métricas de sala
+        $totalAsignados = $esRevisor && ! $esSupervisor ? AsignacionRevisor::where('ID_Revisor', $idUsuario)->count() : AsignacionRevisor::count();
+        $revisadosHoy = Revision::whereDate('Fecha_Revision', today())->count();
+        $enSubsanacion = Revision::where('Resultado', 'Observado')->count();
+
+        $metricas = [
+            'expedientes_asignados' => $totalAsignados,
+            'revisados_hoy' => $revisadosHoy,
+            'en_subsanacion' => $enSubsanacion,
+            'prioritarios_sla' => Solicitud::doesntHave('asignaciones')->count(),
+        ];
+
+        $tiposTramite = \App\Models\TipoTramite::where('Estado_Tipo_Tr', 'Activo')->orderBy('Nombre')->get();
 
         return view('portal.mesa-dictamen', [
             'solicitudes' => $solicitudes,
+            'metricas' => $metricas,
+            'tiposTramite' => $tiposTramite,
+            'buscar' => $search,
+            'idTipoTramite' => $idTipoTramite,
         ]);
     }
 
@@ -59,6 +107,24 @@ class MesaDictamenController extends Controller
 
         $asignacionActiva = $solicitud->asignaciones->where('ID_Revisor', Auth::id())->last()
             ?? $solicitud->asignaciones->last();
+
+        // Si es Revisor y la solicitud aún no tiene asignación, se autoasigna para permitir evaluar de inmediato
+        if (! $asignacionActiva && Auth::check() && Auth::user()->esRevisor()) {
+            $asignacionActiva = AsignacionRevisor::create([
+                'ID_Solicitud' => $solicitud->ID_Solicitud,
+                'ID_Revisor' => (int) Auth::id(),
+                'ID_Asignador' => (int) Auth::id(),
+                'Fecha_Asignacion' => now(),
+            ]);
+
+            Revision::create([
+                'ID_Asignacion' => $asignacionActiva->ID_Asignacion,
+                'Resultado' => 'En Revisión',
+                'Fecha_Revision' => now(),
+            ]);
+
+            $solicitud->load('asignaciones.revisor', 'asignaciones.revisiones');
+        }
 
         return view('portal.evaluacion', [
             'solicitud' => $solicitud,

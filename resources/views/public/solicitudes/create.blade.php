@@ -35,8 +35,25 @@
         </div>
     @endif
 
+    @php
+        $reqObligatorios = $versionVigente->requisitos->where('Prioridad', 'Obligatorio')->pluck('ID_Requisitos')->values();
+    @endphp
+
     {{-- Formulario de Carga del Expediente --}}
-    <form action="{{ route('solicitudes.store') }}" method="POST" enctype="multipart/form-data" class="space-y-8">
+    <form action="{{ route('solicitudes.store') }}"
+          method="POST"
+          enctype="multipart/form-data"
+          class="space-y-8"
+          x-data="{
+              obligatorios: {{ json_encode($reqObligatorios) }},
+              cargados: {},
+              onFileChange(e, id) {
+                  this.cargados[id] = e.target.files.length > 0;
+              },
+              get todosObligatoriosListos() {
+                  return this.obligatorios.every(id => this.cargados[id]);
+              }
+          }">
         @csrf
         <input type="hidden" name="id_version_tramite" value="{{ $versionVigente->ID_Version_Tramite }}">
 
@@ -60,14 +77,23 @@
 
         {{-- 2. Carga de Recaudos Normativos --}}
         <div class="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200/80 shadow-xs space-y-6">
-            <div class="border-b border-slate-100 pb-4">
-                <h2 class="text-base font-bold text-[#001229] flex items-center gap-2" style="font-family: var(--font-display);">
-                    <span class="material-symbols-outlined text-[#0051d5]">upload_file</span>
-                    <span>2. Documentación y Requisitos Digitales</span>
-                </h2>
-                <p class="text-xs text-slate-500 mt-1">
-                    Puedes adjuntar archivos en formato PDF o imagen (Máx. 10MB por archivo).
-                </p>
+            <div class="border-b border-slate-100 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                    <h2 class="text-base font-bold text-[#001229] flex items-center gap-2" style="font-family: var(--font-display);">
+                        <span class="material-symbols-outlined text-[#0051d5]">upload_file</span>
+                        <span>2. Documentación y Requisitos Digitales</span>
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-1">
+                        Solo se aceptan archivos en formato <strong>.PDF</strong> (Máx. 10MB por archivo). Los marcados como <span class="text-amber-700 font-semibold">Obligatorio</span> son indispensables para continuar.
+                    </p>
+                </div>
+                <div x-show="obligatorios.length > 0" class="shrink-0">
+                    <span :class="todosObligatoriosListos ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200'"
+                          class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border">
+                        <span class="material-symbols-outlined text-sm" x-text="todosObligatoriosListos ? 'check_circle' : 'pending'"></span>
+                        <span x-text="todosObligatoriosListos ? 'Requisitos obligatorios completos' : 'Faltan documentos obligatorios'"></span>
+                    </span>
+                </div>
             </div>
 
             <div class="space-y-6">
@@ -80,10 +106,10 @@
                                 </span>
                                 <div>
                                     <h3 class="text-sm font-semibold text-[#0b1c30]">{{ $req->Nombre }}</h3>
-                                    <span class="text-xs text-slate-500">Formato admitido: {{ $req->Formato }}</span>
+                                    <span class="text-xs text-slate-500">Formato admitido: Únicamente PDF</span>
                                 </div>
                             </div>
-                            <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold shrink-0 {{ $req->Prioridad === 'Obligatorio' ? 'bg-amber-100 text-amber-900' : 'bg-slate-200 text-slate-700' }}">
+                            <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold shrink-0 {{ $req->Prioridad === 'Obligatorio' ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-slate-200 text-slate-700' }}">
                                 {{ $req->Prioridad }}
                             </span>
                         </div>
@@ -91,7 +117,9 @@
                         <div>
                             <input type="file"
                                    name="documentos[{{ $req->ID_Requisitos }}]"
-                                   accept=".pdf,.png,.jpg,.jpeg"
+                                   accept=".pdf,application/pdf"
+                                   @change="onFileChange($event, {{ $req->ID_Requisitos }})"
+                                   @if($req->Prioridad === 'Obligatorio') required @endif
                                    class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#eff4ff] file:text-[#0051d5] hover:file:bg-[#dce9ff]">
                         </div>
                     </div>
@@ -101,15 +129,17 @@
             </div>
         </div>
 
-        {{-- Botón Enviar --}}
+        {{-- Botón Enviar con bloqueo interactivo --}}
         <div class="flex items-center justify-between pt-4">
             <a href="{{ route('tramites.show', $tramite->ID_Tipo_Tramite) }}" class="text-xs text-slate-500 hover:underline">
                 Cancelar y volver
             </a>
             <button type="submit"
-                    class="h-12 px-8 bg-[#001229] hover:bg-[#0f2744] text-white rounded-xl font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-sm hover:shadow active:scale-[0.99]">
+                    :disabled="!todosObligatoriosListos"
+                    :class="todosObligatoriosListos ? 'bg-[#001229] hover:bg-[#0f2744] text-white cursor-pointer shadow-sm hover:shadow active:scale-[0.99]' : 'bg-slate-200 text-slate-400 cursor-not-allowed'"
+                    class="h-12 px-8 rounded-xl font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2">
                 <span class="material-symbols-outlined text-lg">send</span>
-                <span>Registrar Solicitud y Emitir Folio</span>
+                <span x-text="todosObligatoriosListos ? 'Registrar Solicitud y Emitir Folio' : 'Adjunte los requisitos obligatorios para enviar'">Registrar Solicitud y Emitir Folio</span>
             </button>
         </div>
     </form>

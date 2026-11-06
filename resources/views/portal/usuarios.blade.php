@@ -11,6 +11,14 @@
 
 @section('content')
 
+<div x-data="{
+    showCreateModal: false,
+    showEditModal: false,
+    editUserId: null,
+    editUserName: '',
+    editUserRoles: []
+}">
+
 {{-- ═══════════════════════════════════ HEADER ══ --}}
 <div class="mb-6 space-y-2">
     <nav class="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
@@ -34,19 +42,12 @@
             </p>
         </div>
         <div class="flex flex-wrap items-center gap-2.5">
-            <button class="inline-flex items-center gap-2 px-3.5 py-2 bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold shadow-xs transition-all">
-                <span class="material-symbols-outlined text-lg text-slate-500">download</span>
-                <span>Exportar Padrón</span>
-            </button>
-            <button class="inline-flex items-center gap-2 px-3.5 py-2 bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold shadow-xs transition-all">
-                <span class="material-symbols-outlined text-lg text-slate-500">policy</span>
-                <span>Políticas RBAC</span>
-            </button>
-            <a href="{{ route('portal.usuarios.create') }}"
-               class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold shadow-xs transition-all">
+            <button @click="showCreateModal = true"
+                    type="button"
+                    class="inline-flex items-center gap-2 px-4 py-2 bg-[#001229] hover:bg-[#0f2744] text-white rounded-lg text-xs font-semibold shadow-xs transition-all cursor-pointer">
                 <span class="material-symbols-outlined text-lg">person_add</span>
                 <span>Nuevo Usuario</span>
-            </a>
+            </button>
         </div>
     </div>
 </div>
@@ -236,13 +237,22 @@
                         </td>
                         <td class="py-3.5 px-4 text-right">
                             <div class="flex items-center justify-end gap-2">
-                                <a href="{{ route('portal.usuarios.edit', $usuario->ID_Usuarios) }}"
-                                   class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-600 text-[11px] font-semibold transition-colors">
-                                    <span class="material-symbols-outlined text-xs">edit</span> Editar
-                                </a>
-                                <button class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-rose-50 hover:text-rose-700 text-slate-600 text-[11px] font-semibold transition-colors">
-                                    <span class="material-symbols-outlined text-xs">block</span>
+                                <button type="button"
+                                        @click="showEditModal = true; editUserId = {{ $usuario->ID_Usuarios }}; editUserName = '{{ addslashes($usuario->Nombre) }}'; editUserRoles = {{ $usuario->roles->pluck('ID_Rol')->toJson() }};"
+                                        class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-600 text-[11px] font-semibold transition-colors cursor-pointer">
+                                    <span class="material-symbols-outlined text-xs">edit</span> Roles
                                 </button>
+                                @if(auth()->id() !== $usuario->ID_Usuarios)
+                                    <form method="POST" action="{{ route('portal.usuarios.destroy', $usuario->ID_Usuarios) }}" onsubmit="return confirm('¿Está seguro de eliminar o deshabilitar este usuario del sistema?');" class="inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                                title="Eliminar usuario"
+                                                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-rose-50 hover:text-rose-700 text-slate-600 text-[11px] font-semibold transition-colors cursor-pointer">
+                                            <span class="material-symbols-outlined text-xs">delete</span>
+                                        </button>
+                                    </form>
+                                @endif
                             </div>
                         </td>
                     </tr>
@@ -312,4 +322,122 @@
     </div>
 </div>
 
+{{-- ═══════════════════════════════════ MODAL CREAR USUARIO ══ --}}
+<div x-show="showCreateModal"
+     x-cloak
+     class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4"
+     style="display: none;">
+    <div @click.outside="showCreateModal = false"
+         class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl border border-slate-200 space-y-5">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-[#0051d5]">person_add</span>
+                <h3 class="font-bold text-base text-[#0b1c30]">Registrar Nuevo Usuario</h3>
+            </div>
+            <button @click="showCreateModal = false" class="text-slate-400 hover:text-slate-600">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <form action="{{ route('portal.usuarios.store') }}" method="POST" class="space-y-4">
+            @csrf
+            <div>
+                <label for="nombre" class="block text-xs font-semibold text-[#0b1c30] mb-1">Nombre Completo</label>
+                <input type="text" name="nombre" id="nombre" required placeholder="Ej. Ing. Carlos Pérez"
+                       class="w-full px-3.5 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#0051d5]">
+            </div>
+
+            <div>
+                <label for="email" class="block text-xs font-semibold text-[#0b1c30] mb-1">Correo Electrónico Institucional</label>
+                <input type="email" name="email" id="email" required placeholder="carlos.perez@setc.gob.mx"
+                       class="w-full px-3.5 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#0051d5]">
+            </div>
+
+            <div>
+                <label for="password" class="block text-xs font-semibold text-[#0b1c30] mb-1">Contraseña Inicial</label>
+                <input type="password" name="password" id="password" required minlength="8" placeholder="••••••••"
+                       class="w-full px-3.5 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#0051d5]">
+            </div>
+
+            <div>
+                <span class="block text-xs font-semibold text-[#0b1c30] mb-2">Asignar Roles</span>
+                <div class="space-y-2 max-h-40 overflow-y-auto p-2 bg-slate-50 rounded-lg border border-slate-200">
+                    @foreach($roles ?? [] as $r)
+                        <label class="flex items-center gap-2 text-xs text-[#0b1c30] cursor-pointer">
+                            <input type="checkbox" name="roles[]" value="{{ $r->ID_Rol }}"
+                                   class="rounded text-[#0051d5] focus:ring-[#0051d5]">
+                            <span class="font-medium">{{ $r->Nombre }}</span>
+                        </label>
+                    @endforeach
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+                <button type="button" @click="showCreateModal = false"
+                        class="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 text-xs font-semibold hover:bg-slate-200 transition-colors">
+                    Cancelar
+                </button>
+                <button type="submit"
+                        class="px-5 py-2 rounded-lg bg-[#001229] hover:bg-[#0f2744] text-white text-xs font-semibold transition-colors">
+                    Crear Usuario
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{{-- ═══════════════════════════════════ MODAL EDITAR ROLES ══ --}}
+<div x-show="showEditModal"
+     x-cloak
+     class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4"
+     style="display: none;">
+    <div @click.outside="showEditModal = false"
+         class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200 space-y-5">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-[#0051d5]">manage_accounts</span>
+                <h3 class="font-bold text-base text-[#0b1c30]">Modificar Roles de Usuario</h3>
+            </div>
+            <button @click="showEditModal = false" class="text-slate-400 hover:text-slate-600">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <p class="text-xs text-slate-500">
+            Usuario seleccionado: <strong class="text-[#0b1c30]" x-text="editUserName"></strong>
+        </p>
+
+        <form :action="'{{ url('portal/usuarios') }}/' + editUserId + '/roles'" method="POST" class="space-y-4">
+            @csrf
+            @method('PUT')
+
+            <div>
+                <span class="block text-xs font-semibold text-[#0b1c30] mb-2">Seleccione los roles aplicables</span>
+                <div class="space-y-2 p-3 bg-slate-50 rounded-lg border border-slate-200">
+                    @foreach($roles ?? [] as $r)
+                        <label class="flex items-center gap-2 text-xs text-[#0b1c30] cursor-pointer">
+                            <input type="checkbox" name="roles[]" value="{{ $r->ID_Rol }}"
+                                   :checked="editUserRoles.includes({{ $r->ID_Rol }})"
+                                   class="rounded text-[#0051d5] focus:ring-[#0051d5]">
+                            <span class="font-medium">{{ $r->Nombre }}</span>
+                        </label>
+                    @endforeach
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+                <button type="button" @click="showEditModal = false"
+                        class="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 text-xs font-semibold hover:bg-slate-200 transition-colors">
+                    Cancelar
+                </button>
+                <button type="submit"
+                        class="px-5 py-2 rounded-lg bg-[#0051d5] hover:bg-[#003ea8] text-white text-xs font-semibold transition-colors">
+                    Guardar Cambios
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+</div> {{-- Cierre de x-data --}}
 @endsection

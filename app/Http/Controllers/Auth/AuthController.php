@@ -44,12 +44,20 @@ class AuthController extends Controller
                 'Fecha_Creacion' => now(),
             ]);
 
-            // Redirección inteligente según rol
-            if ($usuario->roles()->whereIn('Nombre', ['Administrador', 'Supervisor', 'Revisor', 'Revisor L1', 'Revisor L2'])->exists()) {
-                return redirect()->intended(route('portal.dashboard'));
+            // Redirección inteligente según rol institucional
+            if ($usuario->esAdministrador()) {
+                return redirect()->route('portal.dashboard');
             }
 
-            return redirect()->intended(route('expedientes.index'));
+            if ($usuario->esRevisor()) {
+                return redirect()->route('portal.mesa-dictamen');
+            }
+
+            if ($usuario->esSupervisor()) {
+                return redirect()->route('portal.matriz-cargas');
+            }
+
+            return redirect()->route('expedientes.index');
         }
 
         return back()->withErrors([
