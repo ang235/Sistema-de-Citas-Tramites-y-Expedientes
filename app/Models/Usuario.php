@@ -49,6 +49,16 @@ class Usuario extends Authenticatable
         return 'Contrasena';
     }
 
+    public function getNameAttribute(): string
+    {
+        return (string) ($this->attributes['Nombre'] ?? '');
+    }
+
+    public function getEmailAttribute(): string
+    {
+        return (string) ($this->attributes['Email'] ?? '');
+    }
+
     protected function casts(): array
     {
         return [

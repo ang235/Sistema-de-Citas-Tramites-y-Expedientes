@@ -42,6 +42,14 @@ class TipoTramite extends Model
     }
 
     /**
+     * Alias de versiones para compatibilidad.
+     */
+    public function versionesTramite(): HasMany
+    {
+        return $this->versiones();
+    }
+
+    /**
      * Obtiene la versión actualmente vigente del trámite.
      */
     public function versionVigente(): ?VersionTramite

@@ -61,6 +61,14 @@ class Documento extends Model
     }
 
     /**
+     * Alias de versionesDoc para compatibilidad.
+     */
+    public function versiones(): HasMany
+    {
+        return $this->versionesDoc();
+    }
+
+    /**
      * Última versión cargada del documento.
      */
     public function ultimaVersion(): ?VersionDoc

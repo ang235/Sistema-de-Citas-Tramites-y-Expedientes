@@ -20,6 +20,91 @@
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    {{-- Tailwind Stitch Civic Scheme Engine --}}
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "inverse-surface": "#213145",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed": "#d4e3ff",
+                        "on-secondary-fixed": "#00174b",
+                        "on-primary": "#ffffff",
+                        "secondary-container": "#316bf3",
+                        "on-tertiary-fixed": "#002114",
+                        "on-tertiary-fixed-variant": "#005137",
+                        "on-secondary-fixed-variant": "#003ea8",
+                        "on-surface-variant": "#44474d",
+                        "surface-container-low": "#eff4ff",
+                        "surface-container-high": "#dce9ff",
+                        "secondary-fixed": "#dbe1ff",
+                        "error-container": "#ffdad6",
+                        "secondary-fixed-dim": "#b4c5ff",
+                        "on-primary-fixed": "#021c39",
+                        "surface-bright": "#f8f9ff",
+                        "on-primary-container": "#798fb1",
+                        "background": "#f8f9ff",
+                        "on-background": "#0b1c30",
+                        "error": "#ba1a1a",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed": "#85f8c4",
+                        "on-secondary-container": "#fefcff",
+                        "surface": "#f8f9ff",
+                        "primary": "#001229",
+                        "secondary": "#0051d5",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed-dim": "#68dba9",
+                        "outline": "#74777e",
+                        "on-surface": "#0b1c30",
+                        "on-tertiary-container": "#1fa072",
+                        "on-primary-fixed-variant": "#324866",
+                        "primary-fixed-dim": "#b2c8ed",
+                        "surface-dim": "#cbdbf5",
+                        "surface-container-highest": "#d3e4fe",
+                        "surface-container": "#e5eeff",
+                        "surface-container-lowest": "#ffffff",
+                        "outline-variant": "#c4c6ce",
+                        "inverse-primary": "#b2c8ed",
+                        "inverse-on-surface": "#eaf1ff",
+                        "surface-tint": "#4a5f7f",
+                        "on-secondary": "#ffffff",
+                        "primary-container": "#0f2744",
+                        "surface-variant": "#d3e4fe",
+                        "tertiary-container": "#002d1d",
+                        "tertiary": "#00160c"
+                    },
+                    fontFamily: {
+                        "headline-xl": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "label-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "code-sm": ["Inter"]
+                    },
+                    fontSize: {
+                        "code-sm": ["13px", { lineHeight: "18px", fontWeight: "500" }],
+                        "label-sm": ["12px", { lineHeight: "16px", fontWeight: "600" }],
+                        "headline-xl": ["36px", { lineHeight: "44px", fontWeight: "700" }],
+                        "headline-lg": ["30px", { lineHeight: "38px", fontWeight: "600" }],
+                        "body-sm": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+                        "label-md": ["14px", { lineHeight: "20px", fontWeight: "500" }],
+                        "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+                        "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
+                        "headline-md": ["22px", { lineHeight: "28px", fontWeight: "600" }],
+                        "headline-sm": ["18px", { lineHeight: "24px", fontWeight: "600" }]
+                    }
+                }
+            }
+        };
+    </script>
     @stack('head')
 </head>
 <body class="min-h-screen flex overflow-hidden"

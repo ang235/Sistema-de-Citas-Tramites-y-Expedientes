@@ -51,6 +51,14 @@ class Revision extends Model
     }
 
     /**
+     * Alias de asignacionRevisor para compatibilidad.
+     */
+    public function asignacion(): BelongsTo
+    {
+        return $this->asignacionRevisor();
+    }
+
+    /**
      * Observaciones técnicas emitidas durante la revisión.
      */
     public function observaciones(): HasMany
