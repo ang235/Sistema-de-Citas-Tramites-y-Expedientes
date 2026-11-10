@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('Nombre', 150);
             $table->string('Email', 150)->unique();
             $table->string('Contrasena', 255);
+            $table->boolean('Activo')->default(true);
             $table->timestamp('Fecha_Creacion')->useCurrent();
             $table->timestamps();
         });

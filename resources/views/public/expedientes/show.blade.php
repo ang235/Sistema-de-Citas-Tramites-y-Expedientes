@@ -158,6 +158,142 @@
         </div>
     </div>
 
+    {{-- ══════════════════════════════════════════ LÍNEA DE TIEMPO / TIMELINE DINÁMICO ══ --}}
+    @php
+        $step1_done = true;
+        $step2_done = (bool) $asignacion;
+        $step2_active = !$step2_done;
+        $step2_date = $asignacion?->Fecha_Asignacion;
+
+        $hayObs = $observacionesAbiertas->isNotEmpty();
+        $step3_done = ($step2_done && ($porcentajeAvance === 100 || $tieneResolucion || ($revision && $revision->Resultado === 'Aprobado')));
+        $step3_active = ($step2_done && !$step3_done);
+
+        $step4_done = (bool) ($revision && in_array($revision->Resultado, ['Aprobado', 'Rechazado']));
+        $step4_active = ($step3_done && !$step4_done);
+        $step4_date = $revision?->Fecha_Revision;
+
+        $step5_done = $tieneResolucion;
+        $step5_active = ($step4_done && !$step5_done);
+        $step5_date = $ultimaResolucion?->Fecha_Resolucion;
+    @endphp
+    <div class="bg-white rounded-2xl border border-slate-200/80 p-6 lg:p-8 shadow-xs space-y-6">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+            <div>
+                <h2 class="text-lg lg:text-xl font-bold text-[#001229]" style="font-family: var(--font-display);">
+                    Línea de Tiempo y Trazabilidad del Expediente
+                </h2>
+                <p class="text-xs text-slate-500 mt-0.5">
+                    Estado en tiempo real de las 5 fases procedimentales de su trámite institucional.
+                </p>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    Sincronizado en Vivo
+                </span>
+            </div>
+        </div>
+
+        <div class="relative py-2">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-6 relative">
+
+                {{-- Hito 1: Radicación --}}
+                <div class="relative flex md:flex-col items-start gap-4 md:gap-3">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 font-bold text-xs bg-emerald-500 text-white shadow-xs">
+                        <span class="material-symbols-outlined text-lg">check</span>
+                    </div>
+                    <div>
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-700 block">Fase 1</span>
+                        <h3 class="text-sm font-bold text-slate-900 mt-0.5">Radicación</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Expediente generado con folio oficial</p>
+                        <span class="text-[11px] text-slate-400 font-mono mt-1 block">
+                            {{ $solicitud->Fecha_Creacion_Solicitud ? $solicitud->Fecha_Creacion_Solicitud->format('d/m/Y H:i') : ($solicitud->created_at ? $solicitud->created_at->format('d/m/Y') : 'Completado') }}
+                        </span>
+                    </div>
+                </div>
+
+                {{-- Hito 2: Asignación Técnica --}}
+                <div class="relative flex md:flex-col items-start gap-4 md:gap-3">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 font-bold text-xs {{ $step2_done ? 'bg-emerald-500 text-white' : ($step2_active ? 'bg-[#0051d5] text-white ring-4 ring-blue-100' : 'bg-slate-200 text-slate-500') }} shadow-xs">
+                        <span class="material-symbols-outlined text-lg">{{ $step2_done ? 'check' : ($step2_active ? 'pending' : 'person_search') }}</span>
+                    </div>
+                    <div>
+                        <span class="text-[11px] font-bold uppercase tracking-wider {{ $step2_done ? 'text-emerald-700' : ($step2_active ? 'text-[#0051d5]' : 'text-slate-400') }} block">Fase 2</span>
+                        <h3 class="text-sm font-bold text-slate-900 mt-0.5">Asignación Técnica</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">
+                            {{ $revisor ? 'Asignado a: ' . $revisor->Nombre : 'Esperando asignación' }}
+                        </p>
+                        @if($step2_date)
+                            <span class="text-[11px] text-slate-400 font-mono mt-1 block">
+                                {{ \Carbon\Carbon::parse($step2_date)->format('d/m/Y H:i') }}
+                            </span>
+                        @endif
+                    </div>
+                </div>
+
+                {{-- Hito 3: Evaluación de Recaudos --}}
+                <div class="relative flex md:flex-col items-start gap-4 md:gap-3">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 font-bold text-xs {{ $step3_done ? 'bg-emerald-500 text-white' : ($hayObs ? 'bg-amber-500 text-white ring-4 ring-amber-100 animate-pulse' : ($step3_active ? 'bg-[#0051d5] text-white ring-4 ring-blue-100' : 'bg-slate-200 text-slate-500')) }} shadow-xs">
+                        <span class="material-symbols-outlined text-lg">{{ $step3_done ? 'check' : ($hayObs ? 'warning' : ($step3_active ? 'hourglass_top' : 'folder')) }}</span>
+                    </div>
+                    <div>
+                        <span class="text-[11px] font-bold uppercase tracking-wider {{ $step3_done ? 'text-emerald-700' : ($hayObs ? 'text-amber-700' : ($step3_active ? 'text-[#0051d5]' : 'text-slate-400')) }} block">Fase 3</span>
+                        <h3 class="text-sm font-bold text-slate-900 mt-0.5">Evaluación de Recaudos</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">
+                            @if($hayObs)
+                                <span class="text-amber-800 font-medium">{{ $observacionesAbiertas->count() }} requerimiento(s) por solventar</span>
+                            @elseif($step3_done)
+                                Recaudos técnicos validados
+                            @else
+                                Revisión de recaudos en curso
+                            @endif
+                        </p>
+                    </div>
+                </div>
+
+                {{-- Hito 4: Dictamen Técnico --}}
+                <div class="relative flex md:flex-col items-start gap-4 md:gap-3">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 font-bold text-xs {{ $step4_done ? 'bg-emerald-500 text-white' : ($step4_active ? 'bg-[#0051d5] text-white ring-4 ring-blue-100' : 'bg-slate-200 text-slate-500') }} shadow-xs">
+                        <span class="material-symbols-outlined text-lg">{{ $step4_done ? 'check' : ($step4_active ? 'gavel' : 'balance') }}</span>
+                    </div>
+                    <div>
+                        <span class="text-[11px] font-bold uppercase tracking-wider {{ $step4_done ? 'text-emerald-700' : ($step4_active ? 'text-[#0051d5]' : 'text-slate-400') }} block">Fase 4</span>
+                        <h3 class="text-sm font-bold text-slate-900 mt-0.5">Dictamen de Calificación</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">
+                            {{ $revision ? 'Calificación: ' . $revision->Resultado : 'Pendiente de emisión de dictamen' }}
+                        </p>
+                        @if($step4_date)
+                            <span class="text-[11px] text-slate-400 font-mono mt-1 block">
+                                {{ \Carbon\Carbon::parse($step4_date)->format('d/m/Y') }}
+                            </span>
+                        @endif
+                    </div>
+                </div>
+
+                {{-- Hito 5: Resolución Final --}}
+                <div class="relative flex md:flex-col items-start gap-4 md:gap-3">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 font-bold text-xs {{ $step5_done ? 'bg-emerald-500 text-white ring-4 ring-emerald-100' : ($step5_active ? 'bg-indigo-600 text-white ring-4 ring-indigo-100' : 'bg-slate-200 text-slate-500') }} shadow-xs">
+                        <span class="material-symbols-outlined text-lg">{{ $step5_done ? 'verified' : ($step5_active ? 'draw' : 'task_alt') }}</span>
+                    </div>
+                    <div>
+                        <span class="text-[11px] font-bold uppercase tracking-wider {{ $step5_done ? 'text-emerald-700' : ($step5_active ? 'text-indigo-700' : 'text-slate-400') }} block">Fase 5</span>
+                        <h3 class="text-sm font-bold text-slate-900 mt-0.5">Resolución Final</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">
+                            {{ $tieneResolucion ? 'Acto emitido: ' . $ultimaResolucion->Tipo_Resolucion : 'Pendiente de firma resolutiva' }}
+                        </p>
+                        @if($step5_date)
+                            <span class="text-[11px] text-emerald-600 font-semibold font-mono mt-1 block">
+                                {{ \Carbon\Carbon::parse($step5_date)->format('d/m/Y') }}
+                            </span>
+                        @endif
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
     {{-- ══════════════════════════════════════════ OBSERVACIONES ABIERTAS (SI EXISTEN) ══ --}}
     @if ($observacionesAbiertas->isNotEmpty())
         <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6 lg:p-8 space-y-6">

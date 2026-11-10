@@ -19,8 +19,18 @@ use Illuminate\View\View;
 
 class AsignacionController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request): View|RedirectResponse
     {
+        /** @var Usuario|null $currentUser */
+        $currentUser = Auth::user();
+        if (! $currentUser || ! ($currentUser->esSupervisor() || $currentUser->esAdministrador())) {
+            if ($currentUser?->esRevisor()) {
+                return redirect()->route('portal.revisor-dashboard');
+            }
+
+            return redirect()->route('expedientes.index');
+        }
+
         $buscar = $request->query('buscar');
         $nivel = $request->query('nivel');
 
@@ -35,13 +45,13 @@ class AsignacionController extends Controller
                     $q->where('Nombre', 'like', "%{$nivel}%");
                 } else {
                     $q->where('Nombre', 'like', '%Revisor%')
-                      ->orWhere('Nombre', 'like', '%Supervisor%');
+                        ->orWhere('Nombre', 'like', '%Supervisor%');
                 }
             })
             ->when($buscar, function ($query, $term): void {
                 $query->where(function ($q) use ($term): void {
                     $q->where('Nombre', 'like', "%{$term}%")
-                      ->orWhere('Email', 'like', "%{$term}%");
+                        ->orWhere('Email', 'like', "%{$term}%");
                 });
             })
             ->withCount('asignacionesComoRevisor')
@@ -145,4 +155,3 @@ class AsignacionController extends Controller
         return back()->with('success', "Asignación inteligente completada: {$asignados} expedientes distribuidos.");
     }
 }
-

@@ -106,4 +106,3 @@ class CitaCiudadanoController extends Controller
         return redirect()->route('citas.index')->with('info', 'La cita fue cancelada correctamente.');
     }
 }
-

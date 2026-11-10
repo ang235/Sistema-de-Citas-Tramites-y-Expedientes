@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Models\Usuario;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -38,7 +39,7 @@ class CheckRole
             foreach (explode(',', $role) as $r) {
                 $trimmed = trim($r);
                 if ($trimmed !== '') {
-                    $allowedRoles[] = $trimmed;
+                    $allowedRoles[] = strtolower($trimmed);
                 }
             }
         }
@@ -48,15 +49,29 @@ class CheckRole
             $user->load('roles');
         }
 
-        $userRoles = $user->roles->pluck('Nombre')->all();
+        // Alias internos para simplificar el uso en rutas
+        // 'ciudadano' => cualquier rol que NO sea admin/revisor/supervisor
+        // 'revisor'   => rol que contiene 'Revisor'
+        // 'supervisor' => rol que contiene 'Supervisor'
+        // 'admin'     => rol que contiene 'Admin'
+        /** @var Usuario $user */
+        $matchAlias = function (string $alias) use ($user): bool {
+            return match ($alias) {
+                'ciudadano', 'solicitante' => $user->esCiudadano(),
+                'revisor' => $user->esRevisor(),
+                'supervisor' => $user->esSupervisor(),
+                'admin', 'administrador' => $user->esAdministrador(),
+                default => $user->roles->contains(
+                    fn ($r) => strcasecmp((string) $r->Nombre, $alias) === 0
+                ),
+            };
+        };
 
         $hasRole = false;
         foreach ($allowedRoles as $allowed) {
-            foreach ($userRoles as $userRole) {
-                if (strcasecmp($allowed, (string) $userRole) === 0) {
-                    $hasRole = true;
-                    break 2;
-                }
+            if ($matchAlias($allowed)) {
+                $hasRole = true;
+                break;
             }
         }
 
@@ -66,6 +81,22 @@ class CheckRole
                     'message' => 'Acceso denegado: rol insuficiente.',
                     'roles_requeridos' => $allowedRoles,
                 ], 403);
+            }
+
+            // Rol institucional intentando acceder a área ciudadana → redirigir a su panel
+            if ($user instanceof Usuario) {
+                if ($user->esRevisor()) {
+                    return redirect()->route('portal.revisor-dashboard')
+                        ->with('warning', 'Como Revisor Técnico no tienes acceso a las secciones ciudadanas.');
+                }
+                if ($user->esSupervisor()) {
+                    return redirect()->route('portal.supervisor-dashboard')
+                        ->with('warning', 'Como Supervisor no tienes acceso a las secciones ciudadanas.');
+                }
+                if ($user->esAdministrador()) {
+                    return redirect()->route('portal.dashboard')
+                        ->with('warning', 'Como Administrador no tienes acceso a las secciones ciudadanas.');
+                }
             }
 
             abort(403, 'No cuenta con los permisos requeridos para acceder a esta sección.');

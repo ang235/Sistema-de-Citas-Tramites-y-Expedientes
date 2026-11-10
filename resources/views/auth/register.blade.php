@@ -18,8 +18,8 @@
 
             {{-- Cabecera --}}
             <div class="space-y-3 text-center mb-8">
-                <div class="inline-flex w-12 h-12 rounded-xl bg-[#eff4ff] items-center justify-center text-[#0051d5] mb-1 shadow-sm">
-                    <span class="material-symbols-outlined text-2xl">person_add</span>
+                <div class="flex justify-center mb-3">
+                    <img src="{{ asset('images/logo.png') }}" alt="Logo SETC" class="h-20 sm:h-24 w-auto object-contain drop-shadow-sm transition-transform duration-200 hover:scale-105">
                 </div>
                 <h1 class="text-2xl font-bold tracking-tight text-[#001229]" style="font-family: var(--font-display);">
                     Crear Cuenta Ciudadana
@@ -124,7 +124,7 @@
                 <div class="p-3.5 rounded-xl bg-[#eff4ff] text-xs text-[#44474d] flex items-start gap-2.5">
                     <span class="material-symbols-outlined text-[#0051d5] text-base shrink-0 mt-0.5">policy</span>
                     <span>
-                        Al registrarte aceptas las condiciones de uso telemático del Sistema Estatal SETC y el tratamiento protegido de tus datos conforme a la legislación de transparencia y privacidad.
+                        Al registrarte aceptas las condiciones de uso telemático del Sistema de Expedientes de Trámites y Citas (SETC) y el tratamiento protegido de tus datos conforme a la legislación de transparencia y privacidad.
                     </span>
                 </div>
 

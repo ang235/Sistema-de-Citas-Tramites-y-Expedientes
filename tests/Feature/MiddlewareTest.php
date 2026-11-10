@@ -67,3 +67,27 @@ test('check role middleware allows user with the required role', function () {
     expect($response->getStatusCode())->toBe(200);
     expect($response->getContent())->toBe('acceso concedido');
 });
+
+test('check role middleware redirects revisor to revisor dashboard when accessing citizen routes', function () {
+    $middleware = new CheckRole;
+    $usuario = new Usuario;
+    $usuario->ID_Usuarios = 3;
+    $usuario->Nombre = 'Revisor Documental';
+    $usuario->Email = 'revisor@setc.gob';
+
+    $rolRevisor = new Rol;
+    $rolRevisor->ID_Rol = 3;
+    $rolRevisor->Nombre = 'Revisor Técnico';
+
+    $usuario->setRelation('roles', collect([$rolRevisor]));
+
+    $request = Request::create('/expedientes', 'GET');
+    $request->setUserResolver(fn () => $usuario);
+
+    $response = $middleware->handle($request, function () {
+        return new Response('ok', 200);
+    }, 'ciudadano');
+
+    expect($response->isRedirection())->toBeTrue();
+    expect($response->headers->get('Location'))->toContain('/portal/revisor/panel');
+});

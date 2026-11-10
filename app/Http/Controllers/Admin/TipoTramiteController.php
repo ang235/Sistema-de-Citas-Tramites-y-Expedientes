@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreTipoTramiteRequest;
 use App\Models\Bitacora;
 use App\Models\TipoTramite;
+use App\Models\VersionTramite;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,15 +16,45 @@ use Illuminate\View\View;
 
 class TipoTramiteController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $tramites = TipoTramite::withCount('versiones')
-            ->orderBy('Nombre')
-            ->paginate(15);
+        $tab = $request->query('tab', 'activos');
+        $buscar = $request->query('buscar');
+
+        $query = TipoTramite::withCount('versiones')
+            ->with(['versionesTramite.requisitos'])
+            ->when($tab === 'inactivos', function ($q): void {
+                $q->where('Estado_Tipo_Tr', 'Inactivo');
+            }, function ($q): void {
+                $q->where('Estado_Tipo_Tr', '!=', 'Inactivo');
+            })
+            ->when($buscar, function ($q, $term): void {
+                $q->where('Nombre', 'like', "%{$term}%")
+                    ->orWhere('Descripcion', 'like', "%{$term}%");
+            })
+            ->orderBy('Nombre');
+
+        $tiposTramite = $query->paginate(15)->appends($request->query());
+
+        $totalActivos = TipoTramite::where('Estado_Tipo_Tr', '!=', 'Inactivo')->count();
+        $totalInactivos = TipoTramite::where('Estado_Tipo_Tr', 'Inactivo')->count();
+
+        $kpis = [
+            'total_tramites' => TipoTramite::count(),
+            'versiones_activas' => VersionTramite::where('Vigente', true)->count(),
+            'total_activos' => $totalActivos,
+            'total_inactivos' => $totalInactivos,
+            'pendientes_revision' => TipoTramite::where('Estado_Tipo_Tr', '!=', 'Activo')->where('Estado_Tipo_Tr', '!=', 'Inactivo')->count(),
+        ];
 
         return view('portal.parametros', [
-            'tramites' => $tramites,
-            'tiposTramite' => $tramites,
+            'tramites' => $tiposTramite,
+            'tiposTramite' => $tiposTramite,
+            'tab' => $tab,
+            'buscar' => $buscar,
+            'totalActivos' => $totalActivos,
+            'totalInactivos' => $totalInactivos,
+            'kpis' => $kpis,
         ]);
     }
 
@@ -71,16 +102,19 @@ class TipoTramiteController extends Controller
         /** @var TipoTramite $tramite */
         $tramite = TipoTramite::findOrFail($id);
         $nombre = $tramite->Nombre;
-        $tramite->delete();
+
+        $nuevoEstado = $tramite->Estado_Tipo_Tr === 'Inactivo' ? 'Activo' : 'Inactivo';
+        $tramite->update(['Estado_Tipo_Tr' => $nuevoEstado]);
+
+        $accionLabel = $nuevoEstado === 'Inactivo' ? 'deshabilitado' : 'reactivado';
 
         Bitacora::create([
             'ID_Usuarios' => (int) Auth::id(),
-            'Accion' => 'Eliminación de trámite',
-            'Descripcion' => "Trámite eliminado: {$nombre} (#{$id}).",
+            'Accion' => $nuevoEstado === 'Inactivo' ? 'Deshabilitación de trámite' : 'Reactivación de trámite',
+            'Descripcion' => "Trámite {$accionLabel}: {$nombre} (#{$id}).",
             'Fecha_Creacion' => now(),
         ]);
 
-        return back()->with('success', 'Trámite eliminado del catálogo.');
+        return back()->with('success', "Trámite {$nombre} marcado como {$nuevoEstado} exitosamente.");
     }
 }
-

@@ -25,4 +25,3 @@ class StoreRevisionRequest extends FormRequest
         ];
     }
 }
-

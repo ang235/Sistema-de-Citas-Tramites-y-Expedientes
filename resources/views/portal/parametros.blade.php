@@ -123,23 +123,38 @@
 
 {{-- ═══════════════════════════════════ TABLA CATÁLOGO TUPA ══ --}}
 <div class="bg-white rounded-xl border border-slate-200/80 shadow-xs overflow-hidden">
-    <div class="px-6 py-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-            <h2 class="text-base font-bold text-[#0b1c30]" style="font-family: var(--font-display);">Catálogo de Tipos de Trámite TUPA</h2>
-            <p class="text-xs text-slate-500 mt-0.5">Gestión de procedimientos administrativos según normativa vigente.</p>
+    {{-- Pestañas de estado: Activos vs Inactivos --}}
+    <div class="px-6 pt-4 border-b border-slate-100 flex items-center justify-between gap-4 flex-wrap">
+        <div class="flex items-center gap-1 border-b-2 border-transparent -mb-px">
+            <a href="{{ route('portal.parametros', ['tab' => 'activos']) }}"
+               class="pb-3 px-3 text-xs font-bold border-b-2 transition-colors flex items-center gap-1.5 {{ ($tab ?? 'activos') === 'activos' ? 'border-[#0051d5] text-[#0051d5]' : 'border-transparent text-slate-500 hover:text-slate-800' }}">
+                <span class="material-symbols-outlined text-sm">task_alt</span>
+                <span>Trámites Activos ({{ $totalActivos ?? 0 }})</span>
+            </a>
+            <a href="{{ route('portal.parametros', ['tab' => 'inactivos']) }}"
+               class="pb-3 px-3 text-xs font-bold border-b-2 transition-colors flex items-center gap-1.5 {{ ($tab ?? 'activos') === 'inactivos' ? 'border-amber-600 text-amber-700' : 'border-transparent text-slate-500 hover:text-slate-800' }}">
+                <span class="material-symbols-outlined text-sm">block</span>
+                <span>Trámites Inactivos / Deshabilitados ({{ $totalInactivos ?? 0 }})</span>
+            </a>
         </div>
-        <div class="flex items-center gap-3">
+
+        <form method="GET" action="{{ route('portal.parametros') }}" class="flex items-center gap-2 pb-3">
+            <input type="hidden" name="tab" value="{{ $tab ?? 'activos' }}">
             <div class="relative">
                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-base pointer-events-none">search</span>
-                <input class="pl-9 pr-4 py-1.5 border border-slate-200 rounded-lg text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 w-56" placeholder="Buscar trámite, código TUPA..." type="text">
+                <input name="buscar" value="{{ $buscar ?? '' }}"
+                       class="pl-9 pr-4 py-1.5 border border-slate-200 rounded-lg text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 w-56"
+                       placeholder="Buscar por nombre o descripción..." type="text">
             </div>
-            <select class="px-3 py-1.5 border border-slate-200 rounded-lg text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-600/20 cursor-pointer bg-white">
-                <option>Todos los estados</option>
-                <option>Vigente</option>
-                <option>Borrador</option>
-                <option>Obsoleto</option>
-            </select>
-        </div>
+            <button type="submit" class="px-3 py-1.5 rounded-lg bg-[#001229] hover:bg-[#0f2744] text-white text-xs font-semibold transition-colors">
+                Buscar
+            </button>
+            @if(!empty($buscar))
+                <a href="{{ route('portal.parametros', ['tab' => $tab ?? 'activos']) }}" class="px-2 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs">
+                    Limpiar
+                </a>
+            @endif
+        </form>
     </div>
 
     <div class="overflow-x-auto">
@@ -151,7 +166,7 @@
                     <th class="py-3 px-4">Versión Activa</th>
                     <th class="py-3 px-4">Requisitos</th>
                     <th class="py-3 px-4">SLA Legal</th>
-                    <th class="py-3 px-4">Estado</th>
+                    <th class="py-3 px-4">Estado Catálogo</th>
                     <th class="py-3 px-4 text-right">Acciones</th>
                 </tr>
             </thead>
@@ -159,9 +174,9 @@
                 @forelse ($tiposTramite ?? [] as $tipo)
                     @php
                         $version = $tipo->versionesTramite->where('Vigente', true)->first() ?? $tipo->versionesTramite->last();
-                        $esVigente = $version?->Vigente ?? false;
+                        $esInactivo = ($tipo->Estado_Tipo_Tr === 'Inactivo');
                     @endphp
-                    <tr class="hover:bg-slate-50 transition-colors">
+                    <tr class="hover:bg-slate-50 transition-colors {{ $esInactivo ? 'bg-slate-50/70 opacity-80' : '' }}">
                         <td class="py-3.5 px-6">
                             <span class="font-mono font-bold text-blue-700 text-[11px]">TUPA-{{ str_pad($tipo->ID_Tipo_Tramite, 3, '0', STR_PAD_LEFT) }}</span>
                         </td>
@@ -176,16 +191,16 @@
                                 <span class="text-slate-400">—</span>
                             @endif
                         </td>
-                        <td class="py-3.5 px-4 font-semibold text-[#0b1c30]">{{ $version?->requisitos->count() ?? '—' }}</td>
+                        <td class="py-3.5 px-4 font-semibold text-[#0b1c30]">{{ $version?->requisitos->count() ?? '0' }}</td>
                         <td class="py-3.5 px-4 text-slate-600">{{ $tipo->SLA_dias ?? '15' }}d</td>
                         <td class="py-3.5 px-4">
-                            @if ($esVigente)
-                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Vigente
+                            @if ($esInactivo)
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>Inactivo
                                 </span>
                             @else
-                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>Borrador
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>{{ $tipo->Estado_Tipo_Tr ?? 'Activo' }}
                                 </span>
                             @endif
                         </td>
@@ -214,56 +229,26 @@
                                         <span>+ Requisito</span>
                                     </button>
                                 @endif
-                                <form method="POST" action="{{ route('portal.tipo-tramites.destroy', $tipo->ID_Tipo_Tramite) }}" onsubmit="return confirm('¿Está seguro de eliminar este trámite del catálogo?');" class="inline">
+                                <form method="POST" action="{{ route('portal.tipo-tramites.destroy', $tipo->ID_Tipo_Tramite) }}" onsubmit="return confirm('¿Está seguro de {{ $esInactivo ? 'reactivar' : 'deshabilitar' }} este trámite del catálogo? No se eliminarán sus registros históricos.');" class="inline">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit"
-                                            title="Eliminar trámite"
-                                            class="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-100 hover:bg-rose-50 hover:text-rose-700 text-slate-500 text-[11px] font-semibold transition-colors cursor-pointer">
-                                        <span class="material-symbols-outlined text-xs">delete</span>
+                                            title="{{ $esInactivo ? 'Reactivar trámite' : 'Deshabilitar trámite' }}"
+                                            class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-colors cursor-pointer {{ $esInactivo ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100' : 'bg-slate-100 hover:bg-amber-50 hover:text-amber-800 text-slate-600' }}">
+                                        <span class="material-symbols-outlined text-xs">{{ $esInactivo ? 'check_circle' : 'block' }}</span>
+                                        <span>{{ $esInactivo ? 'Reactivar' : 'Deshabilitar' }}</span>
                                     </button>
                                 </form>
                             </div>
                         </td>
                     </tr>
                 @empty
-                    {{-- Filas de demostración --}}
-                    @foreach([
-                        ['001','Licencia de Funcionamiento Comercial Tipo A','v3.2','8','15d','Vigente'],
-                        ['002','Habilitación Urbana y Conformidad de Obra','v2.1','12','30d','Vigente'],
-                        ['003','Inspección Técnica de Seguridad ITSE','v4.0','6','7d','Vigente'],
-                        ['004','Permiso de Operación de Almacén','v1.3','5','20d','Borrador'],
-                        ['005','Copia Certificada de Documentos Registrales','v2.0','3','5d','Vigente'],
-                    ] as $t)
-                        <tr class="hover:bg-slate-50 transition-colors">
-                            <td class="py-3.5 px-6"><span class="font-mono font-bold text-blue-700 text-[11px]">TUPA-{{ $t[0] }}</span></td>
-                            <td class="py-3.5 px-4"><span class="font-semibold text-[#0b1c30]">{{ $t[1] }}</span></td>
-                            <td class="py-3.5 px-4"><span class="font-mono text-slate-600">{{ $t[2] }}</span></td>
-                            <td class="py-3.5 px-4 font-semibold text-[#0b1c30]">{{ $t[3] }}</td>
-                            <td class="py-3.5 px-4 text-slate-600">{{ $t[4] }}</td>
-                            <td class="py-3.5 px-4">
-                                @if($t[5] === 'Vigente')
-                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Vigente
-                                    </span>
-                                @else
-                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>Borrador
-                                    </span>
-                                @endif
-                            </td>
-                            <td class="py-3.5 px-4 text-right">
-                                <div class="flex items-center justify-end gap-2">
-                                    <button class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-600 text-[11px] font-semibold transition-colors">
-                                        <span class="material-symbols-outlined text-xs">visibility</span> Ver
-                                    </button>
-                                    <button class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#0f2744] hover:bg-[#16365c] text-white text-[11px] font-semibold transition-colors">
-                                        <span class="material-symbols-outlined text-xs">edit</span> Editar
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    @endforeach
+                    <tr>
+                        <td colspan="7" class="py-12 text-center text-slate-400">
+                            <span class="material-symbols-outlined text-4xl block mb-2 text-slate-300">folder_off</span>
+                            No hay trámites registrados en esta categoría ({{ ($tab ?? 'activos') === 'inactivos' ? 'Inactivos' : 'Activos' }}).
+                        </td>
+                    </tr>
                 @endforelse
             </tbody>
         </table>
@@ -273,7 +258,7 @@
         @php
             $tramitesCol = $tiposTramite ?? $tramites ?? null;
         @endphp
-        <span class="text-xs text-slate-500">{{ $tramitesCol ? (method_exists($tramitesCol, 'total') ? $tramitesCol->total() : $tramitesCol->count()) : 5 }} procedimientos administrativos registrados</span>
+        <span class="text-xs text-slate-500">{{ $tramitesCol ? (method_exists($tramitesCol, 'total') ? $tramitesCol->total() : $tramitesCol->count()) : 0 }} procedimientos administrativos</span>
         @if(isset($tramitesCol) && $tramitesCol instanceof \Illuminate\Pagination\LengthAwarePaginator)
             {{ $tramitesCol->links() }}
         @endif

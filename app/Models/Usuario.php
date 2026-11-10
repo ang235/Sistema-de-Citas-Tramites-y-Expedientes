@@ -30,7 +30,7 @@ use Illuminate\Notifications\Notifiable;
  * @property-read Collection<int, AsignacionRevisor> $asignacionesComoAsignador
  * @property-read Collection<int, Resolucion> $resolucionesSupervisadas
  */
-#[Fillable(['Nombre', 'Email', 'Contrasena', 'Fecha_Creacion'])]
+#[Fillable(['Nombre', 'Email', 'Contrasena', 'Fecha_Creacion', 'Activo'])]
 #[Hidden(['Contrasena', 'remember_token'])]
 class Usuario extends Authenticatable
 {
@@ -59,11 +59,22 @@ class Usuario extends Authenticatable
         return (string) ($this->attributes['Email'] ?? '');
     }
 
+    public function getRoleLabelAttribute(): string
+    {
+        return $this->roles->first()?->Nombre ?? 'Solicitante / Ciudadano';
+    }
+
+    public function getActivoAttribute(): bool
+    {
+        return (bool) ($this->attributes['Activo'] ?? true);
+    }
+
     protected function casts(): array
     {
         return [
             'Fecha_Creacion' => 'datetime',
             'Contrasena' => 'hashed',
+            'Activo' => 'boolean',
         ];
     }
 

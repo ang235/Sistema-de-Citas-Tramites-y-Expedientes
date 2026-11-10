@@ -37,16 +37,23 @@
             </div>
         </div>
 
-        <div class="flex flex-wrap items-center gap-2.5 shrink-0">
-            <a href="{{ route('citas.create') }}" target="_blank" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-primary-container hover:bg-[#1a3860] text-white text-xs font-semibold shadow-xs transition-all">
-                <span class="material-symbols-outlined text-base">add_circle</span>
-                <span>Agendar Nueva Cita</span>
-            </a>
-            <button onclick="window.print()" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-xs transition-colors">
-                <span class="material-symbols-outlined text-base text-slate-500">print</span>
-                <span>Padrón Diario</span>
-            </button>
-        </div>
+        @if(!auth()->user()->esSupervisor() && !auth()->user()->esAdministrador())
+            <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+                <a href="{{ route('citas.create') }}" target="_blank" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-primary-container hover:bg-[#1a3860] text-white text-xs font-semibold shadow-xs transition-all">
+                    <span class="material-symbols-outlined text-base">add_circle</span>
+                    <span>Agendar Nueva Cita</span>
+                </a>
+                <button onclick="window.print()" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-xs transition-colors">
+                    <span class="material-symbols-outlined text-base text-slate-500">print</span>
+                    <span>Padrón Diario</span>
+                </button>
+            </div>
+        @else
+            <div class="flex items-center gap-2 text-xs text-slate-600 bg-slate-100 border border-slate-200/80 px-3.5 py-2 rounded-lg">
+                <span class="material-symbols-outlined text-base text-slate-500">visibility</span>
+                <span class="font-medium">Modo Supervisión: Consulta y Revisión de Citas</span>
+            </div>
+        @endif
     </div>
 
     {{-- ══ KPI SUMMARY CARDS ══ --}}

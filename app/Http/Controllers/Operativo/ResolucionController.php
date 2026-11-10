@@ -40,4 +40,3 @@ class ResolucionController extends Controller
         return back()->with('success', 'Resolución formal emitida y registrada en el expediente.');
     }
 }
-

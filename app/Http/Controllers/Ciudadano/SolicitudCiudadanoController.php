@@ -114,4 +114,3 @@ class SolicitudCiudadanoController extends Controller
             ->with('success', "Expediente {$codigoFolio} registrado exitosamente.");
     }
 }
-

@@ -27,7 +27,7 @@
                     @auth
                         Bienvenido, {{ auth()->user()->Nombre ?? auth()->user()->name }}.
                     @else
-                        Bienvenido al Sistema Estatal de Trámites y Citas (SETC).
+                        Bienvenido al Sistema de Expedientes de Trámites y Citas (SETC).
                     @endauth
                     <span class="text-[#0051d5] block font-semibold text-2xl lg:text-3xl mt-1">
                         ¿Qué gestión o trámite deseas realizar hoy?

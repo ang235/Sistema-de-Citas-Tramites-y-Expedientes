@@ -26,4 +26,3 @@ class StoreVersionTramiteRequest extends FormRequest
         ];
     }
 }
-

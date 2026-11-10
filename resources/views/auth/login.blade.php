@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
 @section('title', 'Iniciar Sesión')
-@section('meta_description', 'Accede a la Ventanilla Única Digital del Sistema Estatal de Citas, Trámites y Expedientes.')
+@section('meta_description', 'Accede a la Ventanilla Única Digital del Sistema de Expedientes de Trámites y Citas.')
 
 @section('breadcrumb')
     <a href="{{ route('home') }}" class="breadcrumb-item">SETC</a>
@@ -19,8 +19,8 @@
 
             {{-- Cabecera del formulario --}}
             <div class="space-y-3 text-center mb-8">
-                <div class="inline-flex w-12 h-12 rounded-xl bg-[#eff4ff] items-center justify-center text-[#0051d5] mb-1 shadow-sm">
-                    <span class="material-symbols-outlined text-2xl">account_circle</span>
+                <div class="flex justify-center mb-3">
+                    <img src="{{ asset('images/logo.png') }}" alt="Logo SETC" class="h-20 sm:h-24 w-auto object-contain drop-shadow-sm transition-transform duration-200 hover:scale-105">
                 </div>
                 <h1 class="text-2xl font-bold tracking-tight text-[#001229]" style="font-family: var(--font-display);">
                     Acceso Ciudadano e Institucional
@@ -129,7 +129,7 @@
                 <span class="material-symbols-outlined text-sm text-[#059669]">verified_user</span>
                 <span>Conexión cifrada de alta seguridad GovTech</span>
             </div>
-            <p>SETC • Sistema Estatal de Citas, Trámites y Expedientes</p>
+            <p>SETC • Sistema de Expedientes de Trámites y Citas</p>
         </div>
     </div>
 </div>

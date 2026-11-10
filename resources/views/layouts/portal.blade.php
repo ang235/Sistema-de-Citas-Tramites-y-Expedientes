@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full scroll-smooth">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,8 +7,20 @@
 
     {{-- SEO — portal interno (no indexable) --}}
     <title>@yield('title', 'Panel Operativo') — SETC Enterprise</title>
-    <meta name="description" content="@yield('meta_description', 'Panel operativo interno del Sistema Estatal de Citas, Trámites y Expedientes.')">
+    <meta name="description" content="@yield('meta_description', 'Panel operativo interno del Sistema de Expedientes de Trámites y Citas (SETC).')">
     <meta name="robots" content="noindex, nofollow">
+
+    {{-- Detección inmediata de modo oscuro para evitar destello --}}
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
 
     {{-- Fuentes del sistema SETC --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -33,133 +45,131 @@
             theme: {
                 extend: {
                     colors: {
-                        "inverse-surface": "#213145",
-                        "on-tertiary": "#ffffff",
-                        "primary-fixed": "#d4e3ff",
-                        "on-secondary-fixed": "#00174b",
-                        "on-primary": "#ffffff",
-                        "secondary-container": "#316bf3",
-                        "on-tertiary-fixed": "#002114",
-                        "on-tertiary-fixed-variant": "#005137",
-                        "on-secondary-fixed-variant": "#003ea8",
-                        "on-surface-variant": "#44474d",
-                        "surface-container-low": "#eff4ff",
-                        "surface-container-high": "#dce9ff",
-                        "secondary-fixed": "#dbe1ff",
-                        "error-container": "#ffdad6",
-                        "secondary-fixed-dim": "#b4c5ff",
-                        "on-primary-fixed": "#021c39",
-                        "surface-bright": "#f8f9ff",
-                        "on-primary-container": "#798fb1",
-                        "background": "#f8f9ff",
-                        "on-background": "#0b1c30",
-                        "error": "#ba1a1a",
-                        "on-error": "#ffffff",
-                        "tertiary-fixed": "#85f8c4",
-                        "on-secondary-container": "#fefcff",
-                        "surface": "#f8f9ff",
                         "primary": "#001229",
                         "secondary": "#0051d5",
-                        "on-error-container": "#93000a",
-                        "tertiary-fixed-dim": "#68dba9",
-                        "outline": "#74777e",
-                        "on-surface": "#0b1c30",
-                        "on-tertiary-container": "#1fa072",
-                        "on-primary-fixed-variant": "#324866",
-                        "primary-fixed-dim": "#b2c8ed",
-                        "surface-dim": "#cbdbf5",
-                        "surface-container-highest": "#d3e4fe",
-                        "surface-container": "#e5eeff",
-                        "surface-container-lowest": "#ffffff",
-                        "outline-variant": "#c4c6ce",
-                        "inverse-primary": "#b2c8ed",
-                        "inverse-on-surface": "#eaf1ff",
-                        "surface-tint": "#4a5f7f",
-                        "on-secondary": "#ffffff",
-                        "primary-container": "#0f2744",
-                        "surface-variant": "#d3e4fe",
-                        "tertiary-container": "#002d1d",
-                        "tertiary": "#00160c"
-                    },
-                    fontFamily: {
-                        "headline-xl": ["Plus Jakarta Sans"],
-                        "headline-lg": ["Plus Jakarta Sans"],
-                        "headline-md": ["Plus Jakarta Sans"],
-                        "headline-sm": ["Plus Jakarta Sans"],
-                        "body-lg": ["Inter"],
-                        "body-md": ["Inter"],
-                        "body-sm": ["Inter"],
-                        "label-md": ["Inter"],
-                        "label-sm": ["Inter"],
-                        "code-sm": ["Inter"]
-                    },
-                    fontSize: {
-                        "code-sm": ["13px", { lineHeight: "18px", fontWeight: "500" }],
-                        "label-sm": ["12px", { lineHeight: "16px", fontWeight: "600" }],
-                        "headline-xl": ["36px", { lineHeight: "44px", fontWeight: "700" }],
-                        "headline-lg": ["30px", { lineHeight: "38px", fontWeight: "600" }],
-                        "body-sm": ["14px", { lineHeight: "20px", fontWeight: "400" }],
-                        "label-md": ["14px", { lineHeight: "20px", fontWeight: "500" }],
-                        "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
-                        "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
-                        "headline-md": ["22px", { lineHeight: "28px", fontWeight: "600" }],
-                        "headline-sm": ["18px", { lineHeight: "24px", fontWeight: "600" }]
                     }
                 }
             }
         };
     </script>
+
+    <style>
+        /* ── Estilos para Sidebar en formato Botones de Lista con Colores ── */
+        .sidebar-btn-item {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            padding: 0.55rem 0.75rem;
+            border-radius: 0.75rem;
+            font-size: 13px;
+            font-weight: 500;
+            color: #cbd5e1;
+            background-color: rgba(15, 29, 46, 0.7);
+            border: 1px solid rgba(51, 65, 85, 0.55);
+            text-decoration: none;
+            transition: all 160ms cubic-bezier(0.4, 0, 0.2, 1);
+            margin-bottom: 0.35rem;
+        }
+        .sidebar-btn-item:hover {
+            background-color: rgba(26, 44, 69, 0.95);
+            border-color: rgba(96, 165, 250, 0.4);
+            color: #ffffff;
+            transform: translateX(2px);
+        }
+        .sidebar-btn-item.active {
+            background: linear-gradient(135deg, #0051d5 0%, #1d4ed8 100%);
+            border-color: rgba(147, 197, 253, 0.5);
+            color: #ffffff;
+            font-weight: 600;
+            box-shadow: 0 4px 14px rgba(0, 81, 213, 0.35);
+        }
+        .sidebar-btn-icon {
+            width: 1.85rem;
+            height: 1.85rem;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: transform 150ms ease;
+        }
+        .sidebar-btn-item:hover .sidebar-btn-icon {
+            transform: scale(1.08);
+        }
+
+        /* ── Scrollbars Visibles y Elegantes ── */
+        .custom-scroll {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(148, 163, 184, 0.5) transparent;
+        }
+        .custom-scroll::-webkit-scrollbar {
+            width: 7px;
+            height: 7px;
+            display: block;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.4);
+            border-radius: 9999px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb:hover {
+            background: rgba(100, 116, 139, 0.7);
+        }
+        .dark .custom-scroll {
+            scrollbar-color: rgba(71, 85, 105, 0.6) transparent;
+        }
+        .dark .custom-scroll::-webkit-scrollbar-thumb {
+            background: rgba(71, 85, 105, 0.6);
+        }
+        .dark .custom-scroll::-webkit-scrollbar-thumb:hover {
+            background: rgba(100, 116, 139, 0.9);
+        }
+    </style>
+
     @stack('head')
 </head>
-<body class="min-h-screen flex overflow-hidden"
-      style="background-color: var(--color-surface); color: var(--color-on-surface);">
+<body class="h-full flex overflow-hidden bg-slate-50 dark:bg-[#070e17] text-slate-900 dark:text-slate-100 antialiased">
 
     {{-- ════════════════════════════════════════════════════════ SIDEBAR ═════════ --}}
-    {{--
-        El sidebar recibe su contenido desde la vista con @section('sidebar') o usa
-        la configuración del controlador via $sidebarConfig. Si ninguno existe, se
-        usa el nav por defecto de SETC Enterprise.
-    --}}
     <aside id="sidebar"
-           class="flex-shrink-0 flex flex-col h-screen sticky top-0 z-40 transition-all duration-300"
-           style="width: 240px; background-color: var(--color-primary);"
+           class="flex-shrink-0 flex flex-col h-full z-40 transition-all duration-300 w-64 bg-[#0a1626] border-r border-slate-800 text-slate-200"
            aria-label="Panel de navegación">
 
         {{-- Logo & Contexto operativo --}}
-        <div class="px-4 py-5 shrink-0">
-            <div class="flex items-center gap-3 mb-5">
-                <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-                     style="background-color: rgba(255,255,255,0.12);">
-                    <span class="material-symbols-outlined text-white text-lg">account_balance</span>
+        <div class="px-4 py-4 shrink-0 border-b border-slate-800/80 bg-[#08121f]">
+            <div class="flex items-center gap-3 mb-3">
+                <div class="w-10 h-10 rounded-xl bg-white/10 p-1 flex items-center justify-center shrink-0 border border-white/20">
+                    <img src="{{ asset('images/logo.png') }}" alt="Logo SETC" class="h-8 w-auto object-contain">
                 </div>
                 <div class="flex flex-col leading-tight min-w-0">
-                    <div class="flex items-center gap-2">
-                        <span class="text-white font-bold text-sm" style="font-family: var(--font-display);">S.E.T.C.</span>
-                        <span class="px-1.5 py-0.5 rounded text-white font-bold"
-                              style="font-size: 9px; background-color: var(--color-secondary); letter-spacing: 0.05em;">ENTERPRISE</span>
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-white font-bold text-base tracking-tight" style="font-family: var(--font-display);">S.E.T.C.</span>
+                        <span class="px-1.5 py-0.5 rounded text-white font-bold text-[9px] bg-[#0051d5] tracking-wider">ENTERPRISE</span>
                     </div>
-                    <span class="text-xs truncate" style="color: rgba(255,255,255,0.5);">Mesa de Control GOV</span>
+                    <span class="text-[11px] truncate text-slate-400 font-medium">Expedientes, Trámites y Citas</span>
                 </div>
             </div>
 
-            {{-- Contexto institucional --}}
-            <div class="px-3 py-2 rounded-lg" style="background-color: rgba(255,255,255,0.06);">
+            {{-- Identidad Institucional --}}
+            <div class="px-3 py-2 rounded-xl bg-slate-900/80 border border-slate-800">
                 <div class="flex items-center justify-between mb-1">
-                    <span class="text-label-sm uppercase" style="color: rgba(255,255,255,0.4); letter-spacing: 0.08em;">Contexto Institucional</span>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Identidad Institucional</span>
                     <div class="flex items-center gap-1">
-                        <div class="w-1.5 h-1.5 rounded-full" style="background-color: var(--color-tertiary-fixed-dim);"></div>
-                        <span style="font-size: 10px; color: var(--color-tertiary-fixed-dim);">Seguro</span>
+                        <div class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></div>
+                        <span class="text-[10px] text-emerald-300 font-semibold">Oficial</span>
                     </div>
                 </div>
-                <select class="w-full text-white text-xs bg-transparent border-none outline-none cursor-pointer"
-                        id="sede-selector" aria-label="Seleccionar sede">
-                    <option value="" style="background-color: #001229;">{{ auth()->user()->sede ?? 'Administración Central' }}</option>
-                </select>
+                <div class="flex items-center gap-1.5 text-white text-xs">
+                    <span class="material-symbols-outlined text-sm text-blue-400">verified</span>
+                    <span class="font-medium truncate">{{ auth()->user()->role_label ?? 'Personal Institucional' }}</span>
+                </div>
             </div>
         </div>
 
-        {{-- Navegación scrollable según rol --}}
-        <nav class="flex-1 overflow-y-auto px-3 pb-4 space-y-0.5" aria-label="Menú operativo" style="scrollbar-width:none;">
+        {{-- Navegación en Formato de Botones de Lista con Colores --}}
+        <nav class="flex-1 overflow-y-auto custom-scroll px-3 py-3 space-y-1" aria-label="Menú operativo">
 
             @hasSection('sidebar')
                 @yield('sidebar')
@@ -173,352 +183,410 @@
 
                 @if($isAdmin)
                     {{-- ─── ADMINISTRADOR ────────────────────────────────────────── --}}
-                    <div class="sidebar-section-label">Panel Principal</div>
+                    <div class="px-2 pt-2 pb-1 text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+                        Panel Principal
+                    </div>
+
                     <a href="{{ route('portal.dashboard') }}"
-                       class="sidebar-item {{ Request::routeIs('portal.dashboard') ? 'active' : '' }}"
-                       @if(Request::routeIs('portal.dashboard')) aria-current="page" @endif>
-                        <span class="material-symbols-outlined text-base">dashboard</span>
-                        Dashboard Operativo
+                       class="sidebar-btn-item {{ Request::routeIs('portal.dashboard') ? 'active' : '' }}">
+                        <div class="sidebar-btn-icon bg-blue-500/20 text-blue-300 border border-blue-400/20">
+                            <span class="material-symbols-outlined text-base">dashboard</span>
+                        </div>
+                        <span class="flex-1 truncate">Dashboard Operativo</span>
                     </a>
 
-                    <div class="sidebar-section-label">Configuración & Seguridad</div>
+                    <div class="px-2 pt-3 pb-1 text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+                        Configuración & Seguridad
+                    </div>
+
                     <a href="{{ route('portal.usuarios') }}"
-                       class="sidebar-item {{ Request::routeIs('portal.usuarios*') ? 'active' : '' }}">
-                        <span class="material-symbols-outlined text-base">manage_accounts</span>
-                        Gestión de Usuarios
-                    </a>
-                    <a href="{{ route('portal.parametros') }}"
-                       class="sidebar-item {{ Request::routeIs('portal.parametros*') ? 'active' : '' }}">
-                        <span class="material-symbols-outlined text-base">tune</span>
-                        Trámites y Requisitos
-                    </a>
-                    <a href="{{ route('portal.auditoria') }}"
-                       class="sidebar-item {{ Request::routeIs('portal.auditoria*') ? 'active' : '' }}">
-                        <span class="material-symbols-outlined text-base">policy</span>
-                        Auditoría & Logs PIDE
+                       class="sidebar-btn-item {{ Request::routeIs('portal.usuarios*') ? 'active' : '' }}">
+                        <div class="sidebar-btn-icon bg-sky-500/20 text-sky-300 border border-sky-400/20">
+                            <span class="material-symbols-outlined text-base">manage_accounts</span>
+                        </div>
+                        <span class="flex-1 truncate">Gestión de Usuarios</span>
                     </a>
 
-                    <div class="sidebar-section-label">Control Operativo</div>
+                    <a href="{{ route('portal.parametros') }}"
+                       class="sidebar-btn-item {{ Request::routeIs('portal.parametros*') ? 'active' : '' }}">
+                        <div class="sidebar-btn-icon bg-rose-500/20 text-rose-300 border border-rose-400/20">
+                            <span class="material-symbols-outlined text-base">tune</span>
+                        </div>
+                        <span class="flex-1 truncate">Trámites y Requisitos</span>
+                    </a>
+
+                    <a href="{{ route('portal.auditoria') }}"
+                       class="sidebar-btn-item {{ Request::routeIs('portal.auditoria*') ? 'active' : '' }}">
+                        <div class="sidebar-btn-icon bg-purple-500/20 text-purple-300 border border-purple-400/20">
+                            <span class="material-symbols-outlined text-base">policy</span>
+                        </div>
+                        <span class="flex-1 truncate">Bitácora & Auditoría</span>
+                    </a>
+
+                    <div class="px-2 pt-3 pb-1 text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                        Control Operativo
+                    </div>
+
                     <a href="{{ route('portal.matriz-cargas') }}"
-                       class="sidebar-item {{ Request::routeIs('portal.matriz-cargas*') ? 'active' : '' }}">
-                        <span class="material-symbols-outlined text-base">balance</span>
-                        Matriz de Cargas
+                       class="sidebar-btn-item {{ Request::routeIs('portal.matriz-cargas*') ? 'active' : '' }}">
+                        <div class="sidebar-btn-icon bg-indigo-500/20 text-indigo-300 border border-indigo-400/20">
+                            <span class="material-symbols-outlined text-base">balance</span>
+                        </div>
+                        <span class="flex-1 truncate">Matriz de Cargas</span>
                     </a>
-                    <a href="{{ route('portal.metricas') }}"
-                       class="sidebar-item {{ Request::routeIs('portal.metricas*') ? 'active' : '' }}">
-                        <span class="material-symbols-outlined text-base">monitoring</span>
-                        Métricas Globales
-                    </a>
+
                     <a href="{{ route('portal.citas') }}"
-                       class="sidebar-item {{ Request::routeIs('portal.citas*') ? 'active' : '' }}">
-                        <span class="material-symbols-outlined text-base">calendar_month</span>
-                        Agenda de Citas
+                       class="sidebar-btn-item {{ Request::routeIs('portal.citas*') ? 'active' : '' }}">
+                        <div class="sidebar-btn-icon bg-teal-500/20 text-teal-300 border border-teal-400/20">
+                            <span class="material-symbols-outlined text-base">calendar_month</span>
+                        </div>
+                        <span class="flex-1 truncate">Agenda de Citas</span>
                     </a>
 
                 @elseif($isRevisor)
-                    {{-- ─── REVISOR TÉCNICO ──────────────────────────────────────── --}}
-                    <div class="sidebar-section-label">Mesa Técnica</div>
-                    <a href="{{ route('portal.mesa-dictamen') }}"
-                       class="sidebar-item {{ Request::routeIs('portal.mesa-dictamen*') ? 'active' : '' }}"
-                       @if(Request::routeIs('portal.mesa-dictamen*')) aria-current="page" @endif>
-                        <span class="material-symbols-outlined text-base">gavel</span>
-                        Mesa de Dictamen
-                    </a>
-                    <a href="{{ route('portal.expedientes') }}"
-                       class="sidebar-item {{ Request::routeIs('portal.expedientes*') ? 'active' : '' }}">
-                        <span class="material-symbols-outlined text-base">folder_open</span>
-                        Expedientes Asignados
-                        @if(($observedCount ?? 0) > 0)
-                            <span class="ml-auto px-2 py-0.5 rounded-full text-white font-bold"
-                                  style="font-size: 11px; background-color: var(--color-secondary); min-width: 1.25rem; text-align:center;">
-                                {{ $observedCount }}
-                            </span>
-                        @endif
+                    {{-- ─── REVISOR TÉCNICO (EXCLUSIVAMENTE SUS 2 APARTADOS DESIGNADOS) ── --}}
+                    <div class="px-2 pt-2 pb-1 text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                        Revisión Técnica
+                    </div>
+
+                    <a href="{{ route('portal.revisor-dashboard') }}"
+                       class="sidebar-btn-item {{ Request::routeIs('portal.revisor-dashboard*') ? 'active' : '' }}">
+                        <div class="sidebar-btn-icon bg-blue-500/20 text-blue-300 border border-blue-400/20">
+                            <span class="material-symbols-outlined text-base">monitoring</span>
+                        </div>
+                        <span class="flex-1 truncate">Mando de Revisión Técnica</span>
                     </a>
 
-                    <div class="sidebar-section-label">Atención</div>
-                    <a href="{{ route('portal.citas') }}"
-                       class="sidebar-item {{ Request::routeIs('portal.citas*') ? 'active' : '' }}">
-                        <span class="material-symbols-outlined text-base">calendar_month</span>
-                        Agenda de Citas
+                    <a href="{{ route('portal.mesa-dictamen') }}"
+                       class="sidebar-btn-item {{ Request::routeIs('portal.mesa-dictamen*') || Request::routeIs('portal.expedientes.evaluar*') ? 'active' : '' }}">
+                        <div class="sidebar-btn-icon bg-amber-500/20 text-amber-300 border border-amber-400/20">
+                            <span class="material-symbols-outlined text-base">fact_check</span>
+                        </div>
+                        <span class="flex-1 truncate">Mesa de Calificación Documental</span>
                     </a>
 
                 @elseif($isSupervisor)
                     {{-- ─── SUPERVISOR / DICTAMINADOR ────────────────────────────── --}}
-                    <div class="sidebar-section-label">Supervisión & Cargas</div>
-                    <a href="{{ route('portal.matriz-cargas') }}"
-                       class="sidebar-item {{ Request::routeIs('portal.matriz-cargas*') ? 'active' : '' }}"
-                       @if(Request::routeIs('portal.matriz-cargas*')) aria-current="page" @endif>
-                        <span class="material-symbols-outlined text-base">balance</span>
-                        Matriz de Cargas
-                    </a>
-                    <a href="{{ route('portal.metricas') }}"
-                       class="sidebar-item {{ Request::routeIs('portal.metricas*') ? 'active' : '' }}">
-                        <span class="material-symbols-outlined text-base">monitoring</span>
-                        Métricas y Desempeño
-                    </a>
-                    <a href="{{ route('portal.mesa-dictamen') }}"
-                       class="sidebar-item {{ Request::routeIs('portal.mesa-dictamen*') ? 'active' : '' }}">
-                        <span class="material-symbols-outlined text-base">gavel</span>
-                        Mesa de Dictamen
-                    </a>
-                    <a href="{{ route('portal.expedientes') }}"
-                       class="sidebar-item {{ Request::routeIs('portal.expedientes*') ? 'active' : '' }}">
-                        <span class="material-symbols-outlined text-base">folder_open</span>
-                        Expedientes Supervisados
+                    <div class="px-2 pt-2 pb-1 text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+                        Supervisión & Mando
+                    </div>
+
+                    <a href="{{ route('portal.supervisor-dashboard') }}"
+                       class="sidebar-btn-item {{ Request::routeIs('portal.supervisor-dashboard*') ? 'active' : '' }}">
+                        <div class="sidebar-btn-icon bg-blue-500/20 text-blue-300 border border-blue-400/20">
+                            <span class="material-symbols-outlined text-base">dashboard_customize</span>
+                        </div>
+                        <span class="flex-1 truncate">Mando de Supervisión</span>
                     </a>
 
-                    <div class="sidebar-section-label">Atención</div>
+                    <a href="{{ route('portal.matriz-cargas') }}"
+                       class="sidebar-btn-item {{ Request::routeIs('portal.matriz-cargas*') ? 'active' : '' }}">
+                        <div class="sidebar-btn-icon bg-indigo-500/20 text-indigo-300 border border-indigo-400/20">
+                            <span class="material-symbols-outlined text-base">balance</span>
+                        </div>
+                        <span class="flex-1 truncate">Matriz de Asignaciones</span>
+                    </a>
+
+                    <a href="{{ route('portal.auditoria') }}"
+                       class="sidebar-btn-item {{ Request::routeIs('portal.auditoria*') ? 'active' : '' }}">
+                        <div class="sidebar-btn-icon bg-purple-500/20 text-purple-300 border border-purple-400/20">
+                            <span class="material-symbols-outlined text-base">policy</span>
+                        </div>
+                        <span class="flex-1 truncate">Bitácora de Supervisión</span>
+                    </a>
+
+                    <div class="px-2 pt-3 pb-1 text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-teal-400"></span>
+                        Atención & Agenda
+                    </div>
+
                     <a href="{{ route('portal.citas') }}"
-                       class="sidebar-item {{ Request::routeIs('portal.citas*') ? 'active' : '' }}">
-                        <span class="material-symbols-outlined text-base">calendar_month</span>
-                        Agenda de Citas
+                       class="sidebar-btn-item {{ Request::routeIs('portal.citas*') ? 'active' : '' }}">
+                        <div class="sidebar-btn-icon bg-teal-500/20 text-teal-300 border border-teal-400/20">
+                            <span class="material-symbols-outlined text-base">calendar_month</span>
+                        </div>
+                        <span class="flex-1 truncate">Supervisión de Citas</span>
                     </a>
 
                 @else
-                    {{-- ─── GENERAL / OPERATIVO ──────────────────────────────────── --}}
-                    <div class="sidebar-section-label">Operación</div>
-                    <a href="{{ route('portal.dashboard') }}"
-                       class="sidebar-item {{ Request::routeIs('portal.dashboard') ? 'active' : '' }}">
-                        <span class="material-symbols-outlined text-base">dashboard</span>
-                        Dashboard Operativo
-                    </a>
-                    <a href="{{ route('portal.expedientes') }}"
-                       class="sidebar-item {{ Request::routeIs('portal.expedientes*') ? 'active' : '' }}">
-                        <span class="material-symbols-outlined text-base">folder_open</span>
-                        Expedientes
-                    </a>
-                    <a href="{{ route('portal.citas') }}"
-                       class="sidebar-item {{ Request::routeIs('portal.citas*') ? 'active' : '' }}">
-                        <span class="material-symbols-outlined text-base">calendar_month</span>
-                        Agenda de Citas
+                    {{-- ─── PERSONAL INSTITUCIONAL GENERAL ──────────────────────── --}}
+                    <div class="px-2 pt-2 pb-1 text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+                        Panel Institucional
+                    </div>
+
+                    <a href="{{ route('home') }}"
+                       class="sidebar-btn-item">
+                        <div class="sidebar-btn-icon bg-blue-500/20 text-blue-300 border border-blue-400/20">
+                            <span class="material-symbols-outlined text-base">home</span>
+                        </div>
+                        <span class="flex-1 truncate">Portal Principal</span>
                     </a>
                 @endif
             @endif
         </nav>
 
-        {{-- Usuario actual (pie del sidebar) --}}
-        <div class="shrink-0 px-3 py-4" style="border-top: 1px solid rgba(255,255,255,0.1);">
-            <div class="flex items-center gap-3 p-2 rounded-lg" style="background-color: rgba(255,255,255,0.06);">
-                <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0"
-                     style="background-color: var(--color-secondary);">
-                    {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
-                </div>
-                <div class="flex-1 min-w-0">
-                    <p class="text-white font-semibold truncate" style="font-size: 13px;">
-                        {{ Str::limit(auth()->user()->name ?? 'Usuario', 20) }}
-                    </p>
-                    <p class="truncate" style="font-size: 11px; color: rgba(255,255,255,0.5);">
-                        {{ auth()->user()->role_label ?? 'Revisor' }}
-                    </p>
-                </div>
-                <div class="relative flex-shrink-0" x-data="{ open: false }">
-                    <button @click="open = !open" class="btn-ghost" style="color: rgba(255,255,255,0.6);"
-                            aria-label="Opciones de usuario" id="btn-user-sidebar">
-                        <span class="material-symbols-outlined text-base">more_vert</span>
-                    </button>
-                    <div x-show="open" @click.outside="open = false"
-                         x-transition class="dropdown-menu absolute bottom-full mb-2 left-0" role="menu">
-                        <a href="{{ route('profile.show') }}" class="dropdown-item" role="menuitem">
-                            <span class="material-symbols-outlined text-base">person</span>Mi Perfil
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button type="submit" class="dropdown-item danger" role="menuitem">
-                                <span class="material-symbols-outlined text-base">logout</span>Cerrar Sesión
-                            </button>
-                        </form>
+        {{-- Usuario actual e interactividad de sesión (pie del sidebar) --}}
+        <div class="shrink-0 px-3 py-3 border-t border-slate-800 bg-[#08121f]" x-data="{ openUser: false }">
+            <div class="relative">
+                <div @click="openUser = !openUser"
+                     class="flex items-center gap-2.5 p-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 transition-all cursor-pointer group">
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-xs shrink-0 bg-[#0051d5] group-hover:scale-105 transition-transform">
+                        {{ strtoupper(substr(auth()->user()->Nombre ?? auth()->user()->name ?? 'U', 0, 1)) }}
                     </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-white font-semibold truncate text-xs group-hover:text-blue-300 transition-colors">
+                            {{ auth()->user()->Nombre ?? auth()->user()->name ?? 'Usuario' }}
+                        </p>
+                        <p class="truncate text-[10px] text-slate-400">
+                            {{ auth()->user()->role_label ?? 'Personal SETC' }}
+                        </p>
+                    </div>
+
+                    {{-- Botón interactivo directo para cerrar sesión --}}
+                    <form method="POST" action="{{ route('logout') }}" @click.stop class="shrink-0">
+                        @csrf
+                        <button type="submit"
+                                class="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                                title="Cerrar Sesión Inmediatamente">
+                            <span class="material-symbols-outlined text-base">logout</span>
+                        </button>
+                    </form>
                 </div>
-            </div>
-            <div class="flex items-center gap-1.5 mt-2 px-2">
-                <div class="status-dot-active"></div>
-                <span style="font-size: 11px; color: rgba(255,255,255,0.4);">2FA verificado</span>
-                <span class="ml-auto" style="font-size: 11px; color: rgba(255,255,255,0.3);">v3.4.2</span>
+
+                {{-- Menú desplegable interactivo de sesión --}}
+                <div x-show="openUser"
+                     @click.outside="openUser = false"
+                     x-transition:enter="transition ease-out duration-150"
+                     x-transition:enter-start="opacity-0 translate-y-2 scale-95"
+                     x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                     x-transition:leave="transition ease-in duration-100"
+                     x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                     x-transition:leave-end="opacity-0 translate-y-2 scale-95"
+                     class="absolute bottom-full mb-2 left-0 right-0 bg-[#0c1a2e] border border-slate-700/80 rounded-xl shadow-2xl p-2 z-50 text-slate-200"
+                     style="display: none;">
+                    <div class="px-2.5 py-1.5 border-b border-slate-800 mb-1">
+                        <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Sesión Institucional</span>
+                        <p class="text-xs font-semibold text-white truncate">{{ auth()->user()->Email ?? auth()->user()->email }}</p>
+                        <span class="text-[10px] text-emerald-400 font-medium block mt-0.5">{{ auth()->user()->role_label }}</span>
+                    </div>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit"
+                                class="w-full flex items-center gap-2 px-2.5 py-2 text-xs font-semibold text-rose-400 hover:bg-rose-500/15 rounded-lg transition-colors cursor-pointer text-left">
+                            <span class="material-symbols-outlined text-base">logout</span>
+                            <span>Cerrar Sesión</span>
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </aside>
 
     {{-- ════════════════════════════════════════════════════════ MAIN WRAPPER ════ --}}
-    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+    <div class="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
 
         {{-- ── Topbar ── --}}
-        <header class="shrink-0 flex items-center justify-between gap-4 px-6 h-16 z-30"
-                style="background-color: var(--color-surface-container-lowest); border-bottom: 1px solid var(--color-outline-variant); box-shadow: var(--shadow-header);">
+        <header class="shrink-0 flex items-center justify-between gap-4 px-6 h-16 z-30 bg-white dark:bg-[#0a1626] border-b border-slate-200/90 dark:border-slate-800 shadow-xs">
 
             {{-- Toggle sidebar (mobile) + Buscador --}}
             <div class="flex items-center gap-3 flex-1 min-w-0">
-                <button id="btn-sidebar-toggle" class="btn-ghost lg:hidden" aria-label="Toggle sidebar">
+                <button id="btn-sidebar-toggle" class="p-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 lg:hidden" aria-label="Toggle sidebar">
                     <span class="material-symbols-outlined">menu</span>
                 </button>
 
-                {{-- Global search --}}
-                <form action="{{ route('portal.expedientes') }}" method="GET" class="relative flex-1 max-w-sm hidden sm:flex items-center" role="search">
-                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-sm pointer-events-none"
-                          style="color: var(--color-on-surface-variant);">search</span>
+                {{-- Global search context-aware --}}
+                @php
+                    $searchAction = route('portal.dashboard');
+                    $searchParam = 'buscar';
+                    if (auth()->user()?->esRevisor()) {
+                        $searchAction = route('portal.mesa-dictamen');
+                        $searchParam = 'buscar';
+                    } elseif (auth()->user()?->esSupervisor()) {
+                        $searchAction = route('portal.matriz-cargas');
+                        $searchParam = 'buscar';
+                    }
+                @endphp
+                <form action="{{ $searchAction }}" method="GET" class="relative flex-1 max-w-sm hidden sm:flex items-center" role="search">
+                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400 pointer-events-none">search</span>
                     <input type="text"
-                           name="q"
-                           class="input pl-9 text-sm w-full"
-                           style="height: 36px;"
+                           name="{{ $searchParam }}"
+                           class="w-full h-9 pl-9 pr-8 text-xs bg-slate-50 dark:bg-slate-800/80 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0051d5]/20 placeholder:text-slate-400"
                            placeholder="Buscar por Folio, Administrado, RFC..."
-                           aria-label="Búsqueda global"
-                           id="topbar-search"
-                           value="{{ request('q') }}">
-                    <span class="absolute right-2 top-1/2 -translate-y-1/2 px-1.5 py-0.5 rounded text-xs font-mono"
-                          style="background-color: var(--color-surface-container-high); color: var(--color-on-surface-variant);">⌘K</span>
+                           value="{{ request($searchParam) ?? request('q') }}">
                 </form>
             </div>
 
-            {{-- Indicadores de estado del sistema --}}
-            <div class="flex items-center gap-3 shrink-0">
+            {{-- Indicadores de estado del sistema & Controles --}}
+            <div class="flex items-center gap-2.5 shrink-0">
 
                 {{-- Red segura --}}
-                <div class="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold"
-                     style="background-color: var(--color-success-bg); color: var(--color-success-text);">
+                <div class="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
                     <span class="material-symbols-outlined text-sm">lock</span>
                     Red Segura PKI
                 </div>
 
                 {{-- Sede actual --}}
-                <div class="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold"
-                     style="background-color: var(--color-surface-container-low); color: var(--color-on-surface-variant);">
+                <div class="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
                     <span class="material-symbols-outlined text-sm">location_on</span>
-                    {{ auth()->user()->sede ?? 'Sede Central Metropolitana' }}
+                    {{ auth()->user()->sede ?? 'Sede Central' }}
                 </div>
+
+                {{-- BOTÓN MODO OSCURO / CLARO --}}
+                <button type="button"
+                        onclick="toggleDarkMode()"
+                        class="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                        title="Alternar Modo Oscuro / Claro"
+                        aria-label="Alternar Modo Oscuro">
+                    <span class="material-symbols-outlined block dark:hidden text-amber-500 text-xl">dark_mode</span>
+                    <span class="material-symbols-outlined hidden dark:block text-yellow-300 text-xl">light_mode</span>
+                </button>
 
                 {{-- Notificaciones con Dropdown --}}
                 <div class="relative" x-data="{ openNotif: false }">
-                    <button @click="openNotif = !openNotif" class="btn-ghost relative" aria-label="Notificaciones" id="btn-topbar-notifications">
-                        <span class="material-symbols-outlined">notifications</span>
-                        @if(($notificationCount ?? 0) > 0)
-                            <span class="absolute top-1 right-1 w-2.5 h-2.5 rounded-full ring-2 ring-white"
-                                  style="background-color: var(--color-secondary);"></span>
-                        @endif
+                    <button @click="openNotif = !openNotif" class="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 relative transition-colors" aria-label="Notificaciones" id="btn-topbar-notifications">
+                        <span class="material-symbols-outlined text-xl">notifications</span>
                     </button>
                     <div x-show="openNotif" @click.outside="openNotif = false"
                          x-transition
-                         class="dropdown-menu absolute right-0 top-full mt-2 w-80 z-50 bg-white rounded-xl shadow-lg border border-slate-200" role="dialog" aria-label="Panel de notificaciones" style="display: none;">
-                        <div class="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
-                            <span class="text-sm font-bold text-[#0b1c30]">Notificaciones</span>
+                         class="dropdown-menu absolute right-0 top-full mt-2 w-80 z-50 bg-white dark:bg-[#111f33] rounded-xl shadow-lg border border-slate-200 dark:border-slate-800" role="dialog" aria-label="Panel de notificaciones" style="display: none;">
+                        <div class="px-4 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                            <span class="text-sm font-bold text-[#0b1c30] dark:text-white">Notificaciones</span>
                             <span class="text-xs text-slate-400 font-mono">{{ now()->format('d/m/Y') }}</span>
                         </div>
-                        <div class="py-1 max-h-72 overflow-y-auto divide-y divide-slate-100">
+                        <div class="py-1 max-h-80 overflow-y-auto custom-scroll divide-y divide-slate-100 dark:divide-slate-800">
                             @php
-                                $bitacorasRecientes = auth()->check() ? auth()->user()->bitacoras()->latest('Fecha_Hora')->take(5)->get() : collect();
+                                $u = auth()->user();
+                                $notificaciones = collect();
+
+                                if ($u) {
+                                    if ($u->esAdministrador()) {
+                                        $notificaciones = \App\Models\Bitacora::latest('ID_Bitacora')
+                                            ->take(6)
+                                            ->get()
+                                            ->map(fn($b) => [
+                                                'icon' => 'admin_panel_settings',
+                                                'color' => 'bg-slate-100 text-[#001229]',
+                                                'title' => $b->Accion ?? 'Evento de Sistema',
+                                                'desc' => $b->Descripcion,
+                                                'time' => $b->Fecha_Creacion ? $b->Fecha_Creacion->diffForHumans() : 'Reciente',
+                                                'link' => route('portal.auditoria'),
+                                            ]);
+                                    } elseif ($u->esSupervisor()) {
+                                        $sinAsignar = \App\Models\Solicitud::doesntHave('asignaciones')
+                                            ->latest('ID_Solicitud')
+                                            ->take(3)
+                                            ->get()
+                                            ->map(fn($s) => [
+                                                'icon' => 'person_alert',
+                                                'color' => 'bg-rose-50 text-rose-700',
+                                                'title' => 'Expediente por Asignar',
+                                                'desc' => 'Folio: ' . ($s->folio?->Codigo_Folio ?? ('EXP-' . $s->ID_Solicitud)),
+                                                'time' => $s->created_at ? $s->created_at->diffForHumans() : 'Reciente',
+                                                'link' => route('portal.matriz-cargas'),
+                                            ]);
+                                        $porResolver = \App\Models\Solicitud::whereIn('Estado_Solicitud', ['Aprobado', 'Rechazado'])
+                                            ->doesntHave('resoluciones')
+                                            ->latest('updated_at')
+                                            ->take(3)
+                                            ->get()
+                                            ->map(fn($s) => [
+                                                'icon' => 'gavel',
+                                                'color' => 'bg-indigo-50 text-indigo-700',
+                                                'title' => 'Listo para Resolución',
+                                                'desc' => 'Folio: ' . ($s->folio?->Codigo_Folio ?? ('EXP-' . $s->ID_Solicitud)),
+                                                'time' => $s->updated_at ? $s->updated_at->diffForHumans() : 'Reciente',
+                                                'link' => route('portal.supervisor-dashboard'),
+                                            ]);
+                                        $notificaciones = $sinAsignar->concat($porResolver);
+                                    } elseif ($u->esRevisor()) {
+                                        $misAsignaciones = \App\Models\AsignacionRevisor::where('ID_Revisor', $u->ID_Usuarios)
+                                            ->where('Estado_Asignacion', 'Activo')
+                                            ->with('solicitud.folio')
+                                            ->latest('ID_Asignacion')
+                                            ->take(4)
+                                            ->get()
+                                            ->map(fn($a) => [
+                                                'icon' => 'assignment_turned_in',
+                                                'color' => 'bg-blue-50 text-[#0051d5]',
+                                                'title' => 'Expediente Asignado a tu Mesa',
+                                                'desc' => 'Folio: ' . ($a->solicitud?->folio?->Codigo_Folio ?? ('EXP-' . $a->ID_Solicitud)),
+                                                'time' => $a->created_at ? $a->created_at->diffForHumans() : 'Reciente',
+                                                'link' => route('portal.mesa-dictamen'),
+                                            ]);
+                                        $notificaciones = $misAsignaciones;
+                                    }
+                                }
                             @endphp
-                            @forelse($bitacorasRecientes as $bit)
-                                <div class="p-3 hover:bg-slate-50 transition-colors flex items-start gap-2.5">
-                                    <div class="w-7 h-7 rounded-full bg-[#eff4ff] text-[#0051d5] flex items-center justify-center shrink-0 mt-0.5">
-                                        <span class="material-symbols-outlined text-sm">info</span>
+
+                            @forelse($notificaciones as $n)
+                                <a href="{{ $n['link'] }}" class="flex items-start gap-3 p-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                                    <div class="w-8 h-8 rounded-lg {{ $n['color'] }} flex items-center justify-center shrink-0">
+                                        <span class="material-symbols-outlined text-base">{{ $n['icon'] }}</span>
                                     </div>
                                     <div class="flex-1 min-w-0">
-                                        <p class="text-xs font-semibold text-[#0b1c30] truncate">{{ $bit->Accion ?? 'Actividad' }}</p>
-                                        <p class="text-[11px] text-slate-400">{{ $bit->Fecha_Hora ? \Carbon\Carbon::parse($bit->Fecha_Hora)->diffForHumans() : '' }}</p>
+                                        <span class="text-xs font-bold text-slate-800 dark:text-slate-200 block truncate">{{ $n['title'] }}</span>
+                                        <span class="text-[11px] text-slate-500 dark:text-slate-400 block truncate">{{ $n['desc'] }}</span>
+                                        <span class="text-[10px] text-slate-400 font-mono">{{ $n['time'] }}</span>
                                     </div>
-                                </div>
+                                </a>
                             @empty
-                                <div class="px-4 py-6 text-center text-xs text-slate-400">
-                                    <span class="material-symbols-outlined text-2xl block mb-1 opacity-30">notifications_none</span>
-                                    Sin notificaciones recientes
+                                <div class="py-6 text-center text-xs text-slate-400">
+                                    No tienes notificaciones pendientes.
                                 </div>
                             @endforelse
-                        </div>
-                        <div class="border-t border-slate-100 px-4 py-2.5 bg-slate-50 rounded-b-xl flex justify-between items-center">
-                            <a href="{{ route('portal.auditoria') }}" class="text-xs text-[#0051d5] font-semibold hover:underline">Ver auditoría completa →</a>
-                            <button @click="openNotif = false" class="text-xs text-slate-400 hover:text-slate-600">Cerrar</button>
                         </div>
                     </div>
                 </div>
 
                 {{-- Ayuda con Dropdown --}}
                 <div class="relative" x-data="{ openAyuda: false }">
-                    <button @click="openAyuda = !openAyuda" class="btn-ghost" aria-label="Ayuda y documentación">
-                        <span class="material-symbols-outlined">help_outline</span>
+                    <button @click="openAyuda = !openAyuda" class="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" aria-label="Ayuda">
+                        <span class="material-symbols-outlined text-xl">help_outline</span>
                     </button>
                     <div x-show="openAyuda" @click.outside="openAyuda = false"
                          x-transition
-                         class="dropdown-menu absolute right-0 top-full mt-2 w-72 z-50 bg-white rounded-xl shadow-lg border border-slate-200" role="dialog" style="display: none;">
-                        <div class="px-4 py-3 border-b border-slate-100">
-                            <span class="text-sm font-bold text-[#0b1c30]">Mesa de Ayuda SETC</span>
-                        </div>
-                        <div class="p-3 space-y-3">
-                            <div class="space-y-1.5">
-                                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Atajos Rápidos</span>
-                                <div class="flex items-center justify-between text-xs py-1 border-b border-slate-100">
-                                    <span class="text-slate-600">Búsqueda global</span>
-                                    <kbd class="px-1.5 py-0.5 rounded bg-slate-100 text-[11px] font-mono font-bold text-slate-700">⌘K</kbd>
-                                </div>
-                                <div class="flex items-center justify-between text-xs py-1 border-b border-slate-100">
-                                    <span class="text-slate-600">Nueva Cita</span>
-                                    <kbd class="px-1.5 py-0.5 rounded bg-slate-100 text-[11px] font-mono font-bold text-slate-700">C</kbd>
-                                </div>
-                            </div>
-                            <div class="pt-1">
-                                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Canales de Soporte</span>
-                                <div class="space-y-1">
-                                    <a href="mailto:soporte@setc.gob.mx" class="flex items-center gap-2 text-xs text-[#0051d5] hover:underline">
-                                        <span class="material-symbols-outlined text-sm">mail</span>
-                                        soporte@setc.gob.mx
-                                    </a>
-                                    <p class="text-xs text-slate-500 flex items-center gap-2">
-                                        <span class="material-symbols-outlined text-sm">call</span>
-                                        800-SETC-GOB (Ext. 401)
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
+                         class="dropdown-menu absolute right-0 top-full mt-2 w-72 z-50 bg-white dark:bg-[#111f33] rounded-xl shadow-lg border border-slate-200 dark:border-slate-800 p-3" role="dialog" style="display: none;">
+                        <span class="text-xs font-bold text-slate-800 dark:text-white block border-b border-slate-100 dark:border-slate-800 pb-2 mb-2">Mesa de Ayuda SETC</span>
+                        <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                            Para soporte técnico o asistencia normativa, contacte a soporte@setc.gob.pe o llame a la extensión interna 401.
+                        </p>
                     </div>
                 </div>
 
-                {{-- Avatar usuario --}}
-                <div class="relative" x-data="{ open: false }">
-                    <button @click="open = !open"
-                            class="flex items-center gap-2 px-2 py-1.5 rounded-lg transition-colors"
-                            @mouseenter="$el.style.backgroundColor='var(--color-surface-container-low)'"
-                            @mouseleave="$el.style.backgroundColor='transparent'"
-                            aria-haspopup="true" :aria-expanded="open" id="btn-topbar-user">
-                        <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm"
-                             style="background-color: var(--color-secondary);">
-                            {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 2)) }}
-                        </div>
-                        <div class="hidden sm:flex flex-col text-left">
-                            <span class="text-label-md font-semibold" style="color: var(--color-on-surface);">
-                                {{ Str::limit(auth()->user()->name ?? 'Admin', 18) }}
-                            </span>
-                            <span class="text-label-sm" style="color: var(--color-on-surface-variant);">
-                                {{ auth()->user()->role_label ?? 'Administrador' }}
+                {{-- Tarjeta de Usuario en Topbar: Exclusiva para visualización del rol institucional (Solo Vista) --}}
+                <div class="flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-slate-100/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/60 select-none shadow-2xs">
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-xs bg-gradient-to-br from-[#0051d5] to-[#1e40af] shrink-0 shadow-xs">
+                        {{ strtoupper(substr(auth()->user()->Nombre ?? auth()->user()->name ?? 'U', 0, 1)) }}
+                    </div>
+                    <div class="hidden sm:flex flex-col text-left leading-tight">
+                        <span class="text-xs font-bold text-slate-900 dark:text-slate-100 truncate max-w-[140px]">
+                            {{ auth()->user()->Nombre ?? auth()->user()->name ?? 'Usuario' }}
+                        </span>
+                        <div class="flex items-center gap-1.5 mt-0.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0 animate-pulse"></span>
+                            <span class="text-[10px] font-bold text-[#0051d5] dark:text-blue-300 font-mono tracking-tight uppercase truncate max-w-[140px]">
+                                {{ auth()->user()->role_label ?? 'Personal SETC' }}
                             </span>
                         </div>
-                    </button>
-                    <div x-show="open" @click.outside="open = false"
-                         x-transition class="dropdown-menu absolute right-0 top-full mt-2" role="menu">
-                        <a href="{{ route('profile.show') }}" class="dropdown-item" role="menuitem">
-                            <span class="material-symbols-outlined text-base">person</span>Mi Perfil
-                        </a>
-                        <a href="{{ route('portal.metricas') }}" class="dropdown-item" role="menuitem">
-                            <span class="material-symbols-outlined text-base">monitoring</span>Mis Métricas
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button type="submit" class="dropdown-item danger" role="menuitem">
-                                <span class="material-symbols-outlined text-base">logout</span>Cerrar Sesión
-                            </button>
-                        </form>
                     </div>
                 </div>
             </div>
         </header>
 
-        {{-- ── Área de contenido scrollable ── --}}
-        <div class="flex-1 overflow-y-auto" style="background-color: var(--color-surface);">
+        {{-- ── ÁREA DE CONTENIDO SCROLLABLE (SOLUCIÓN DEFINITIVA DE SCROLL) ── --}}
+        <div class="flex-1 min-h-0 overflow-y-auto custom-scroll bg-slate-50 dark:bg-[#070e17]" id="portal-content-scroll">
 
             {{-- Breadcrumb interno --}}
             @hasSection('breadcrumb')
                 <div class="px-6 lg:px-8 pt-4">
-                    <nav class="breadcrumb" aria-label="Ruta de navegación">
-                        <a href="{{ route('portal.dashboard') }}">Inicio</a>
+                    <nav class="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-medium" aria-label="Ruta de navegación">
+                        <a href="{{ route('portal.dashboard') }}" class="hover:text-slate-800 dark:hover:text-slate-200">Inicio</a>
                         @yield('breadcrumb')
                     </nav>
                 </div>
@@ -528,27 +596,21 @@
             @if(session('success') || session('error') || session('warning') || session('info'))
                 <div class="px-6 lg:px-8 pt-3" id="flash-messages">
                     @if(session('success'))
-                        <div class="alert alert-success" role="alert">
-                            <span class="material-symbols-outlined text-base shrink-0">check_circle</span>
+                        <div class="p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 text-xs flex items-center gap-2">
+                            <span class="material-symbols-outlined text-base text-emerald-600">check_circle</span>
                             <span>{{ session('success') }}</span>
                         </div>
                     @endif
                     @if(session('error'))
-                        <div class="alert alert-danger" role="alert">
-                            <span class="material-symbols-outlined text-base shrink-0">error</span>
+                        <div class="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200 text-xs flex items-center gap-2">
+                            <span class="material-symbols-outlined text-base text-rose-600">error</span>
                             <span>{{ session('error') }}</span>
                         </div>
                     @endif
                     @if(session('warning'))
-                        <div class="alert alert-warning" role="alert">
-                            <span class="material-symbols-outlined text-base shrink-0">warning</span>
+                        <div class="p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-200 text-xs flex items-center gap-2">
+                            <span class="material-symbols-outlined text-base text-amber-600">warning</span>
                             <span>{{ session('warning') }}</span>
-                        </div>
-                    @endif
-                    @if(session('info'))
-                        <div class="alert alert-info" role="alert">
-                            <span class="material-symbols-outlined text-base shrink-0">info</span>
-                            <span>{{ session('info') }}</span>
                         </div>
                     @endif
                 </div>
@@ -557,9 +619,9 @@
             {{-- Errores de validación --}}
             @if($errors->any())
                 <div class="px-6 lg:px-8 pt-3">
-                    <div class="alert alert-danger" role="alert">
-                        <span class="material-symbols-outlined text-base shrink-0">error</span>
-                        <ul class="list-none space-y-0.5">
+                    <div class="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200 text-xs flex items-start gap-2">
+                        <span class="material-symbols-outlined text-base text-rose-600 mt-0.5">error</span>
+                        <ul class="list-disc list-inside space-y-0.5">
                             @foreach($errors->all() as $error)
                                 <li>{{ $error }}</li>
                             @endforeach
@@ -569,7 +631,7 @@
             @endif
 
             {{-- CONTENIDO PRINCIPAL --}}
-            <main id="main-content" role="main" class="px-6 lg:px-8 py-6 pb-12">
+            <main id="main-content" role="main" class="px-6 lg:px-8 py-6 pb-16">
                 @yield('content')
             </main>
         </div>
@@ -577,13 +639,26 @@
 
     {{-- ════════════════════════════════════════════════════════ SCRIPTS ═════════ --}}
     <script>
+        // ── Alternar Modo Oscuro / Claro ───────────────────────────────────────
+        function toggleDarkMode() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
         // ── Toggle sidebar mobile ──────────────────────────────────────────────
         const btnSidebar = document.getElementById('btn-sidebar-toggle');
         const sidebar    = document.getElementById('sidebar');
         if (btnSidebar && sidebar) {
             btnSidebar.addEventListener('click', () => {
-                const hidden = sidebar.classList.toggle('-translate-x-full');
-                sidebar.style.position = 'fixed';
+                sidebar.classList.toggle('-translate-x-full');
+                sidebar.classList.toggle('fixed');
+                sidebar.classList.toggle('inset-y-0');
+                sidebar.classList.toggle('left-0');
             });
         }
 

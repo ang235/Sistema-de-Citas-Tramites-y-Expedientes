@@ -14,7 +14,7 @@ class StoreUsuarioRequest extends FormRequest
     }
 
     /**
-     * @return array<string, array<int, string>>
+     * @return array<string, array<int, mixed>>
      */
     public function rules(): array
     {
@@ -22,9 +22,18 @@ class StoreUsuarioRequest extends FormRequest
             'nombre' => ['required', 'string', 'max:150'],
             'email' => ['required', 'string', 'email', 'max:150', 'unique:usuarios,Email'],
             'password' => ['required', 'string', 'min:8'],
-            'roles' => ['required', 'array'],
-            'roles.*' => ['integer', 'exists:roles,ID_Rol'],
+            'id_rol' => ['required', 'integer', 'exists:roles,ID_Rol'],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'id_rol.required' => 'Debe seleccionar un rol institucional para el usuario.',
+            'id_rol.exists' => 'El rol seleccionado no es válido.',
         ];
     }
 }
-

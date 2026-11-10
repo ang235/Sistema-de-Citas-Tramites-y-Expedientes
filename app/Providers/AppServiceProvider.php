@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -20,6 +22,17 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Asegurar columna Activo en usuarios sin borrar datos
+        try {
+            if (Schema::hasTable('usuarios') && ! Schema::hasColumn('usuarios', 'Activo')) {
+                Schema::table('usuarios', function (Blueprint $table) {
+                    $table->boolean('Activo')->default(true);
+                });
+            }
+        } catch (\Throwable) {
+            // Ignorar si ya está aplicada en concurrencia
+        }
+
         Gate::define('manage-users', fn ($user) => $user->esAdministrador());
         Gate::define('mesa-dictamen', fn ($user) => $user->esRevisor());
         Gate::define('supervisar', fn ($user) => $user->esSupervisor());

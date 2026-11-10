@@ -83,4 +83,3 @@ class VersionTramiteController extends Controller
         return back()->with('success', 'Versión eliminada.');
     }
 }
-

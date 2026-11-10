@@ -49,4 +49,3 @@ class RequisitoController extends Controller
         return back()->with('success', 'Requisito eliminado.');
     }
 }
-

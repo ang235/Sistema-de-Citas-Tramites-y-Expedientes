@@ -1,117 +1,113 @@
 @extends('layouts.portal')
 
-@section('title', 'Mesa Técnica de Calificación y Dictamen')
+@section('title', 'Mesa de Calificación Documental')
 
 @section('breadcrumb')
     <span class="material-symbols-outlined text-xs">chevron_right</span>
-    <span>Operaciones</span>
+    <span>Revisión Técnica</span>
     <span class="material-symbols-outlined text-xs">chevron_right</span>
-    <span>Mesa de Dictamen</span>
-    <span class="material-symbols-outlined text-xs">chevron_right</span>
-    <span class="current">Expediente Activo</span>
+    <span>Mesa de Calificación</span>
+    @if($solicitudSeleccionada)
+        <span class="material-symbols-outlined text-xs">chevron_right</span>
+        <span class="current">{{ $solicitudSeleccionada->folio?->Codigo_Folio ?? 'EXP-' . $solicitudSeleccionada->ID_Solicitud }}</span>
+    @endif
 @endsection
 
 @section('content')
 
 {{-- ═══════════════════════════════════ HEADER / CONTEXTO SALA ══ --}}
-<div class="mb-6 flex flex-wrap items-center justify-between gap-4 bg-white rounded-xl shadow-sm border border-slate-200/80 p-5">
+<div class="mb-6 flex flex-wrap items-center justify-between gap-4 bg-white dark:bg-[#111f33] rounded-xl shadow-xs border border-slate-200/80 dark:border-slate-800 p-5">
     <div class="flex flex-col gap-1">
-        <h1 class="font-bold text-xl text-[#0b1c30] tracking-tight" style="font-family: var(--font-display);">
-            Mesa Técnica de Calificación y Dictamen
+        <h1 class="font-bold text-xl text-[#0b1c30] dark:text-white tracking-tight" style="font-family: var(--font-display);">
+            Mesa de Calificación Documental y Dictamen Técnico
         </h1>
-        <div class="flex items-center gap-3 mt-1">
-            <span class="px-2.5 py-0.5 rounded-full bg-[#e5eeff] text-[#0b1c30] text-xs font-semibold">Sala V-04</span>
-            <div class="flex items-center gap-2 bg-[#eff4ff] px-3 py-1.5 rounded-lg">
+        <div class="flex items-center gap-3 mt-1 flex-wrap">
+            <span class="px-2.5 py-0.5 rounded-full bg-[#e5eeff] dark:bg-blue-950/60 text-[#0051d5] dark:text-blue-300 text-xs font-semibold">Ventanilla de Calificación Especializada</span>
+            <div class="flex items-center gap-2 bg-[#eff4ff] dark:bg-slate-800/80 px-3 py-1.5 rounded-lg">
                 <span class="relative flex items-center justify-center">
                     <span class="w-2.5 h-2.5 rounded-full bg-[#0051d5]"></span>
                     <span class="w-2.5 h-2.5 rounded-full bg-[#0051d5] animate-ping absolute opacity-75"></span>
                 </span>
                 <div class="flex flex-col">
-                    <span class="text-xs font-semibold text-[#0b1c30]">Revisor Jurídico L2: {{ auth()->user()->name ?? 'Ing. Carlos Ruiz' }}</span>
-                    <span class="text-[11px] text-[#44474d] font-mono">Turno Ordinario • Ventanilla Digital Metropolitana</span>
+                    <span class="text-xs font-semibold text-[#0b1c30] dark:text-slate-200">Revisor Asignado: {{ auth()->user()->Nombre ?? auth()->user()->name ?? 'Personal SETC' }}</span>
+                    <span class="text-[11px] text-[#44474d] dark:text-slate-400 font-mono">{{ auth()->user()->role_label ?? 'Revisor Técnico' }} • Examen de Documentos Asignados</span>
                 </div>
             </div>
         </div>
     </div>
     <div class="flex items-center gap-2">
-        <a href="{{ route('portal.dashboard') }}" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors">
-            <span class="material-symbols-outlined text-base">arrow_back</span>
-            Volver al Panel
+        <a href="{{ route('portal.revisor-dashboard') }}" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-[#0051d5] dark:text-blue-300 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 text-xs font-semibold transition-colors">
+            <span class="material-symbols-outlined text-base">monitoring</span>
+            <span>Mando de Revisión Técnica</span>
         </a>
     </div>
 </div>
 
-{{-- ═══════════════════════════════════ KPI RIBBON (4 métricas) ══ --}}
+{{-- ═══════════════════════════════════ KPI RIBBON ══ --}}
 <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
-    <div class="flex items-center gap-3 p-3.5 bg-white rounded-xl border border-slate-200/80 shadow-xs">
-        <div class="p-2 rounded-lg bg-[#eff4ff] text-[#0051d5] flex items-center justify-center">
+    <div class="flex items-center gap-3 p-3.5 bg-white dark:bg-[#111f33] rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+        <div class="p-2 rounded-lg bg-[#eff4ff] dark:bg-blue-950/60 text-[#0051d5] dark:text-blue-400 flex items-center justify-center">
             <span class="material-symbols-outlined text-base">assignment</span>
         </div>
         <div class="flex flex-col">
-            <span class="text-xl font-bold text-[#0b1c30] leading-none">{{ $metricas['expedientes_asignados'] ?? 12 }}</span>
-            <span class="text-[11px] text-[#44474d]">Expedientes asignados</span>
+            <span class="text-xl font-bold text-[#0b1c30] dark:text-white leading-none">{{ $metricas['expedientes_asignados'] ?? 0 }}</span>
+            <span class="text-[11px] text-[#44474d] dark:text-slate-400">Expedientes asignados</span>
         </div>
     </div>
-    <div class="flex items-center gap-3 p-3.5 bg-white rounded-xl border border-slate-200/80 shadow-xs">
-        <div class="p-2 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center">
+    <div class="flex items-center gap-3 p-3.5 bg-white dark:bg-[#111f33] rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+        <div class="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 flex items-center justify-center">
             <span class="material-symbols-outlined text-base">check_circle</span>
         </div>
         <div class="flex flex-col">
-            <span class="text-xl font-bold text-emerald-700 leading-none">{{ $metricas['revisados_hoy'] ?? 8 }}</span>
-            <span class="text-[11px] text-[#44474d]">Revisados hoy</span>
+            <span class="text-xl font-bold text-emerald-700 dark:text-emerald-400 leading-none">{{ $metricas['revisados_hoy'] ?? 0 }}</span>
+            <span class="text-[11px] text-[#44474d] dark:text-slate-400">Revisados hoy</span>
         </div>
     </div>
-    <div class="flex items-center gap-3 p-3.5 bg-white rounded-xl border border-slate-200/80 shadow-xs">
-        <div class="p-2 rounded-lg bg-[#eff4ff] text-[#0051d5] flex items-center justify-center">
+    <div class="flex items-center gap-3 p-3.5 bg-white dark:bg-[#111f33] rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+        <div class="p-2 rounded-lg bg-[#eff4ff] dark:bg-blue-950/60 text-[#0051d5] dark:text-blue-400 flex items-center justify-center">
             <span class="material-symbols-outlined text-base">sync_problem</span>
         </div>
         <div class="flex flex-col">
-            <span class="text-xl font-bold text-[#0051d5] leading-none">{{ $metricas['en_subsanacion'] ?? 3 }}</span>
-            <span class="text-[11px] text-[#44474d]">En subsanación</span>
+            <span class="text-xl font-bold text-[#0051d5] dark:text-blue-300 leading-none">{{ $metricas['en_subsanacion'] ?? 0 }}</span>
+            <span class="text-[11px] text-[#44474d] dark:text-slate-400">En subsanación</span>
         </div>
     </div>
-    <div class="flex items-center gap-3 p-3.5 bg-white rounded-xl border border-slate-200/80 shadow-xs">
-        <div class="p-2 rounded-lg bg-rose-50 text-rose-700 flex items-center justify-center">
+    <div class="flex items-center gap-3 p-3.5 bg-white dark:bg-[#111f33] rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+        <div class="p-2 rounded-lg bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-400 flex items-center justify-center">
             <span class="material-symbols-outlined text-base">timer</span>
         </div>
         <div class="flex flex-col">
-            <span class="text-xl font-bold text-rose-700 leading-none">{{ $metricas['prioritarios_sla'] ?? 1 }}</span>
-            <span class="text-[11px] text-[#44474d]">Prioritario SLA &lt; 4h</span>
+            <span class="text-xl font-bold text-rose-700 dark:text-rose-400 leading-none">{{ $metricas['prioritarios_sla'] ?? 0 }}</span>
+            <span class="text-[11px] text-[#44474d] dark:text-slate-400">Sin asignar / Prioritarios</span>
         </div>
     </div>
 </div>
 
 {{-- ═══════════════════════════════════ FILTROS ══ --}}
-<div class="mb-4 flex flex-wrap items-center justify-between gap-3 bg-white rounded-xl border border-slate-200/80 shadow-xs p-4">
-    <div class="flex items-center gap-2 overflow-x-auto">
-        <span class="text-xs text-[#44474d] mr-1 font-medium shrink-0">Filtros:</span>
-        <button class="px-3 py-1.5 rounded-full bg-rose-50 text-rose-800 text-xs font-semibold flex items-center gap-1.5" type="button">
-            <span class="w-2 h-2 rounded-full bg-rose-600"></span>
-            <span>Crítico</span>
-        </button>
-        <button class="px-3 py-1.5 rounded-full bg-amber-50 text-amber-800 text-xs font-semibold flex items-center gap-1.5 hover:bg-amber-100 transition-colors" type="button">
-            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-            <span>Ámbar SLA</span>
-        </button>
-        <button class="px-3 py-1.5 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold flex items-center gap-1.5 hover:bg-slate-200 transition-colors" type="button">
-            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-            <span>Tiempo Óptimo</span>
-        </button>
-    </div>
-    <form method="GET" action="{{ route('portal.mesa-dictamen') }}" class="flex items-center gap-3">
-        <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
-            <span class="material-symbols-outlined text-base text-slate-400">category</span>
-            <select name="id_tipo_tramite" onchange="this.form.submit()" aria-label="Filtrar por tipo de trámite" class="bg-transparent text-xs text-slate-700 focus:outline-none cursor-pointer">
+<div class="mb-4 flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-[#111f33] rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs p-4">
+    <form method="GET" action="{{ route('portal.mesa-dictamen') }}" class="flex items-center gap-3 flex-wrap flex-1">
+        <div class="relative flex-1 min-w-[200px] max-w-md">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none">search</span>
+            <input name="buscar" value="{{ request('buscar') }}"
+                   class="w-full pl-9 pr-3 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-800 dark:text-slate-200 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0051d5]/20"
+                   placeholder="Buscar folio, solicitante o trámite..." type="text"/>
+        </div>
+        <div class="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700">
+            <span class="material-symbols-outlined text-sm text-slate-400">category</span>
+            <select name="id_tipo_tramite" onchange="this.form.submit()" aria-label="Filtrar por tipo de trámite" class="bg-transparent text-xs text-slate-700 dark:text-slate-300 focus:outline-none cursor-pointer">
                 <option value="">Todos los trámites</option>
                 @foreach ($tiposTramite ?? [] as $tipo)
-                    <option value="{{ $tipo->ID_Tipo_Tramite }}" {{ (string) request('id_tipo_tramite') === (string) $tipo->ID_Tipo_Tramite ? 'selected' : '' }}>
+                    <option value="{{ $tipo->ID_Tipo_Tramite }}" @selected((string) request('id_tipo_tramite') === (string) $tipo->ID_Tipo_Tramite)>
                         {{ $tipo->Nombre }}
                     </option>
                 @endforeach
             </select>
         </div>
+        <button type="submit" class="px-3.5 py-1.5 rounded-lg bg-[#001229] hover:bg-[#0f2744] text-white text-xs font-semibold">
+            Filtrar
+        </button>
         @if(request('buscar') || request('id_tipo_tramite'))
-            <a href="{{ route('portal.mesa-dictamen') }}" class="text-xs text-slate-400 hover:text-slate-600">Limpiar</a>
+            <a href="{{ route('portal.mesa-dictamen') }}" class="text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">Limpiar</a>
         @endif
     </form>
 </div>
@@ -121,300 +117,297 @@
 
     {{-- COLUMNA IZQUIERDA: Expedientes en Cola --}}
     <section class="col-span-12 xl:col-span-4 flex flex-col gap-4">
-        <div class="p-4 bg-white rounded-xl border border-slate-200/80 shadow-xs flex flex-col gap-3">
-            <div class="flex items-center justify-between">
-                <h2 class="text-base font-semibold text-[#0b1c30]">Expedientes en Cola</h2>
-                <span class="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[11px] font-semibold">{{ $solicitudes->total() ?? $solicitudes->count() }} registrados</span>
-            </div>
-            <form method="GET" action="{{ route('portal.mesa-dictamen') }}" class="relative">
-                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-base pointer-events-none">search</span>
-                <input name="buscar" value="{{ request('buscar') }}"
-                       class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-[#0b1c30] placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0051d5]/20 shadow-xs transition-all"
-                       placeholder="Buscar expediente, solicitante o folio..." type="text"/>
-            </form>
+        <div class="p-4 bg-white dark:bg-[#111f33] rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex items-center justify-between">
+            <h2 class="text-sm font-bold text-[#0b1c30] dark:text-white flex items-center gap-2">
+                <span class="material-symbols-outlined text-[#0051d5] text-base">format_list_bulleted</span>
+                Expedientes en Cola
+            </h2>
+            <span class="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[11px] font-semibold">
+                {{ $solicitudes->total() ?? $solicitudes->count() }} registrados
+            </span>
         </div>
 
         <div class="flex flex-col gap-3">
-            @forelse ($solicitudes ?? [] as $sol)
+            @forelse ($solicitudes as $sol)
                 @php
-                    $folio = $sol->folio?->Codigo_Folio ?? 'SETC-' . str_pad($sol->ID_Solicitud, 4, '0', STR_PAD_LEFT);
-                    $esCritico = false; // lógica de SLA
-                    $borderColor = $esCritico ? 'bg-rose-600' : 'bg-[#0051d5]';
+                    $folio = $sol->folio?->Codigo_Folio ?? 'EXP-' . $sol->ID_Solicitud;
+                    $isSelected = $solicitudSeleccionada && $solicitudSeleccionada->ID_Solicitud === $sol->ID_Solicitud;
                 @endphp
-                <a href="{{ route('portal.expedientes.evaluar', $sol->ID_Solicitud) }}"
-                   class="p-4 bg-white rounded-xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all cursor-pointer relative overflow-hidden flex flex-col gap-3 group">
-                    <div class="absolute left-0 top-0 bottom-0 w-1.5 {{ $borderColor }}"></div>
+                <a href="{{ route('portal.mesa-dictamen', array_merge(request()->query(), ['expediente' => $sol->ID_Solicitud])) }}"
+                   class="p-4 rounded-xl border transition-all cursor-pointer relative overflow-hidden flex flex-col gap-2.5 group {{ $isSelected ? 'bg-blue-50/70 dark:bg-blue-950/40 border-[#0051d5] shadow-sm' : 'bg-white dark:bg-[#111f33] border-slate-200/80 dark:border-slate-800 hover:border-slate-300 shadow-xs' }}">
+                    <div class="absolute left-0 top-0 bottom-0 w-1.5 {{ $isSelected ? 'bg-[#0051d5]' : ($sol->Estado_Solicitud === 'Observado' ? 'bg-amber-500' : ($sol->Estado_Solicitud === 'Aprobado' ? 'bg-emerald-500' : 'bg-slate-400')) }}"></div>
                     <div class="flex items-start justify-between gap-2 pl-1">
-                        <div class="flex flex-col">
-                            <span class="font-mono text-xs text-[#0051d5] font-bold">{{ $folio }}</span>
-                            <h3 class="text-sm font-semibold text-[#0b1c30] leading-tight">{{ $sol->solicitante?->Nombre ?? 'Administrado' }}</h3>
-                            <span class="text-xs text-[#44474d]">{{ $sol->versionTramite?->tipoTramite?->Nombre ?? 'Trámite' }}</span>
+                        <div class="flex flex-col min-w-0">
+                            <span class="font-mono text-xs font-bold text-[#0051d5] dark:text-blue-400">{{ $folio }}</span>
+                            <h3 class="text-xs font-bold text-[#0b1c30] dark:text-white truncate">{{ $sol->solicitante?->Nombre ?? 'Administrado' }}</h3>
+                            <span class="text-[11px] text-slate-500 dark:text-slate-400 truncate">{{ $sol->versionTramite?->tipoTramite?->Nombre ?? 'Trámite TUPA' }}</span>
                         </div>
-                        <span class="px-2 py-1 rounded-full bg-slate-100 text-slate-700 text-[11px] font-semibold shrink-0 flex items-center gap-1">
-                            <span class="material-symbols-outlined text-xs">schedule</span>
-                            SLA
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 {{ $sol->Estado_Solicitud === 'Aprobado' ? 'bg-emerald-50 text-emerald-700' : ($sol->Estado_Solicitud === 'Observado' ? 'bg-amber-50 text-amber-800' : 'bg-blue-50 text-blue-700') }}">
+                            {{ str_replace('_', ' ', $sol->Estado_Solicitud) }}
                         </span>
                     </div>
-                    <div class="grid grid-cols-2 gap-2 bg-slate-50 p-2.5 rounded-lg">
-                        <div class="flex flex-col">
-                            <span class="text-[11px] text-[#44474d]">Estado</span>
-                            <span class="text-xs font-semibold text-[#0b1c30]">{{ $sol->Estado_Solicitud ?? 'En revisión' }}</span>
-                        </div>
-                        <div class="flex flex-col">
-                            <span class="text-[11px] text-[#44474d]">Radicación</span>
-                            <span class="text-xs font-semibold text-[#0051d5]">{{ $sol->Fecha_Creacion_Solicitud?->format('d/m') ?? '--' }}</span>
-                        </div>
+                    <div class="flex items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-slate-100 dark:border-slate-800/80 pl-1">
+                        <span>Radicado: {{ $sol->Fecha_Creacion_Solicitud ? $sol->Fecha_Creacion_Solicitud->format('d/m/Y') : ($sol->created_at ? $sol->created_at->format('d/m/Y') : '--') }}</span>
+                        <span class="text-[#0051d5] dark:text-blue-300 font-semibold flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform">
+                            Examinar <span class="material-symbols-outlined text-xs">chevron_right</span>
+                        </span>
                     </div>
                 </a>
             @empty
-                {{-- Estado vacío con expediente de demostración --}}
-                <div class="p-4 bg-white rounded-xl border border-slate-200/80 shadow-sm relative overflow-hidden flex flex-col gap-3">
-                    <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-rose-600"></div>
-                    <div class="flex items-start justify-between gap-2 pl-1">
-                        <div class="flex flex-col">
-                            <span class="font-mono text-xs text-[#0051d5] font-bold">SETC-2025-8841</span>
-                            <h3 class="text-sm font-semibold text-[#0b1c30] leading-tight">Mendoza &amp; Asociados S.A.C.</h3>
-                            <span class="text-xs text-[#44474d]">RUC: 20491823901 • Licencia Comercial Tipo A</span>
-                        </div>
-                        <span class="px-2.5 py-1 rounded-full bg-rose-50 text-rose-800 text-[11px] font-bold shrink-0 flex items-center gap-1">
-                            <span class="material-symbols-outlined text-xs">alarm</span>
-                            3h 15m
-                        </span>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2 bg-slate-50 p-2.5 rounded-lg">
-                        <div class="flex flex-col">
-                            <span class="text-[11px] text-[#44474d]">Preclasif. PIDE</span>
-                            <span class="text-xs font-bold text-[#0b1c30] flex items-center gap-1">
-                                <span class="material-symbols-outlined text-xs text-emerald-600">verified</span>
-                                SUNAT OK
-                            </span>
-                        </div>
-                        <div class="flex flex-col">
-                            <span class="text-[11px] text-[#44474d]">Compatibilidad</span>
-                            <span class="text-xs font-bold text-[#0051d5]">95% Documental</span>
-                        </div>
-                    </div>
-                    <div class="flex items-center justify-between pt-1">
-                        <span class="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[11px] font-semibold">En Revisión Activa</span>
-                        <span class="text-xs text-[#0051d5] font-semibold flex items-center gap-1">
-                            Examinando
-                            <span class="material-symbols-outlined text-xs">arrow_forward</span>
-                        </span>
-                    </div>
+                <div class="p-8 text-center bg-white dark:bg-[#111f33] rounded-xl border border-slate-200/80 dark:border-slate-800 text-slate-400">
+                    <span class="material-symbols-outlined text-3xl block mb-2 text-slate-300">assignment_late</span>
+                    <p class="font-bold text-slate-700 dark:text-slate-300 text-xs">No tienes expedientes asignados</p>
+                    <p class="text-[11px] text-slate-400 mt-1">El supervisor debe asignarle trámites en la Matriz de Cargas antes de poder calificar sus recaudos.</p>
                 </div>
             @endforelse
         </div>
+
+        @if($solicitudes->hasPages())
+            <div class="p-2">
+                {{ $solicitudes->links() }}
+            </div>
+        @endif
     </section>
 
-    {{-- COLUMNA DERECHA: Visor de Documentos + Consola de Dictamen --}}
+    {{-- COLUMNA DERECHA: Visor y Consola de Dictamen Real --}}
     <section class="col-span-12 xl:col-span-8 flex flex-col gap-5">
-
-        {{-- VISOR DE DOCUMENTOS --}}
-        <div class="p-5 bg-white rounded-xl border border-slate-200/80 shadow-xs flex flex-col gap-4">
-            {{-- Tabs de documentos --}}
-            <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-50 p-2 rounded-xl">
-                <div class="flex items-center gap-1 overflow-x-auto">
-                    <button class="px-3.5 py-2 rounded-lg bg-white text-[#0051d5] text-xs font-bold shadow-xs flex items-center gap-2" type="button">
-                        <span class="material-symbols-outlined text-sm">verified_user</span>
-                        <span>Comprobante Domicilio</span>
-                        <span class="w-2 h-2 rounded-full bg-[#0051d5]"></span>
-                    </button>
-                    <button class="px-3.5 py-2 rounded-lg text-slate-500 hover:text-slate-800 text-xs flex items-center gap-2 transition-colors" type="button">
-                        <span class="material-symbols-outlined text-sm">badge</span>
-                        <span>DNI Representante</span>
-                    </button>
-                    <button class="px-3.5 py-2 rounded-lg text-slate-500 hover:text-slate-800 text-xs flex items-center gap-2 transition-colors" type="button">
-                        <span class="material-symbols-outlined text-sm">architecture</span>
-                        <span>Plano ITSE</span>
-                    </button>
-                    <button class="px-3.5 py-2 rounded-lg text-slate-500 hover:text-slate-800 text-xs flex items-center gap-2 transition-colors" type="button">
-                        <span class="material-symbols-outlined text-sm">receipt_long</span>
-                        <span>Voucher de Pago</span>
-                    </button>
+        @if($solicitudSeleccionada)
+            {{-- ENCABEZADO DEL EXPEDIENTE SELECCIONADO --}}
+            <div class="p-5 bg-white dark:bg-[#111f33] rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="space-y-1 min-w-0">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="font-mono text-xs font-bold px-2 py-0.5 rounded bg-blue-50 text-[#0051d5] dark:bg-blue-950/80 dark:text-blue-300">
+                            {{ $solicitudSeleccionada->folio?->Codigo_Folio ?? 'EXP-' . $solicitudSeleccionada->ID_Solicitud }}
+                        </span>
+                        <span class="text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                            {{ $solicitudSeleccionada->versionTramite?->tipoTramite?->Nombre ?? 'Trámite TUPA' }}
+                        </span>
+                        <span class="text-xs px-2 py-0.5 rounded font-semibold {{ $solicitudSeleccionada->Estado_Solicitud === 'Aprobado' ? 'bg-emerald-50 text-emerald-700' : ($solicitudSeleccionada->Estado_Solicitud === 'Observado' ? 'bg-amber-50 text-amber-800' : 'bg-blue-50 text-blue-700') }}">
+                            {{ str_replace('_', ' ', $solicitudSeleccionada->Estado_Solicitud) }}
+                        </span>
+                    </div>
+                    <h2 class="text-base font-bold text-[#001229] dark:text-white truncate">
+                        Titular: {{ $solicitudSeleccionada->solicitante?->Nombre ?? 'Administrado' }}
+                    </h2>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">
+                        Correo: {{ $solicitudSeleccionada->solicitante?->Email ?? 'N/A' }} • Fecha de ingreso: {{ $solicitudSeleccionada->Fecha_Creacion_Solicitud ? $solicitudSeleccionada->Fecha_Creacion_Solicitud->format('d/m/Y H:i') : ($solicitudSeleccionada->created_at ? $solicitudSeleccionada->created_at->format('d/m/Y H:i') : '--') }}
+                    </p>
                 </div>
-                <div class="flex items-center gap-1 px-2">
-                    <button aria-label="Acercar" class="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-800" type="button"><span class="material-symbols-outlined text-base">zoom_in</span></button>
-                    <button aria-label="Alejar" class="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-800" type="button"><span class="material-symbols-outlined text-base">zoom_out</span></button>
-                    <button aria-label="Rotar" class="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-800" type="button"><span class="material-symbols-outlined text-base">rotate_right</span></button>
-                    <button aria-label="Pantalla completa" class="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-800" type="button"><span class="material-symbols-outlined text-base">fullscreen</span></button>
-                    <div class="h-4 w-px bg-slate-200 mx-1"></div>
-                    <button aria-label="Lápiz de anotación" class="p-1.5 rounded-lg bg-slate-100 text-[#0051d5]" type="button"><span class="material-symbols-outlined text-base">edit</span></button>
-                    <button aria-label="Nota de observación" class="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-800" type="button"><span class="material-symbols-outlined text-base">sticky_note_2</span></button>
-                    <button aria-label="Regla técnica" class="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-800" type="button"><span class="material-symbols-outlined text-base">straighten</span></button>
+                <div class="flex items-center gap-2 shrink-0">
+                    <a href="{{ route('portal.expedientes.evaluar', $solicitudSeleccionada->ID_Solicitud) }}"
+                       class="px-3.5 py-2 rounded-lg bg-[#001229] hover:bg-[#0f2744] text-white text-xs font-semibold shadow-xs flex items-center gap-1.5 transition-all">
+                        <span class="material-symbols-outlined text-sm">open_in_full</span>
+                        <span>Mesa Completa</span>
+                    </a>
                 </div>
             </div>
 
-            {{-- Área de previsualización del documento --}}
-            <div class="relative w-full h-[420px] bg-slate-50 rounded-xl overflow-hidden flex items-center justify-center p-6 border border-slate-200">
-                <div class="relative w-full max-w-lg h-full bg-white rounded-lg shadow-md p-8 flex flex-col justify-between overflow-hidden border border-slate-100">
-                    <div class="flex items-center justify-between pb-4 border-b border-slate-100">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-lg bg-[#0f2744] text-white flex items-center justify-center font-bold text-xs">SETC</div>
-                            <div class="flex flex-col">
-                                <span class="text-[11px] font-bold text-[#0b1c30] uppercase tracking-wider">Constancia de Domicilio Fiscal</span>
-                                <span class="text-[11px] text-slate-400 font-mono">SETC-2025-8841-DOC01</span>
-                            </div>
-                        </div>
-                        <span class="px-2 py-1 rounded bg-slate-100 text-slate-600 text-[11px] font-mono">Pág. 1 / 1</span>
+            {{-- RECAUDOS Y DOCUMENTOS DEL EXPEDIENTE --}}
+            <div class="p-5 bg-white dark:bg-[#111f33] rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col gap-4" x-data="{ activeDocIndex: 0 }">
+                <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-blue-600 text-lg">attachment</span>
+                        <h3 class="text-sm font-bold text-[#001229] dark:text-white">Recaudos Presentados ({{ $solicitudSeleccionada->documentos->count() }})</h3>
                     </div>
-                    <div class="space-y-3 my-auto">
-                        <div class="h-2.5 bg-slate-100 rounded w-3/4"></div>
-                        <div class="h-2.5 bg-slate-100 rounded w-full"></div>
-                        <div class="h-2.5 bg-slate-100 rounded w-5/6"></div>
-                        <div class="p-4 bg-slate-50 rounded-lg space-y-2.5 border border-slate-100">
-                            <div class="flex justify-between text-xs">
-                                <span class="text-slate-500">Titular Catastral:</span>
-                                <span class="text-[#0b1c30] font-bold">Mendoza &amp; Asociados S.A.C.</span>
-                            </div>
-                            <div class="flex justify-between text-xs">
-                                <span class="text-slate-500">Dirección Declarada:</span>
-                                <span class="text-[#0b1c30] font-semibold">Av. El Sol 450, Interior 3B, Surco</span>
-                            </div>
-                            <div class="flex justify-between text-xs">
-                                <span class="text-slate-500">Zonificación:</span>
-                                <span class="text-[#0b1c30] font-semibold">Comercio Vecinal (CV-Z3)</span>
-                            </div>
-                        </div>
-                        <div class="h-2.5 bg-slate-100 rounded w-2/3"></div>
+                    <span class="text-xs text-slate-400">Haga clic para calificar el recaudo</span>
+                </div>
+
+                @if($solicitudSeleccionada->documentos->isNotEmpty())
+                    {{-- Tabs de Documentos --}}
+                    <div class="flex items-center gap-2 overflow-x-auto pb-2">
+                        @foreach($solicitudSeleccionada->documentos as $idx => $doc)
+                            <button type="button"
+                                    @click="activeDocIndex = {{ $idx }}"
+                                    :class="activeDocIndex === {{ $idx }} ? 'bg-[#001229] text-white border-transparent' : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100'"
+                                    class="px-3 py-2 rounded-lg text-xs font-semibold border flex items-center gap-2 shrink-0 transition-colors">
+                                <span class="material-symbols-outlined text-sm">description</span>
+                                <span>{{ Str::limit($doc->requisito?->Nombre ?? 'Documento #' . ($idx + 1), 22) }}</span>
+                                <span class="w-2 h-2 rounded-full {{ $doc->Estado_Doc === 'Aprobado' ? 'bg-emerald-400' : ($doc->Estado_Doc === 'Observado' ? 'bg-amber-400' : 'bg-slate-300') }}"></span>
+                            </button>
+                        @endforeach
                     </div>
-                    <div class="flex items-end justify-between pt-4 border-t border-slate-100">
-                        <div class="flex flex-col gap-1">
-                            <span class="text-[11px] text-slate-400 font-mono">Huella Criptográfica SHA-256</span>
-                            <span class="text-[11px] text-[#0b1c30] font-mono font-bold">e8a9...4b12_VALIDATED</span>
+
+                    {{-- Detalle del Documento Activo --}}
+                    @foreach($solicitudSeleccionada->documentos as $idx => $doc)
+                        <div x-show="activeDocIndex === {{ $idx }}" class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 space-y-3">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-700">
+                                <div>
+                                    <h4 class="text-xs font-bold text-slate-900 dark:text-white">
+                                        {{ $doc->requisito?->Nombre ?? 'Requisito Reglamentario' }}
+                                    </h4>
+                                    <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                                        Formato exigido: {{ $doc->requisito?->Formato ?? 'PDF' }} • Estado actual:
+                                        <span class="font-bold {{ $doc->Estado_Doc === 'Aprobado' ? 'text-emerald-600' : ($doc->Estado_Doc === 'Observado' ? 'text-amber-600' : 'text-slate-600') }}">
+                                            {{ $doc->Estado_Doc }}
+                                        </span>
+                                    </p>
+                                </div>
+                                {{-- Calificar Recaudo Rápido --}}
+                                <form action="{{ route('portal.documentos.evaluar', $doc->ID_Documento) }}" method="POST" class="flex items-center gap-1.5 shrink-0">
+                                    @csrf
+                                    <button type="submit" name="estado_doc" value="Aprobado" title="Aprobar documento" class="px-2.5 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-semibold flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-sm">check</span> Aprobar
+                                    </button>
+                                    <button type="submit" name="estado_doc" value="Observado" title="Observar documento" class="px-2.5 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-semibold flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-sm">warning</span> Observar
+                                    </button>
+                                    <button type="submit" name="estado_doc" value="Rechazado" title="Rechazar documento" class="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-800 text-xs font-semibold flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-sm">close</span> Rechazar
+                                    </button>
+                                </form>
+                            </div>
+
+                            <div class="flex items-center justify-between text-xs text-slate-500 pt-1">
+                                <span class="flex items-center gap-1.5">
+                                    <span class="material-symbols-outlined text-sm text-emerald-600">verified</span>
+                                    Recaudo digital registrado en base normativa
+                                </span>
+                                <span class="font-mono text-[11px] text-slate-400">DOC-ID: #{{ $doc->ID_Documento }}</span>
+                            </div>
                         </div>
-                        <div class="relative p-3 bg-slate-100 rounded-lg flex flex-col items-center">
-                            <span class="material-symbols-outlined text-[#0051d5] text-2xl">verified</span>
-                            <span class="text-[11px] font-bold text-[#0b1c30]">Sello Notarial</span>
-                            <div class="absolute -top-12 -right-4 bg-white p-2.5 rounded-lg shadow-lg flex items-center gap-2 z-10 border border-amber-200">
-                                <span class="material-symbols-outlined text-amber-600 text-base">priority_high</span>
-                                <div class="flex flex-col">
-                                    <span class="text-[11px] font-bold text-[#0b1c30] leading-none">Anotación Técnica</span>
-                                    <span class="text-[11px] text-slate-400">Sello con bajo contraste</span>
+                    @endforeach
+                @else
+                    <div class="p-6 text-center text-xs text-slate-400 bg-slate-50 dark:bg-slate-800/40 rounded-xl">
+                        No hay documentos adjuntos en este expediente.
+                    </div>
+                @endif
+            </div>
+
+            {{-- CONSOLA DE DICTAMEN / RESOLUCIÓN REAL --}}
+            <div class="p-6 bg-white dark:bg-[#111f33] rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col gap-4">
+                <div class="border-b border-slate-100 dark:border-slate-800 pb-3 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-sm font-bold text-[#0b1c30] dark:text-white">
+                            @if(auth()->user()->esSupervisor())
+                                Emisión de Resolución Oficial de Supervisión
+                            @else
+                                Pronunciamiento y Dictamen del Revisor Técnico
+                            @endif
+                        </h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                            Su pronunciamiento actualizará el expediente y notificará al administrado.
+                        </p>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-50 text-[#0051d5] dark:bg-blue-950 dark:text-blue-300">
+                        {{ auth()->user()->role_label ?? 'Revisor' }}
+                    </span>
+                </div>
+
+                @if(auth()->user()->esSupervisor())
+                    {{-- Formulario para Supervisor: Resolución --}}
+                    @php
+                        $resolucionExistente = $solicitudSeleccionada->resoluciones->last();
+                    @endphp
+                    @if($resolucionExistente)
+                        <div class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 text-xs text-emerald-900 dark:text-emerald-200 space-y-1">
+                            <span class="font-bold flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-emerald-600">verified</span>
+                                Resolución Oficial Emitida: {{ $resolucionExistente->Tipo_Resolucion }}
+                            </span>
+                            <p class="text-[11px] text-emerald-700 dark:text-emerald-300">
+                                Fecha de Emisión: {{ $resolucionExistente->Fecha_Emision_Resolucion ? \Carbon\Carbon::parse($resolucionExistente->Fecha_Emision_Resolucion)->format('d/m/Y H:i') : now()->format('d/m/Y') }}
+                            </p>
+                        </div>
+                    @else
+                        <form action="{{ route('portal.resoluciones.store', $solicitudSeleccionada->ID_Solicitud) }}" method="POST" class="space-y-4">
+                            @csrf
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                        Sentido Resolutivo <span class="text-rose-500">*</span>
+                                    </label>
+                                    <select name="tipo_resolucion" required class="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs focus:outline-none focus:ring-2 focus:ring-[#0051d5]">
+                                        <option value="Favorable">Favorable (Aprobado)</option>
+                                        <option value="Desfavorable">Desfavorable (Denegatoria)</option>
+                                        <option value="Inadmisible">Inadmisible / Archivo</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                        Fundamentación y Comentarios
+                                    </label>
+                                    <input type="text" name="comentarios" placeholder="Motivación jurídica de la resolución..." class="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs focus:outline-none focus:ring-2 focus:ring-[#0051d5]">
                                 </div>
                             </div>
+                            <button type="submit" class="w-full py-2.5 rounded-xl bg-[#001229] hover:bg-[#0f2744] text-white text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2">
+                                <span class="material-symbols-outlined text-base">verified</span>
+                                <span>Firmar y Emitir Resolución Oficial</span>
+                            </button>
+                        </form>
+                    @endif
+                @elseif($asignacionActiva)
+                    {{-- Formulario para Revisor Técnico --}}
+                    <form action="{{ route('portal.revisiones.store', $asignacionActiva->ID_Asignacion) }}" method="POST" class="space-y-4" x-data="{ decision: 'Aprobado' }">
+                        @csrf
+                        <input type="hidden" name="resultado" :value="decision">
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <button type="button" @click="decision = 'Aprobado'"
+                                    :class="decision === 'Aprobado' ? 'border-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-200' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300'"
+                                    class="p-3 rounded-xl border text-left flex items-start gap-2.5 transition-all">
+                                <span class="material-symbols-outlined text-emerald-600 text-lg mt-0.5">check_circle</span>
+                                <div>
+                                    <span class="text-xs font-bold block">Dictamen Favorable</span>
+                                    <span class="text-[11px] text-slate-500 dark:text-slate-400">Cumple requisitos</span>
+                                </div>
+                            </button>
+
+                            <button type="button" @click="decision = 'Observado'"
+                                    :class="decision === 'Observado' ? 'border-amber-600 bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300'"
+                                    class="p-3 rounded-xl border text-left flex items-start gap-2.5 transition-all">
+                                <span class="material-symbols-outlined text-amber-600 text-lg mt-0.5">rule</span>
+                                <div>
+                                    <span class="text-xs font-bold block">Solicitar Subsanación</span>
+                                    <span class="text-[11px] text-slate-500 dark:text-slate-400">Observar recaudos</span>
+                                </div>
+                            </button>
+
+                            <button type="button" @click="decision = 'Rechazado'"
+                                    :class="decision === 'Rechazado' ? 'border-rose-600 bg-rose-50 dark:bg-rose-950/40 text-rose-900 dark:text-rose-200' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300'"
+                                    class="p-3 rounded-xl border text-left flex items-start gap-2.5 transition-all">
+                                <span class="material-symbols-outlined text-rose-600 text-lg mt-0.5">cancel</span>
+                                <div>
+                                    <span class="text-xs font-bold block">Dictamen Rechazado</span>
+                                    <span class="text-[11px] text-slate-500 dark:text-slate-400">Incumplimiento formal</span>
+                                </div>
+                            </button>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        {{-- CONSOLA DE DICTAMEN --}}
-        <div class="p-6 bg-white rounded-xl border border-slate-200/80 shadow-xs flex flex-col gap-5">
-            <div class="flex items-center justify-between">
-                <div class="flex flex-col">
-                    <h2 class="text-base font-bold text-[#0b1c30]">Consola de Dictamen y Notificación Directa</h2>
-                    <span class="text-xs text-[#44474d]">La decisión generará una cédula formal y un mensaje accesible en el buzón ciudadano.</span>
-                </div>
-                <span class="px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold">
-                    Paso 3 de 3: Pronunciamiento
-                </span>
-            </div>
-
-            {{-- Opciones de dictamen --}}
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <button class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-left flex items-start gap-3 hover:border-emerald-400 hover:shadow-sm transition-all group" id="btn-favorable" onclick="selectDecision('favorable')" type="button">
-                    <span class="material-symbols-outlined text-emerald-600 text-xl mt-0.5">check_circle</span>
-                    <div class="flex flex-col">
-                        <span class="text-sm font-bold text-[#0b1c30]">Dictamen Favorable</span>
-                        <span class="text-xs text-[#44474d]">Cumple requisitos y normativa</span>
-                    </div>
-                </button>
-                <button class="p-3.5 rounded-xl bg-[#eff4ff] border-2 border-[#0051d5] text-left flex items-start gap-3 shadow-sm transition-all" id="btn-correccion" onclick="selectDecision('correccion')" type="button">
-                    <span class="material-symbols-outlined text-[#0051d5] text-xl mt-0.5">rule</span>
-                    <div class="flex flex-col">
-                        <span class="text-sm font-bold text-[#0b1c30]">Solicitar Subsanación</span>
-                        <span class="text-xs text-[#44474d]">Requiere aclarar o reemplazar</span>
-                    </div>
-                </button>
-                <button class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-left flex items-start gap-3 hover:border-rose-400 hover:bg-rose-50 hover:shadow-sm transition-all group" id="btn-rechazo" onclick="selectDecision('rechazo')" type="button">
-                    <span class="material-symbols-outlined text-rose-600 text-xl mt-0.5">cancel</span>
-                    <div class="flex flex-col">
-                        <span class="text-sm font-bold text-[#0b1c30]">Observar con Rechazo</span>
-                        <span class="text-xs text-[#44474d]">Incumplimiento irrecuperable</span>
-                    </div>
-                </button>
-            </div>
-
-            {{-- Editor de mensaje + Vista previa --}}
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div class="flex flex-col gap-2">
-                    <div class="flex items-center justify-between">
-                        <label class="text-xs font-bold text-[#0b1c30]" for="dictamen-editor">Mensaje Empático al Administrado</label>
-                        <span class="text-xs text-[#0051d5] font-semibold cursor-pointer hover:underline">Cargar plantilla</span>
-                    </div>
-                    <textarea class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-[#0b1c30] focus:outline-none focus:ring-2 focus:ring-[#0051d5]/20 focus:bg-white shadow-xs resize-none leading-relaxed" id="dictamen-editor" rows="6">Estimado administrado de Mendoza & Asociados:
-Al revisar su "Comprobante de Domicilio", advertimos que el sello notarial inferior presenta baja legibilidad. Para evitar demoras en su licencia definitiva, por favor adjunte una copia escaneada nítida antes del 26 de marzo.</textarea>
-                    <span class="text-[11px] text-slate-400 font-mono">Variables: [Nombre_Empresa], [Documento_Faltante], [Fecha_Limite]</span>
-                </div>
-                <div class="flex flex-col gap-2">
-                    <span class="text-xs font-bold text-[#0b1c30]">Vista Previa Móvil del Administrado</span>
-                    <div class="flex-1 bg-slate-50 border border-slate-200 p-4 rounded-xl flex flex-col justify-between min-h-[150px]">
-                        <div class="flex items-center gap-3 pb-3">
-                            <div class="w-7 h-7 rounded-full bg-[#0f2744] text-white flex items-center justify-center font-bold text-xs">S</div>
-                            <div class="flex flex-col">
-                                <span class="text-xs font-bold text-[#0b1c30]">Notificación Municipal SETC</span>
-                                <span class="text-[11px] text-slate-400 font-mono">Buzón Electrónico Oficial</span>
-                            </div>
+                        <div x-show="decision === 'Observado' || decision === 'Rechazado'" class="space-y-1.5" x-cloak>
+                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                                Observaciones Técnicas / Fundamentación <span class="text-rose-500">*</span>
+                            </label>
+                            <textarea name="observaciones[0][detalles]" rows="3"
+                                      placeholder="Describa la deficiencia encontrada y el plazo reglamentario para subsanar..."
+                                      class="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs focus:outline-none focus:ring-2 focus:ring-[#0051d5]"></textarea>
                         </div>
-                        <p class="text-xs text-slate-500 italic leading-normal bg-white p-3 rounded-lg shadow-xs">
-                            "Estimado administrado: Advertimos que el sello notarial inferior presenta baja legibilidad. Por favor adjunte una copia nítida..."
-                        </p>
-                        <div class="flex items-center justify-between pt-3">
-                            <span class="text-xs text-[#0051d5] font-semibold">Botón: [Subir Subsanación]</span>
-                            <span class="text-[11px] text-slate-400 font-mono">Plazo: 48h</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            {{-- Acciones finales --}}
-            <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100">
-                <div class="flex items-center gap-2">
-                    <button class="px-4 py-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-[#0b1c30] text-xs font-semibold transition-colors flex items-center gap-2" type="button">
-                        <span class="material-symbols-outlined text-base">save</span>
-                        <span>Guardar Borrador</span>
-                    </button>
-                    <button class="px-4 py-2.5 rounded-lg text-slate-500 hover:text-slate-800 text-xs transition-colors" type="button">
-                        Historial de Revisiones
-                    </button>
-                </div>
-                <div class="flex items-center gap-3">
-                    <button class="px-6 py-2.5 rounded-lg bg-[#0f2744] hover:bg-[#1a3860] text-white text-xs font-bold transition-all shadow-sm flex items-center gap-2" type="button">
-                        <span class="material-symbols-outlined text-base">verified</span>
-                        <span>Firmar y Notificar Resolución (PKI / FIDO2)</span>
-                    </button>
-                </div>
+                        <div class="flex items-center justify-between pt-2">
+                            <span class="text-xs text-slate-400 flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm text-emerald-500">lock</span>
+                                Firma PKI Digital del Revisor Habilitada
+                            </span>
+                            <button type="submit" class="px-5 py-2.5 rounded-xl bg-[#001229] hover:bg-[#0f2744] text-white text-xs font-bold transition-all shadow-sm flex items-center gap-2">
+                                <span class="material-symbols-outlined text-base">verified</span>
+                                <span>Emitir Dictamen Oficial</span>
+                            </button>
+                        </div>
+                    </form>
+                @else
+                    <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-400">
+                        Visualización en modo consulta o auditoría. El expediente puede abrirse en la mesa completa para asignación o dictamen pericial.
+                    </div>
+                @endif
             </div>
-        </div>
+        @else
+            <div class="p-12 text-center bg-white dark:bg-[#111f33] rounded-xl border border-slate-200/80 dark:border-slate-800 text-slate-400">
+                <span class="material-symbols-outlined text-5xl block mb-2 text-slate-300">inbox</span>
+                <h3 class="text-sm font-bold text-slate-700 dark:text-slate-300">Ningún expediente seleccionado</h3>
+                <p class="text-xs text-slate-500 mt-1">Seleccione un expediente de la cola izquierda para visualizar sus recaudos y emitir dictamen.</p>
+            </div>
+        @endif
     </section>
+
 </div>
-
-@push('scripts')
-<script>
-    function selectDecision(tipo) {
-        const btnF = document.getElementById('btn-favorable');
-        const btnC = document.getElementById('btn-correccion');
-        const btnR = document.getElementById('btn-rechazo');
-        const editor = document.getElementById('dictamen-editor');
-
-        // Reset styles
-        btnF.className = btnF.className.replace('border-emerald-400 shadow-sm', '').replace('border-2', 'border');
-        btnF.classList.add('bg-emerald-50', 'border', 'border-emerald-200');
-        btnC.className = btnC.className.replace('border-2 border-[#0051d5]', 'border border-slate-200').replace('bg-[#eff4ff]', 'bg-slate-50');
-        btnR.classList.remove('border-rose-400', 'bg-rose-50');
-
-        if (tipo === 'favorable') {
-            btnF.classList.add('border-emerald-400', 'shadow-sm');
-            editor.value = "Estimado titular de Mendoza & Asociados S.A.C.:\nNos complace informarle que la evaluación técnica ha concluido satisfactoriamente. Su solicitud cumple plenamente con la normativa comercial vigente. Su certificado de Licencia Comercial Tipo A ha sido firmado digitalmente.";
-        } else if (tipo === 'correccion') {
-            btnC.classList.add('bg-[#eff4ff]', 'border-2', 'border-[#0051d5]', 'shadow-sm');
-            editor.value = "Estimado administrado de Mendoza & Asociados:\nAl revisar su 'Comprobante de Domicilio', advertimos que el sello notarial inferior presenta baja legibilidad. Por favor adjunte una copia escaneada nítida antes del 26 de marzo.";
-        } else if (tipo === 'rechazo') {
-            btnR.classList.add('border-rose-400', 'bg-rose-50', 'shadow-sm');
-            editor.value = "RESOLUCIÓN DENEGATORIA:\nSe observa formalmente la solicitud de Licencia Comercial Tipo A por incompatibilidad estricta con la zonificación reglamentaria según Ord. 1029-SETC. Plazo de 15 días hábiles para recurso de reconsideración o apelación.";
-        }
-    }
-</script>
-@endpush
 
 @endsection

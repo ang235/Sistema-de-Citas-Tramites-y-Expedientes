@@ -25,4 +25,3 @@ class StoreCitaRequest extends FormRequest
         ];
     }
 }
-

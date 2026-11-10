@@ -24,4 +24,3 @@ class AsignarExpedienteRequest extends FormRequest
         ];
     }
 }
-

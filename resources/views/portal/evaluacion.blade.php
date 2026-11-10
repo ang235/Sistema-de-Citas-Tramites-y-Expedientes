@@ -4,7 +4,7 @@
 
 @section('breadcrumb')
     <span class="material-symbols-outlined text-xs">chevron_right</span>
-    <a href="{{ route('portal.dashboard') }}">Operaciones</a>
+    <a href="{{ auth()->user()?->esRevisor() && !auth()->user()?->esSupervisor() ? route('portal.revisor-dashboard') : route('portal.dashboard') }}">Operaciones</a>
     <span class="material-symbols-outlined text-xs">chevron_right</span>
     <a href="{{ route('portal.mesa-dictamen') }}">Mesa de Dictamen</a>
     <span class="material-symbols-outlined text-xs">chevron_right</span>

@@ -34,27 +34,36 @@ class AuthController extends Controller
         $usuario = Usuario::where('Email', $request->validated('email'))->first();
 
         if ($usuario !== null && Hash::check($request->validated('password'), $usuario->Contrasena)) {
+            if (! ($usuario->Activo ?? true)) {
+                return back()->withErrors([
+                    'email' => 'Esta cuenta institucional se encuentra deshabilitada temporalmente. Contacte a la administración.',
+                ])->onlyInput('email');
+            }
+
             Auth::login($usuario, $request->boolean('remember'));
             $request->session()->regenerate();
 
             Bitacora::create([
                 'ID_Usuarios' => $usuario->ID_Usuarios,
                 'Accion' => 'Inicio de sesión',
-                'Descripcion' => 'Inicio de sesión exitoso desde IP: ' . $request->ip(),
+                'Descripcion' => 'Inicio de sesión exitoso desde IP: '.$request->ip(),
                 'Fecha_Creacion' => now(),
             ]);
+
+            // Asegurar carga fresca de roles asignados
+            $usuario->load('roles');
 
             // Redirección inteligente según rol institucional
             if ($usuario->esAdministrador()) {
                 return redirect()->route('portal.dashboard');
             }
 
-            if ($usuario->esRevisor()) {
-                return redirect()->route('portal.mesa-dictamen');
+            if ($usuario->esSupervisor()) {
+                return redirect()->route('portal.supervisor-dashboard');
             }
 
-            if ($usuario->esSupervisor()) {
-                return redirect()->route('portal.matriz-cargas');
+            if ($usuario->esRevisor()) {
+                return redirect()->route('portal.revisor-dashboard');
             }
 
             return redirect()->route('expedientes.index');
@@ -80,7 +89,9 @@ class AuthController extends Controller
         ]);
 
         // Asignar rol Ciudadano por defecto si existe
-        $rolCiudadano = Rol::where('Nombre', 'Ciudadano')->first();
+        $rolCiudadano = Rol::where('Nombre', 'like', '%Ciudadano%')->first()
+            ?? Rol::where('Nombre', 'like', '%Solicitante%')->first()
+            ?? Rol::where('Nombre', 'Ciudadano')->first();
         if ($rolCiudadano !== null) {
             $usuario->roles()->attach($rolCiudadano->ID_Rol);
         }
@@ -117,4 +128,3 @@ class AuthController extends Controller
         return redirect()->route('home')->with('info', 'Has cerrado sesión.');
     }
 }
-

@@ -126,4 +126,3 @@ class ExpedienteCiudadanoController extends Controller
             ->with('success', 'Observación solventada exitosamente.');
     }
 }
-

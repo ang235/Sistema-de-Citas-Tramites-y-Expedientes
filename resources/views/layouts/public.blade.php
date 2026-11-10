@@ -7,12 +7,12 @@
 
     {{-- SEO --}}
     <title>@yield('title', 'Portal Ciudadano') — SETC</title>
-    <meta name="description" content="@yield('meta_description', 'Sistema Estatal de Citas, Trámites y Expedientes. Realiza tus trámites de forma digital, rápida y segura.')">
+    <meta name="description" content="@yield('meta_description', 'Sistema de Expedientes de Trámites y Citas (SETC). Realiza tus trámites de forma digital, rápida y segura.')">
     <meta name="robots" content="index, follow">
 
     {{-- Open Graph --}}
     <meta property="og:title"       content="@yield('title', 'Portal Ciudadano') — SETC">
-    <meta property="og:description" content="@yield('meta_description', 'Portal ciudadano del SETC.')">
+    <meta property="og:description" content="@yield('meta_description', 'Sistema de Expedientes de Trámites y Citas.')">
     <meta property="og:type"        content="website">
 
     {{-- Icons --}}
@@ -128,13 +128,10 @@
 
             {{-- Logo + Nombre --}}
             <a href="{{ route('home') }}" class="flex items-center gap-3 shrink-0" aria-label="Ir al inicio SETC">
-                <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-                     style="background-color: var(--color-primary-container);">
-                    <span class="material-symbols-outlined text-white text-lg">account_balance</span>
-                </div>
+                <img src="{{ asset('images/logo.png') }}" alt="Logo SETC" class="h-11 w-auto object-contain">
                 <div class="flex flex-col leading-tight">
-                    <span class="text-headline-sm" style="color: var(--color-primary); font-family: var(--font-display);">SETC</span>
-                    <span class="text-label-sm" style="color: var(--color-on-surface-variant);">Portal Ciudadano</span>
+                    <span class="text-headline-sm font-bold tracking-tight" style="color: var(--color-primary); font-family: var(--font-display);">SETC</span>
+                    <span class="text-[11px] font-medium" style="color: var(--color-on-surface-variant);">Sistema de Expedientes de Trámites y Citas</span>
                 </div>
             </a>
 
@@ -165,19 +162,28 @@
 
                 {{-- Nav por defecto si no se pasan ítems --}}
                 @if(empty($publicNav))
+                    @php
+                        $esInstitucional = auth()->check() && (
+                            auth()->user()->esRevisor() ||
+                            auth()->user()->esSupervisor() ||
+                            auth()->user()->esAdministrador()
+                        );
+                    @endphp
                     @foreach([
-                        ['label'=>'Inicio',              'url'=>'/',               'match'=>'/'],
-                        ['label'=>'Trámites y Servicios','url'=>'/tramites',       'match'=>'tramites*'],
-                        ['label'=>'Mis Expedientes',     'url'=>'/expedientes',    'match'=>'expedientes*'],
-                        ['label'=>'Agendar Cita',        'url'=>'/citas',          'match'=>'citas*'],
-                        ['label'=>'Mesa de Ayuda',       'url'=>'/ayuda',          'match'=>'ayuda*'],
+                        ['label'=>'Inicio',              'url'=>'/',            'match'=>'/',          'soloPublico'=>false],
+                        ['label'=>'Trámites y Servicios','url'=>'/tramites',    'match'=>'tramites*',  'soloPublico'=>false],
+                        ['label'=>'Mis Expedientes',     'url'=>'/expedientes', 'match'=>'expedientes*','soloPublico'=>true],
+                        ['label'=>'Agendar Cita',        'url'=>'/citas',       'match'=>'citas*',     'soloPublico'=>true],
+                        ['label'=>'Mesa de Ayuda',       'url'=>'/ayuda',       'match'=>'ayuda*',     'soloPublico'=>false],
                     ] as $item)
-                        <a href="{{ $item['url'] }}"
-                           class="px-3 py-2 rounded-lg text-label-md transition-colors"
-                           style="{{ Request::is($item['match']) ? 'background-color: var(--color-surface-container); color: var(--color-on-surface); font-weight:600;' : 'color: var(--color-on-surface-variant);' }}"
-                           @if(Request::is($item['match'])) aria-current="page" @endif>
-                            {{ $item['label'] }}
-                        </a>
+                        @if(!$item['soloPublico'] || !$esInstitucional)
+                            <a href="{{ $item['url'] }}"
+                               class="px-3 py-2 rounded-lg text-label-md transition-colors"
+                               style="{{ Request::is($item['match']) ? 'background-color: var(--color-surface-container); color: var(--color-on-surface); font-weight:600;' : 'color: var(--color-on-surface-variant);' }}"
+                               @if(Request::is($item['match'])) aria-current="page" @endif>
+                                {{ $item['label'] }}
+                            </a>
+                        @endif
                     @endforeach
                 @endif
             </nav>
@@ -185,68 +191,75 @@
             {{-- Acciones de usuario --}}
             <div class="flex items-center gap-2 shrink-0">
 
-                {{-- Notificaciones Ciudadanas Dinámicas --}}
+                {{-- Notificaciones — solo para ciudadanos; roles institucionales usan su panel --}}
                 @auth
                     @php
-                        $userCitasProximas = auth()->user()->citas()->where('Fecha', '>=', now()->toDateString())->orderBy('Fecha')->take(2)->get();
-                        $userBitacoras = auth()->user()->bitacoras()->latest('Fecha_Hora')->take(3)->get();
-                        $totalAvisos = $userCitasProximas->count() + $userBitacoras->count();
+                        $esInstitucionalNotif = auth()->user()->esRevisor() ||
+                                                auth()->user()->esSupervisor() ||
+                                                auth()->user()->esAdministrador();
                     @endphp
-                    <div class="relative" x-data="{ openNotif: false }">
-                        <button @click="openNotif = !openNotif" class="p-2 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors relative cursor-pointer" aria-label="Notificaciones" id="btn-notifications">
-                            <span class="material-symbols-outlined text-xl">notifications</span>
-                            @if($totalAvisos > 0)
-                                <span class="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-[#0051d5] ring-2 ring-white"></span>
-                            @endif
-                        </button>
-
-                        <div x-show="openNotif" @click.outside="openNotif = false" x-cloak
-                             x-transition class="absolute right-0 top-full mt-2 w-80 bg-white rounded-2xl shadow-xl border border-slate-200/90 py-2 z-50">
-                            <div class="px-4 py-2 border-b border-slate-100 flex items-center justify-between">
-                                <span class="text-xs font-bold text-[#001229]">Buzón de Notificaciones</span>
+                    @if(!$esInstitucionalNotif)
+                        @php
+                            $userCitasProximas = auth()->user()->citas()->where('Fecha', '>=', now()->toDateString())->orderBy('Fecha')->take(2)->get();
+                            $userBitacoras = auth()->user()->bitacoras()->latest('Fecha_Hora')->take(3)->get();
+                            $totalAvisos = $userCitasProximas->count() + $userBitacoras->count();
+                        @endphp
+                        <div class="relative" x-data="{ openNotif: false }">
+                            <button @click="openNotif = !openNotif" class="p-2 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors relative cursor-pointer" aria-label="Notificaciones" id="btn-notifications">
+                                <span class="material-symbols-outlined text-xl">notifications</span>
                                 @if($totalAvisos > 0)
-                                    <span class="text-[10px] font-semibold text-[#0051d5] bg-blue-50 px-2 py-0.5 rounded-full">{{ $totalAvisos }} Avisos</span>
+                                    <span class="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-[#0051d5] ring-2 ring-white"></span>
                                 @endif
-                            </div>
-                            <div class="divide-y divide-slate-100 max-h-72 overflow-y-auto">
-                                @forelse ($userCitasProximas as $cita)
-                                    <a href="{{ route('citas.pase', $cita->ID_Citas) }}" class="p-3 hover:bg-slate-50 transition-colors flex items-start gap-2.5 block">
-                                        <span class="material-symbols-outlined text-[#0051d5] text-lg mt-0.5">calendar_month</span>
-                                        <div class="flex-1 min-w-0">
-                                            <p class="text-xs font-bold text-slate-800 truncate">Turno Programado</p>
-                                            <p class="text-[11px] text-slate-500">Cita para el {{ $cita->Fecha->format('d/m/Y') }} a las {{ $cita->Hora }} hrs.</p>
-                                            <span class="text-[10px] text-[#0051d5] font-semibold mt-1 block">Ver pase digital →</span>
+                            </button>
+
+                            <div x-show="openNotif" @click.outside="openNotif = false" x-cloak
+                                 x-transition class="absolute right-0 top-full mt-2 w-80 bg-white rounded-2xl shadow-xl border border-slate-200/90 py-2 z-50">
+                                <div class="px-4 py-2 border-b border-slate-100 flex items-center justify-between">
+                                    <span class="text-xs font-bold text-[#001229]">Buzón de Notificaciones</span>
+                                    @if($totalAvisos > 0)
+                                        <span class="text-[10px] font-semibold text-[#0051d5] bg-blue-50 px-2 py-0.5 rounded-full">{{ $totalAvisos }} Avisos</span>
+                                    @endif
+                                </div>
+                                <div class="divide-y divide-slate-100 max-h-72 overflow-y-auto">
+                                    @forelse ($userCitasProximas as $cita)
+                                        <a href="{{ route('citas.pase', $cita->ID_Citas) }}" class="p-3 hover:bg-slate-50 transition-colors flex items-start gap-2.5 block">
+                                            <span class="material-symbols-outlined text-[#0051d5] text-lg mt-0.5">calendar_month</span>
+                                            <div class="flex-1 min-w-0">
+                                                <p class="text-xs font-bold text-slate-800 truncate">Turno Programado</p>
+                                                <p class="text-[11px] text-slate-500">Cita para el {{ $cita->Fecha->format('d/m/Y') }} a las {{ $cita->Hora }} hrs.</p>
+                                                <span class="text-[10px] text-[#0051d5] font-semibold mt-1 block">Ver pase digital →</span>
+                                            </div>
+                                        </a>
+                                    @empty
+                                    @endforelse
+
+                                    @forelse ($userBitacoras as $bit)
+                                        <div class="p-3 hover:bg-slate-50 transition-colors flex items-start gap-2.5">
+                                            <span class="material-symbols-outlined text-emerald-600 text-lg mt-0.5">info</span>
+                                            <div class="flex-1 min-w-0">
+                                                <p class="text-xs font-bold text-slate-800 truncate">{{ $bit->Accion }}</p>
+                                                <p class="text-[11px] text-slate-500 line-clamp-2">{{ $bit->Descripcion }}</p>
+                                                <span class="text-[10px] text-slate-400 mt-0.5 block">{{ $bit->Fecha_Hora ? \Carbon\Carbon::parse($bit->Fecha_Hora)->diffForHumans() : '' }}</span>
+                                            </div>
                                         </div>
+                                    @empty
+                                    @endforelse
+
+                                    @if($totalAvisos === 0)
+                                        <div class="p-6 text-center text-xs text-slate-400">
+                                            <span class="material-symbols-outlined text-2xl block mb-1 opacity-30">notifications_none</span>
+                                            No tienes notificaciones pendientes
+                                        </div>
+                                    @endif
+                                </div>
+                                <div class="p-2 border-t border-slate-100 text-center">
+                                    <a href="{{ route('expedientes.index') }}" class="text-[11px] font-semibold text-[#0051d5] hover:underline">
+                                        Ver todos mis expedientes y trámites
                                     </a>
-                                @empty
-                                @endforelse
-
-                                @forelse ($userBitacoras as $bit)
-                                    <div class="p-3 hover:bg-slate-50 transition-colors flex items-start gap-2.5">
-                                        <span class="material-symbols-outlined text-emerald-600 text-lg mt-0.5">info</span>
-                                        <div class="flex-1 min-w-0">
-                                            <p class="text-xs font-bold text-slate-800 truncate">{{ $bit->Accion }}</p>
-                                            <p class="text-[11px] text-slate-500 line-clamp-2">{{ $bit->Descripcion }}</p>
-                                            <span class="text-[10px] text-slate-400 mt-0.5 block">{{ $bit->Fecha_Hora ? \Carbon\Carbon::parse($bit->Fecha_Hora)->diffForHumans() : '' }}</span>
-                                        </div>
-                                    </div>
-                                @empty
-                                @endforelse
-
-                                @if($totalAvisos === 0)
-                                    <div class="p-6 text-center text-xs text-slate-400">
-                                        <span class="material-symbols-outlined text-2xl block mb-1 opacity-30">notifications_none</span>
-                                        No tienes notificaciones pendientes
-                                    </div>
-                                @endif
-                            </div>
-                            <div class="p-2 border-t border-slate-100 text-center">
-                                <a href="{{ route('expedientes.index') }}" class="text-[11px] font-semibold text-[#0051d5] hover:underline">
-                                    Ver todos mis expedientes y trámites
-                                </a>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    @endif
                 @endauth
 
                 {{-- Usuario autenticado dropdown --}}
@@ -282,18 +295,47 @@
                             </div>
 
                             <div class="py-1">
-                                <a href="{{ route('profile.show') }}" class="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-700 hover:bg-blue-50 hover:text-[#0051d5] transition-colors" role="menuitem">
-                                    <span class="material-symbols-outlined text-base text-slate-400">person</span>
-                                    <span>Mi Perfil</span>
-                                </a>
-                                <a href="{{ route('expedientes.index') }}" class="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-700 hover:bg-blue-50 hover:text-[#0051d5] transition-colors" role="menuitem">
-                                    <span class="material-symbols-outlined text-base text-slate-400">folder_open</span>
-                                    <span>Mis Expedientes</span>
-                                </a>
-                                <a href="{{ route('citas.index') }}" class="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-700 hover:bg-blue-50 hover:text-[#0051d5] transition-colors" role="menuitem">
-                                    <span class="material-symbols-outlined text-base text-slate-400">calendar_month</span>
-                                    <span>Mis Citas</span>
-                                </a>
+                                @php
+                                    $esInstitucionalDropdown = auth()->check() && (
+                                        auth()->user()->esRevisor() ||
+                                        auth()->user()->esSupervisor() ||
+                                        auth()->user()->esAdministrador()
+                                    );
+                                @endphp
+
+                                @if($esInstitucionalDropdown)
+                                    {{-- Usuario institucional: solo link a su panel --}}
+                                    @if(auth()->user()->esRevisor())
+                                        <a href="{{ route('portal.revisor-dashboard') }}" class="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-amber-700 hover:bg-amber-50 transition-colors" role="menuitem">
+                                            <span class="material-symbols-outlined text-base text-amber-500">fact_check</span>
+                                            <span>Panel de Revisión Técnica</span>
+                                        </a>
+                                    @elseif(auth()->user()->esSupervisor())
+                                        <a href="{{ route('portal.supervisor-dashboard') }}" class="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-blue-700 hover:bg-blue-50 transition-colors" role="menuitem">
+                                            <span class="material-symbols-outlined text-base text-blue-500">dashboard_customize</span>
+                                            <span>Panel de Supervisión</span>
+                                        </a>
+                                    @elseif(auth()->user()->esAdministrador())
+                                        <a href="{{ route('portal.dashboard') }}" class="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-indigo-700 hover:bg-indigo-50 transition-colors" role="menuitem">
+                                            <span class="material-symbols-outlined text-base text-indigo-500">admin_panel_settings</span>
+                                            <span>Panel Administrativo</span>
+                                        </a>
+                                    @endif
+                                @else
+                                    {{-- Usuario ciudadano: links ciudadanos completos --}}
+                                    <a href="{{ route('profile.show') }}" class="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-700 hover:bg-blue-50 hover:text-[#0051d5] transition-colors" role="menuitem">
+                                        <span class="material-symbols-outlined text-base text-slate-400">person</span>
+                                        <span>Mi Perfil</span>
+                                    </a>
+                                    <a href="{{ route('expedientes.index') }}" class="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-700 hover:bg-blue-50 hover:text-[#0051d5] transition-colors" role="menuitem">
+                                        <span class="material-symbols-outlined text-base text-slate-400">folder_open</span>
+                                        <span>Mis Expedientes</span>
+                                    </a>
+                                    <a href="{{ route('citas.index') }}" class="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-700 hover:bg-blue-50 hover:text-[#0051d5] transition-colors" role="menuitem">
+                                        <span class="material-symbols-outlined text-base text-slate-400">calendar_month</span>
+                                        <span>Mis Citas</span>
+                                    </a>
+                                @endif
                             </div>
 
                             <div class="border-t border-slate-100 pt-1">
@@ -409,15 +451,13 @@
                 {{-- Identidad --}}
                 <div class="space-y-3">
                     <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-white/10 text-blue-200">
-                            <span class="material-symbols-outlined text-base">account_balance</span>
-                        </div>
-                        <span class="text-xl font-bold text-white" style="font-family: var(--font-display);">SETC</span>
+                        <img src="{{ asset('images/logo.png') }}" alt="Logo SETC" class="h-9 w-auto object-contain bg-white rounded p-0.5">
+                        <span class="text-xl font-bold text-white tracking-tight" style="font-family: var(--font-display);">SETC</span>
                         <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-900/60 text-blue-200 border border-blue-400/30 uppercase">Oficial</span>
                     </div>
                     <p class="text-xs text-slate-400 leading-relaxed">
-                        Sistema Institucional de Gestión de Citas, Trámites y Expedientes Digitales.
-                        Plataforma interoperable del Gobierno Digital conforme a la Ley N° 27444.
+                        Sistema de Expedientes de Trámites y Citas (SETC).
+                        Plataforma interoperable del Gobierno Digital conforme a la normatividad vigente.
                     </p>
                 </div>
 
@@ -466,7 +506,7 @@
             {{-- Bottom bar --}}
             <div class="mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-800 text-xs text-slate-500">
                 <p>
-                    &copy; {{ date('Y') }} Sistema Estatal de Citas, Trámites y Expedientes (SETC). Todos los derechos reservados.
+                    &copy; {{ date('Y') }} Sistema de Expedientes de Trámites y Citas (SETC). Todos los derechos reservados.
                 </p>
                 <div class="flex items-center gap-4">
                     <a href="#" class="hover:text-slate-300 transition-colors">Accesibilidad</a>

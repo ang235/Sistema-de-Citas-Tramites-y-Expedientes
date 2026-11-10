@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Operativo;
 use App\Http\Controllers\Controller;
 use App\Models\Bitacora;
 use App\Models\Cita;
+use App\Models\Usuario;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,8 +15,18 @@ use Illuminate\View\View;
 
 class CitaOperativaController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request): View|RedirectResponse
     {
+        /** @var Usuario|null $currentUser */
+        $currentUser = Auth::user();
+        if (! $currentUser || ! ($currentUser->esSupervisor() || $currentUser->esAdministrador())) {
+            if ($currentUser?->esRevisor()) {
+                return redirect()->route('portal.revisor-dashboard');
+            }
+
+            return redirect()->route('expedientes.index');
+        }
+
         $fecha = $request->query('fecha', today()->toDateString());
         $estado = $request->query('estado');
 
@@ -55,4 +66,3 @@ class CitaOperativaController extends Controller
         return back()->with('success', "Estado de la cita actualizado a {$validated['estado_citas']}.");
     }
 }
-
