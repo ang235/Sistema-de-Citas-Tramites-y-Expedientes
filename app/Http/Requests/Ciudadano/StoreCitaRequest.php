@@ -19,7 +19,7 @@ class StoreCitaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id_solicitud' => ['nullable', 'integer', 'exists:solicitudes,ID_Solicitud'],
+            'id_solicitud' => ['required', 'integer', 'exists:solicitudes,ID_Solicitud'],
             'fecha' => ['required', 'date', 'after_or_equal:today'],
             'hora' => ['required', 'date_format:H:i'],
         ];
@@ -31,6 +31,8 @@ class StoreCitaRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'id_solicitud.required' => 'Debe seleccionar un expediente con recaudos aprobados por el revisor técnico para agendar la cita.',
+            'id_solicitud.exists' => 'El expediente seleccionado no es válido.',
             'fecha.required' => 'La fecha de la cita es obligatoria.',
             'fecha.after_or_equal' => 'No se permiten citas en fechas anteriores a la actual.',
             'hora.required' => 'Debe seleccionar un horario disponible para su cita.',

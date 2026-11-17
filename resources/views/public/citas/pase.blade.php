@@ -14,21 +14,21 @@
 @section('content')
 <div class="max-w-3xl mx-auto px-6 lg:px-12 py-10 w-full space-y-8">
     {{-- Notificación de éxito --}}
-    <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm flex items-center justify-between gap-3">
+    <div class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 text-sm flex items-center justify-between gap-3 shadow-xs">
         <div class="flex items-center gap-2.5">
-            <span class="material-symbols-outlined text-emerald-600 text-xl">check_circle</span>
+            <span class="material-symbols-outlined text-emerald-600 dark:text-emerald-400 text-xl">check_circle</span>
             <span class="font-semibold">¡Cita confirmada exitosamente! Tu turno ha sido reservado.</span>
         </div>
-        <button onclick="window.print();" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold transition-colors flex items-center gap-1 shrink-0">
+        <button onclick="window.print();" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold transition-colors flex items-center gap-1 shrink-0 cursor-pointer">
             <span class="material-symbols-outlined text-sm">print</span>
             <span>Imprimir Pase</span>
         </button>
     </div>
 
     {{-- Ticket / Pase Digital --}}
-    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-md overflow-hidden relative" id="pase-imprimible">
+    <div class="bg-white dark:bg-[#111f33] rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-md overflow-hidden relative" id="pase-imprimible">
         {{-- Cabecera Institucional del Pase --}}
-        <div class="bg-[#001229] text-white p-6 sm:p-8 flex items-center justify-between gap-4">
+        <div class="bg-[#001229] dark:bg-[#070e17] text-white p-6 sm:p-8 flex items-center justify-between gap-4 border-b border-slate-800">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-[#0051d5] flex items-center justify-center text-white">
                     <span class="material-symbols-outlined text-2xl">account_balance</span>
@@ -49,63 +49,65 @@
 
         {{-- Cuerpo del Pase --}}
         <div class="p-8 space-y-8">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 items-center border-b border-slate-100 pb-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 items-center border-b border-slate-100 dark:border-slate-800 pb-8">
                 {{-- QR --}}
-                <div class="flex flex-col items-center justify-center p-6 bg-[#eff4ff]/60 border border-[#dce9ff] rounded-2xl text-center space-y-3">
-                    <div class="p-4 bg-white rounded-xl shadow-xs border border-slate-200 inline-block">
-                        <span class="material-symbols-outlined text-7xl text-[#001229]">qr_code_2</span>
+                <div class="flex flex-col items-center justify-center p-6 bg-[#eff4ff]/60 dark:bg-slate-800/60 border border-[#dce9ff] dark:border-slate-700 rounded-2xl text-center space-y-3">
+                    <div class="p-4 bg-white dark:bg-slate-900 rounded-xl shadow-xs border border-slate-200 dark:border-slate-700 inline-block">
+                        <span class="material-symbols-outlined text-7xl text-[#001229] dark:text-white">qr_code_2</span>
                     </div>
                     <div class="space-y-0.5">
                         <span class="text-[11px] text-slate-400 font-mono block">CÓDIGO DE VALIDACIÓN</span>
-                        <span class="text-base font-bold font-mono text-[#001229]">TURNO-{{ str_pad((string)$cita->ID_Citas, 5, '0', STR_PAD_LEFT) }}</span>
+                        <span class="text-base font-bold font-mono text-[#001229] dark:text-white">TURNO-{{ str_pad((string)$cita->ID_Citas, 5, '0', STR_PAD_LEFT) }}</span>
                     </div>
                 </div>
 
                 {{-- Datos Principales --}}
                 <div class="space-y-4 text-xs">
                     <div>
-                        <span class="text-slate-400 block text-[11px]">Ciudadano Solicitante</span>
-                        <span class="text-sm font-bold text-[#0b1c30]">{{ $cita->usuario?->Nombre ?? auth()->user()->Nombre }}</span>
-                        <span class="text-slate-500 block">{{ $cita->usuario?->Email ?? auth()->user()->Email }}</span>
+                        <span class="text-slate-400 dark:text-slate-500 block text-[11px]">Ciudadano Solicitante</span>
+                        <span class="text-sm font-bold text-[#0b1c30] dark:text-white">{{ $cita->usuario?->Nombre ?? auth()->user()->Nombre }}</span>
+                        <span class="text-slate-500 dark:text-slate-400 block">{{ $cita->usuario?->Email ?? auth()->user()->Email }}</span>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4 pt-2">
                         <div>
-                            <span class="text-slate-400 block text-[11px]">Fecha Programada</span>
-                            <span class="text-sm font-bold text-[#0051d5]">{{ $cita->Fecha ? $cita->Fecha->format('d/m/Y') : '' }}</span>
+                            <span class="text-slate-400 dark:text-slate-500 block text-[11px]">Fecha Programada (Español)</span>
+                            <span class="text-sm font-bold text-[#0051d5] dark:text-blue-400 capitalize">
+                                {{ $cita->Fecha ? \Carbon\Carbon::parse($cita->Fecha)->translatedFormat('l, d \d\e F \d\e Y') : '' }}
+                            </span>
                         </div>
                         <div>
-                            <span class="text-slate-400 block text-[11px]">Horario de Turno</span>
-                            <span class="text-sm font-bold text-[#001229]">{{ $cita->Hora }} hrs</span>
+                            <span class="text-slate-400 dark:text-slate-500 block text-[11px]">Horario de Turno</span>
+                            <span class="text-sm font-bold text-[#001229] dark:text-white">{{ substr((string)$cita->Hora, 0, 5) }} hrs</span>
                         </div>
                     </div>
 
                     @if ($cita->solicitud)
                         <div class="pt-2">
-                            <span class="text-slate-400 block text-[11px]">Expediente Vinculado</span>
-                            <span class="text-xs font-mono font-bold text-[#0051d5]">{{ $cita->solicitud->folio?->Codigo_Folio ?? '#' . $cita->solicitud->ID_Solicitud }}</span>
-                            <span class="text-[11px] text-slate-500 block">{{ $cita->solicitud->versionTramite?->tipoTramite?->Nombre }}</span>
+                            <span class="text-slate-400 dark:text-slate-500 block text-[11px]">Expediente Vinculado</span>
+                            <span class="text-xs font-mono font-bold text-[#0051d5] dark:text-blue-400">{{ $cita->solicitud->folio?->Codigo_Folio ?? '#' . $cita->solicitud->ID_Solicitud }}</span>
+                            <span class="text-[11px] text-slate-500 dark:text-slate-400 block">{{ $cita->solicitud->versionTramite?->tipoTramite?->Nombre }}</span>
                         </div>
                     @endif
 
                     <div class="pt-2">
-                        <span class="text-slate-400 block text-[11px]">Sede de Atención</span>
-                        <span class="text-xs font-semibold text-[#0b1c30]">Sede Central • Mesa de Control y Dictamen</span>
-                        <span class="text-[11px] text-slate-500 block">Ventanilla 08 • Atención Ciudadana</span>
+                        <span class="text-slate-400 dark:text-slate-500 block text-[11px]">Sede de Atención</span>
+                        <span class="text-xs font-semibold text-[#0b1c30] dark:text-white">Sede Central • Mesa de Control y Dictamen</span>
+                        <span class="text-[11px] text-slate-500 dark:text-slate-400 block">Ventanilla 08 • Atención Ciudadana</span>
                     </div>
                 </div>
             </div>
 
             {{-- Instrucciones --}}
-            <div class="space-y-2 text-xs text-[#44474d] bg-slate-50 p-4 rounded-xl border border-slate-200">
-                <span class="font-bold text-[#001229] block flex items-center gap-1.5">
-                    <span class="material-symbols-outlined text-base text-[#0051d5]">info</span>
+            <div class="space-y-2 text-xs text-[#44474d] dark:text-slate-300 bg-slate-50 dark:bg-slate-800/60 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                <span class="font-bold text-[#001229] dark:text-white block flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-base text-[#0051d5] dark:text-blue-400">info</span>
                     Recomendaciones para el día de tu turno
                 </span>
-                <ul class="list-disc list-inside space-y-1 text-slate-600 pl-1">
-                    <li>Presenta este código QR impreso o en la pantalla de tu teléfono 10 minutos antes de tu horario.</li>
+                <ul class="list-disc list-inside space-y-1 text-slate-600 dark:text-slate-300 pl-1">
+                    <li>Presenta este código QR impreso o en la pantalla de tu dispositivo móvil 10 minutos antes de tu horario.</li>
                     <li>Porta tu identificación oficial vigente con fotografía.</li>
-                    <li>Si tu cita es para revisión de expediente, asegúrate de haber cargado tus recaudos en el sistema.</li>
+                    <li>Tu expediente ya cuenta con recaudos aprobados previamente por el revisor técnico.</li>
                 </ul>
             </div>
         </div>
@@ -113,20 +115,19 @@
 
     {{-- Botones de Navegación --}}
     <div class="flex flex-wrap items-center justify-between gap-3">
-        <a href="{{ route('citas.index') }}" class="text-xs text-[#0051d5] font-semibold hover:underline flex items-center gap-1">
+        <a href="{{ route('citas.index') }}" class="text-xs text-[#0051d5] dark:text-blue-400 font-semibold hover:underline flex items-center gap-1">
             <span class="material-symbols-outlined text-sm">arrow_back</span>
             <span>Volver a mis citas</span>
         </a>
         <div class="flex items-center gap-3">
-            <a href="{{ route('profile.show') }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#eff4ff] hover:bg-[#dce9ff] text-[#0051d5] text-xs font-semibold transition-colors">
+            <a href="{{ route('profile.show') }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#eff4ff] dark:bg-blue-950/60 hover:bg-[#dce9ff] dark:hover:bg-blue-900/60 text-[#0051d5] dark:text-blue-300 text-xs font-semibold transition-colors">
                 <span class="material-symbols-outlined text-sm">person</span>
                 <span>Ver en Mi Perfil</span>
             </a>
-            <a href="{{ route('expedientes.index') }}" class="text-xs text-slate-600 hover:text-[#001229] font-medium">
+            <a href="{{ route('expedientes.index') }}" class="text-xs text-slate-600 dark:text-slate-400 hover:text-[#001229] dark:hover:text-white font-medium">
                 Ir a mis expedientes
             </a>
         </div>
     </div>
 </div>
 @endsection
-

@@ -39,46 +39,46 @@
     @endif
 
     {{-- ══ CABECERA DE PERFIL DEL USUARIO ══ --}}
-    <div class="bg-white rounded-2xl border border-slate-200/80 p-6 lg:p-8 shadow-xs relative overflow-hidden">
-        <div class="absolute -right-16 -top-16 w-80 h-80 rounded-full bg-[#eff4ff] blur-3xl pointer-events-none"></div>
+    <div class="bg-white dark:bg-[#111f33] rounded-2xl border border-slate-200/80 dark:border-slate-800 p-6 lg:p-8 shadow-xs relative overflow-hidden">
+        <div class="absolute -right-16 -top-16 w-80 h-80 rounded-full bg-[#eff4ff] dark:bg-blue-950/20 blur-3xl pointer-events-none"></div>
 
         <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div class="flex items-start md:items-center gap-5">
-                <div class="w-16 h-16 rounded-2xl bg-[#001229] text-white flex items-center justify-center font-bold text-2xl shrink-0 shadow-md">
+                <div class="w-16 h-16 rounded-2xl bg-[#001229] dark:bg-blue-600 text-white flex items-center justify-center font-bold text-2xl shrink-0 shadow-md">
                     {{ strtoupper(substr($usuario->Nombre ?? $usuario->name ?? 'C', 0, 1)) }}
                 </div>
                 <div class="space-y-1.5">
                     <div class="flex flex-wrap items-center gap-2">
-                        <span class="px-2.5 py-0.5 rounded-full bg-[#eff4ff] text-[#0051d5] text-xs font-semibold">
+                        <span class="px-2.5 py-0.5 rounded-full bg-[#eff4ff] dark:bg-blue-950/60 text-[#0051d5] dark:text-blue-300 text-xs font-semibold">
                             {{ $usuario->role_label ?? 'Solicitante / Ciudadano' }}
                         </span>
-                        <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold flex items-center gap-1">
+                        <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 text-xs font-semibold flex items-center gap-1">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                             Cuenta Activa
                         </span>
                     </div>
-                    <h1 class="text-2xl lg:text-3xl font-bold tracking-tight text-[#001229]" style="font-family: var(--font-display);">
+                    <h1 class="text-2xl lg:text-3xl font-bold tracking-tight text-[#001229] dark:text-white" style="font-family: var(--font-display);">
                         {{ $usuario->Nombre ?? $usuario->name }}
                     </h1>
-                    <div class="flex flex-wrap items-center gap-4 text-xs text-[#44474d]">
+                    <div class="flex flex-wrap items-center gap-4 text-xs text-[#44474d] dark:text-slate-400">
                         <span class="flex items-center gap-1">
                             <span class="material-symbols-outlined text-sm text-slate-400">mail</span>
                             {{ $usuario->Email ?? $usuario->email }}
                         </span>
                         <span class="flex items-center gap-1">
                             <span class="material-symbols-outlined text-sm text-slate-400">calendar_today</span>
-                            Miembro desde {{ $usuario->Fecha_Creacion ? \Carbon\Carbon::parse($usuario->Fecha_Creacion)->isoFormat('MMMM YYYY') : '2026' }}
+                            Miembro desde {{ $usuario->Fecha_Creacion ? \Carbon\Carbon::parse($usuario->Fecha_Creacion)->translatedFormat('F \d\e Y') : '2026' }}
                         </span>
                     </div>
                 </div>
             </div>
 
             <div class="flex items-center gap-3">
-                <a href="{{ route('citas.create') }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-[#001229] hover:bg-[#0f2744] text-white rounded-xl text-xs font-semibold transition-all shadow-sm">
+                <a href="{{ route('citas.create') }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-[#001229] hover:bg-[#0f2744] dark:bg-blue-600 dark:hover:bg-blue-700 text-white rounded-xl text-xs font-semibold transition-all shadow-sm">
                     <span class="material-symbols-outlined text-base">calendar_add_on</span>
                     <span>Agendar Nueva Cita</span>
                 </a>
-                <a href="{{ route('tramites.index') }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-[#eff4ff] hover:bg-[#dce9ff] text-[#0051d5] rounded-xl text-xs font-semibold transition-all">
+                <a href="{{ route('tramites.index') }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-[#eff4ff] hover:bg-[#dce9ff] dark:bg-slate-800 dark:hover:bg-slate-700 text-[#0051d5] dark:text-blue-300 rounded-xl text-xs font-semibold transition-all">
                     <span class="material-symbols-outlined text-base">add_circle</span>
                     <span>Nuevo Trámite</span>
                 </a>
@@ -86,22 +86,22 @@
         </div>
 
         {{-- Métricas Rápidas --}}
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8 pt-6 border-t border-slate-100">
-            <div class="p-3 bg-slate-50 rounded-xl">
-                <span class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Total Citas</span>
-                <span class="text-xl font-bold text-[#001229] mt-0.5 block">{{ $citas->count() }}</span>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8 pt-6 border-t border-slate-100 dark:border-slate-800">
+            <div class="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl">
+                <span class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Total Citas</span>
+                <span class="text-xl font-bold text-[#001229] dark:text-white mt-0.5 block">{{ $citas->count() }}</span>
             </div>
-            <div class="p-3 bg-blue-50/60 rounded-xl">
-                <span class="text-[11px] font-semibold text-[#0051d5] uppercase tracking-wider block">Programadas</span>
-                <span class="text-xl font-bold text-[#0051d5] mt-0.5 block">{{ $citas->where('Estado_Citas', 'Programada')->count() }}</span>
+            <div class="p-3 bg-blue-50/60 dark:bg-blue-950/40 rounded-xl">
+                <span class="text-[11px] font-semibold text-[#0051d5] dark:text-blue-300 uppercase tracking-wider block">Programadas</span>
+                <span class="text-xl font-bold text-[#0051d5] dark:text-blue-300 mt-0.5 block">{{ $citas->where('Estado_Citas', 'Programada')->count() }}</span>
             </div>
-            <div class="p-3 bg-emerald-50/60 rounded-xl">
-                <span class="text-[11px] font-semibold text-emerald-700 uppercase tracking-wider block">Atendidas</span>
-                <span class="text-xl font-bold text-emerald-700 mt-0.5 block">{{ $citas->where('Estado_Citas', 'Atendida')->count() }}</span>
+            <div class="p-3 bg-emerald-50/60 dark:bg-emerald-950/40 rounded-xl">
+                <span class="text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 uppercase tracking-wider block">Atendidas</span>
+                <span class="text-xl font-bold text-emerald-700 dark:text-emerald-300 mt-0.5 block">{{ $citas->where('Estado_Citas', 'Atendida')->count() }}</span>
             </div>
-            <div class="p-3 bg-slate-50 rounded-xl">
-                <span class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Expedientes</span>
-                <span class="text-xl font-bold text-[#001229] mt-0.5 block">{{ $solicitudes->count() }}</span>
+            <div class="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl">
+                <span class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Expedientes</span>
+                <span class="text-xl font-bold text-[#001229] dark:text-white mt-0.5 block">{{ $solicitudes->count() }}</span>
             </div>
         </div>
     </div>
@@ -303,84 +303,161 @@
         @endif
     </div>
 
-    {{-- ══ SECCIÓN 3: ACTUALIZAR DATOS PERSONALES & CONTRASEÑA ══ --}}
-    <div class="bg-white rounded-2xl border border-slate-200/80 p-6 lg:p-8 shadow-xs space-y-6">
-        <div class="border-b border-slate-100 pb-4">
-            <h2 class="text-xl font-bold text-[#001229] flex items-center gap-2" style="font-family: var(--font-display);">
-                <span class="material-symbols-outlined text-[#0051d5]">manage_accounts</span>
-                <span>Actualizar Datos de Cuenta y Contraseña</span>
-            </h2>
-            <p class="text-xs text-slate-500 mt-1">
-                Mantén tus datos de contacto al día para recibir notificaciones sobre tus citas y dictámenes oficiales.
-            </p>
+    {{-- ══ SECCIÓN 3: DATOS + CONTRASEÑA (TABS SEPARADOS) ══ --}}
+    <div x-data="{ tab: '{{ $errors->has('current_password') || $errors->has('password') ? 'password' : 'datos' }}' }"
+         class="bg-white dark:bg-[#111f33] rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs overflow-hidden">
+
+        {{-- Tab Header --}}
+        <div class="flex border-b border-slate-200 dark:border-slate-700">
+            <button type="button"
+                    @click="tab = 'datos'"
+                    :class="tab === 'datos'
+                        ? 'border-b-2 border-[#0051d5] text-[#0051d5] dark:text-blue-400 bg-white dark:bg-[#111f33]'
+                        : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 bg-slate-50/60 dark:bg-slate-800/40'"
+                    class="flex-1 sm:flex-none px-6 py-4 text-sm font-semibold flex items-center justify-center gap-2 transition-all -mb-px">
+                <span class="material-symbols-outlined text-base">person</span>
+                <span>Datos Personales</span>
+            </button>
+            <button type="button"
+                    @click="tab = 'password'"
+                    :class="tab === 'password'
+                        ? 'border-b-2 border-[#0051d5] text-[#0051d5] dark:text-blue-400 bg-white dark:bg-[#111f33]'
+                        : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 bg-slate-50/60 dark:bg-slate-800/40'"
+                    class="flex-1 sm:flex-none px-6 py-4 text-sm font-semibold flex items-center justify-center gap-2 transition-all -mb-px">
+                <span class="material-symbols-outlined text-base">lock</span>
+                <span>Cambiar Contraseña</span>
+            </button>
         </div>
 
-        <form action="{{ route('profile.update') }}" method="POST" class="space-y-6 max-w-2xl">
-            @csrf
-            @method('PUT')
+        {{-- Tab: Datos Personales --}}
+        <div x-show="tab === 'datos'"
+             x-transition:enter="transition ease-out duration-150"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             class="p-6 lg:p-8 space-y-5">
+            <div class="max-w-lg">
+                <h2 class="text-base font-bold text-[#001229] dark:text-white flex items-center gap-2 mb-1" style="font-family: var(--font-display);">
+                    <span class="material-symbols-outlined text-[#0051d5] dark:text-blue-400">manage_accounts</span>
+                    Actualizar Datos de Cuenta
+                </h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mb-5">
+                    Mantén tu nombre y correo al día para recibir notificaciones sobre tus citas y dictámenes.
+                </p>
 
-            <div class="space-y-4">
-                <div>
-                    <label for="nombre" class="block text-xs font-semibold text-[#0b1c30] mb-1">Nombre Completo</label>
-                    <input type="text"
-                           name="nombre"
-                           id="nombre"
-                           value="{{ old('nombre', $usuario->Nombre ?? $usuario->name) }}"
-                           required
-                           class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#0051d5]">
-                </div>
+                <form action="{{ route('profile.update') }}" method="POST" class="space-y-4">
+                    @csrf
+                    @method('PUT')
+                    {{-- Token vacío para contraseña — solo actualiza datos --}}
+                    <input type="hidden" name="solo_datos" value="1">
 
-                <div>
-                    <label for="email" class="block text-xs font-semibold text-[#0b1c30] mb-1">Correo Electrónico Oficial</label>
-                    <input type="email"
-                           name="email"
-                           id="email"
-                           value="{{ old('email', $usuario->Email ?? $usuario->email) }}"
-                           required
-                           class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#0051d5]">
-                </div>
-            </div>
-
-            <div class="pt-4 border-t border-slate-100 space-y-4">
-                <span class="block text-xs font-bold text-[#001229] uppercase tracking-wider">
-                    Cambio de Contraseña (Opcional)
-                </span>
-
-                <div>
-                    <label for="current_password" class="block text-xs font-semibold text-[#0b1c30] mb-1">Contraseña Actual</label>
-                    <input type="password"
-                           name="current_password"
-                           id="current_password"
-                           placeholder="Ingresa tu contraseña actual solo si deseas cambiarla"
-                           class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#0051d5]">
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label for="password" class="block text-xs font-semibold text-[#0b1c30] mb-1">Nueva Contraseña</label>
+                        <label for="nombre" class="block text-xs font-semibold text-[#0b1c30] dark:text-slate-200 mb-1">Nombre Completo</label>
+                        <input type="text"
+                               name="nombre"
+                               id="nombre"
+                               value="{{ old('nombre', $usuario->Nombre ?? $usuario->name) }}"
+                               required
+                               class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-[#0051d5]">
+                        @error('nombre') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div>
+                        <label for="email" class="block text-xs font-semibold text-[#0b1c30] dark:text-slate-200 mb-1">Correo Electrónico</label>
+                        <input type="email"
+                               name="email"
+                               id="email"
+                               value="{{ old('email', $usuario->Email ?? $usuario->email) }}"
+                               required
+                               class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-[#0051d5]">
+                        @error('email') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div class="pt-2">
+                        <button type="submit"
+                                class="inline-flex items-center gap-2 px-6 py-2.5 bg-[#001229] hover:bg-[#0f2744] dark:bg-blue-600 dark:hover:bg-blue-700 text-white text-xs font-semibold rounded-xl transition-all shadow-sm cursor-pointer">
+                            <span class="material-symbols-outlined text-sm">save</span>
+                            Guardar Datos
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {{-- Tab: Cambiar Contraseña --}}
+        <div x-show="tab === 'password'"
+             x-transition:enter="transition ease-out duration-150"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             class="p-6 lg:p-8 space-y-5">
+            <div class="max-w-lg">
+                <h2 class="text-base font-bold text-[#001229] dark:text-white flex items-center gap-2 mb-1" style="font-family: var(--font-display);">
+                    <span class="material-symbols-outlined text-[#0051d5] dark:text-blue-400">lock_reset</span>
+                    Cambiar Contraseña
+                </h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mb-5">
+                    Por seguridad, debes ingresar tu contraseña actual antes de definir una nueva.
+                </p>
+
+                <form action="{{ route('profile.update') }}" method="POST" class="space-y-4">
+                    @csrf
+                    @method('PUT')
+                    {{-- Envía nombre/email actuales para que el controller no los borre --}}
+                    <input type="hidden" name="nombre" value="{{ $usuario->Nombre ?? $usuario->name }}">
+                    <input type="hidden" name="email" value="{{ $usuario->Email ?? $usuario->email }}">
+
+                    <div>
+                        <label for="current_password" class="block text-xs font-semibold text-[#0b1c30] dark:text-slate-200 mb-1">
+                            Contraseña Actual <span class="text-rose-500">*</span>
+                        </label>
+                        <input type="password"
+                               name="current_password"
+                               id="current_password"
+                               required
+                               placeholder="Tu contraseña vigente"
+                               class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-[#0051d5] @error('current_password') border-rose-400 @enderror">
+                        @error('current_password') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div>
+                        <label for="password" class="block text-xs font-semibold text-[#0b1c30] dark:text-slate-200 mb-1">
+                            Nueva Contraseña <span class="text-rose-500">*</span>
+                        </label>
                         <input type="password"
                                name="password"
                                id="password"
+                               required
                                placeholder="Mínimo 8 caracteres"
-                               class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#0051d5]">
+                               class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-[#0051d5] @error('password') border-rose-400 @enderror">
+                        @error('password') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
                     </div>
+
                     <div>
-                        <label for="password_confirmation" class="block text-xs font-semibold text-[#0b1c30] mb-1">Confirmar Nueva Contraseña</label>
+                        <label for="password_confirmation" class="block text-xs font-semibold text-[#0b1c30] dark:text-slate-200 mb-1">
+                            Confirmar Nueva Contraseña <span class="text-rose-500">*</span>
+                        </label>
                         <input type="password"
                                name="password_confirmation"
                                id="password_confirmation"
+                               required
                                placeholder="Repite la nueva contraseña"
-                               class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#0051d5]">
+                               class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-[#0051d5]">
                     </div>
-                </div>
-            </div>
 
-            <div class="pt-4">
-                <button type="submit" class="px-6 py-2.5 bg-[#001229] hover:bg-[#0f2744] text-white text-xs font-semibold rounded-xl transition-all shadow-sm">
-                    Guardar Cambios
-                </button>
+                    <div class="p-3.5 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-xl text-xs text-amber-800 dark:text-amber-300 flex items-start gap-2">
+                        <span class="material-symbols-outlined text-sm mt-0.5">info</span>
+                        <span>Al cambiar tu contraseña se cerrará la sesión en todos los dispositivos activos.</span>
+                    </div>
+
+                    <div class="pt-2">
+                        <button type="submit"
+                                class="inline-flex items-center gap-2 px-6 py-2.5 bg-[#0051d5] hover:bg-[#003ea8] text-white text-xs font-semibold rounded-xl transition-all shadow-sm cursor-pointer">
+                            <span class="material-symbols-outlined text-sm">lock_reset</span>
+                            Actualizar Contraseña
+                        </button>
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
     </div>
 
 </div>

@@ -97,41 +97,41 @@
                         {{ $tramiteNombre }}
                     </h1>
                     <p class="text-sm text-[#44474d] mt-1.5">
-                        Titular: <span class="font-semibold text-[#0b1c30]">{{ $solicitud->solicitante?->Nombre ?? 'Ciudadano Registrado' }}</span>
+                        Titular: <span class="font-semibold text-[#0b1c30] dark:text-white">{{ $solicitud->solicitante?->Nombre ?? 'Ciudadano Registrado' }}</span>
                         <span class="text-xs text-slate-400">({{ $solicitud->solicitante?->Email }})</span>
                     </p>
                 </div>
 
                 {{-- Fichas informativas --}}
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                    <div class="flex items-start gap-3 p-3.5 rounded-xl bg-[#eff4ff]/60 border border-[#dce9ff]/60">
-                        <span class="material-symbols-outlined text-[#0051d5] text-xl mt-0.5">schedule</span>
+                    <div class="flex items-start gap-3 p-3.5 rounded-xl bg-[#eff4ff]/60 dark:bg-slate-800/60 border border-[#dce9ff]/60 dark:border-slate-700">
+                        <span class="material-symbols-outlined text-[#0051d5] dark:text-blue-400 text-xl mt-0.5">schedule</span>
                         <div>
-                            <span class="text-xs text-[#44474d] block">Fecha de Registro</span>
-                            <span class="text-sm text-[#0b1c30] font-semibold">
-                                {{ $solicitud->Fecha_Creacion_Solicitud ? $solicitud->Fecha_Creacion_Solicitud->format('d M Y, H:i') : now()->format('d M Y') }}
+                            <span class="text-xs text-[#44474d] dark:text-slate-400 block">Fecha de Registro</span>
+                            <span class="text-sm text-[#0b1c30] dark:text-white font-semibold capitalize">
+                                {{ $solicitud->Fecha_Creacion_Solicitud ? \Carbon\Carbon::parse($solicitud->Fecha_Creacion_Solicitud)->translatedFormat('d \d\e F \d\e Y, H:i') : now()->translatedFormat('d \d\e F \d\e Y') }}
                             </span>
-                            <span class="text-xs text-slate-500 block">SLA: 5 días hábiles</span>
+                            <span class="text-xs text-slate-500 dark:text-slate-400 block">SLA: 5 días hábiles</span>
                         </div>
                     </div>
-                    <div class="flex items-start gap-3 p-3.5 rounded-xl bg-[#eff4ff]/60 border border-[#dce9ff]/60">
-                        <span class="material-symbols-outlined text-[#0051d5] text-xl mt-0.5">badge</span>
+                    <div class="flex items-start gap-3 p-3.5 rounded-xl bg-[#eff4ff]/60 dark:bg-slate-800/60 border border-[#dce9ff]/60 dark:border-slate-700">
+                        <span class="material-symbols-outlined text-[#0051d5] dark:text-blue-400 text-xl mt-0.5">badge</span>
                         <div>
-                            <span class="text-xs text-[#44474d] block">Especialista Revisor</span>
-                            <span class="text-sm text-[#0b1c30] font-semibold">
+                            <span class="text-xs text-[#44474d] dark:text-slate-400 block">Especialista Revisor</span>
+                            <span class="text-sm text-[#0b1c30] dark:text-white font-semibold">
                                 {{ $revisor ? $revisor->Nombre : 'Mesa de Turno Automática' }}
                             </span>
-                            <span class="text-xs text-slate-500 block">Mesa de Dictamen SETC</span>
+                            <span class="text-xs text-slate-500 dark:text-slate-400 block">Mesa de Dictamen SETC</span>
                         </div>
                     </div>
                 </div>
             </div>
 
             {{-- Avance General Box --}}
-            <div class="lg:w-80 shrink-0 bg-[#eff4ff]/70 border border-[#dce9ff] p-6 rounded-2xl space-y-5">
+            <div class="lg:w-80 shrink-0 bg-[#eff4ff]/70 dark:bg-slate-800/60 border border-[#dce9ff] dark:border-slate-700 p-6 rounded-2xl space-y-5">
                 <div class="flex items-center justify-between">
-                    <span class="text-sm font-semibold text-[#001229]">Avance General</span>
-                    <span class="text-2xl font-bold text-[#0051d5]">{{ $porcentajeAvance }}%</span>
+                    <span class="text-sm font-semibold text-[#001229] dark:text-white">Avance General</span>
+                    <span class="text-2xl font-bold text-[#0051d5] dark:text-blue-400">{{ $porcentajeAvance }}%</span>
                 </div>
                 <div class="w-full bg-[#dce9ff] h-2.5 rounded-full overflow-hidden">
                     <div class="bg-[#0051d5] h-full rounded-full transition-all duration-700 ease-out" style="width: {{ $porcentajeAvance }}%;"></div>
@@ -204,29 +204,29 @@
                         <span class="material-symbols-outlined text-lg">check</span>
                     </div>
                     <div>
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-700 block">Fase 1</span>
-                        <h3 class="text-sm font-bold text-slate-900 mt-0.5">Radicación</h3>
-                        <p class="text-xs text-slate-500 mt-0.5">Expediente generado con folio oficial</p>
-                        <span class="text-[11px] text-slate-400 font-mono mt-1 block">
-                            {{ $solicitud->Fecha_Creacion_Solicitud ? $solicitud->Fecha_Creacion_Solicitud->format('d/m/Y H:i') : ($solicitud->created_at ? $solicitud->created_at->format('d/m/Y') : 'Completado') }}
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 block">Fase 1</span>
+                        <h3 class="text-sm font-bold text-slate-900 dark:text-white mt-0.5">Radicación</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Expediente generado con folio oficial</p>
+                        <span class="text-[11px] text-slate-400 dark:text-slate-500 font-mono mt-1 block capitalize">
+                            {{ $solicitud->Fecha_Creacion_Solicitud ? \Carbon\Carbon::parse($solicitud->Fecha_Creacion_Solicitud)->translatedFormat('d \d\e F, Y H:i') : ($solicitud->created_at ? \Carbon\Carbon::parse($solicitud->created_at)->translatedFormat('d \d\e F, Y') : 'Completado') }}
                         </span>
                     </div>
                 </div>
 
                 {{-- Hito 2: Asignación Técnica --}}
                 <div class="relative flex md:flex-col items-start gap-4 md:gap-3">
-                    <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 font-bold text-xs {{ $step2_done ? 'bg-emerald-500 text-white' : ($step2_active ? 'bg-[#0051d5] text-white ring-4 ring-blue-100' : 'bg-slate-200 text-slate-500') }} shadow-xs">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 font-bold text-xs {{ $step2_done ? 'bg-emerald-500 text-white' : ($step2_active ? 'bg-[#0051d5] text-white ring-4 ring-blue-100 dark:ring-blue-950' : 'bg-slate-200 dark:bg-slate-700 text-slate-500') }} shadow-xs">
                         <span class="material-symbols-outlined text-lg">{{ $step2_done ? 'check' : ($step2_active ? 'pending' : 'person_search') }}</span>
                     </div>
                     <div>
-                        <span class="text-[11px] font-bold uppercase tracking-wider {{ $step2_done ? 'text-emerald-700' : ($step2_active ? 'text-[#0051d5]' : 'text-slate-400') }} block">Fase 2</span>
-                        <h3 class="text-sm font-bold text-slate-900 mt-0.5">Asignación Técnica</h3>
-                        <p class="text-xs text-slate-500 mt-0.5">
+                        <span class="text-[11px] font-bold uppercase tracking-wider {{ $step2_done ? 'text-emerald-700 dark:text-emerald-400' : ($step2_active ? 'text-[#0051d5] dark:text-blue-400' : 'text-slate-400') }} block">Fase 2</span>
+                        <h3 class="text-sm font-bold text-slate-900 dark:text-white mt-0.5">Asignación Técnica</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                             {{ $revisor ? 'Asignado a: ' . $revisor->Nombre : 'Esperando asignación' }}
                         </p>
                         @if($step2_date)
-                            <span class="text-[11px] text-slate-400 font-mono mt-1 block">
-                                {{ \Carbon\Carbon::parse($step2_date)->format('d/m/Y H:i') }}
+                            <span class="text-[11px] text-slate-400 dark:text-slate-500 font-mono mt-1 block capitalize">
+                                {{ \Carbon\Carbon::parse($step2_date)->translatedFormat('d \d\e F, Y H:i') }}
                             </span>
                         @endif
                     </div>
@@ -234,17 +234,17 @@
 
                 {{-- Hito 3: Evaluación de Recaudos --}}
                 <div class="relative flex md:flex-col items-start gap-4 md:gap-3">
-                    <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 font-bold text-xs {{ $step3_done ? 'bg-emerald-500 text-white' : ($hayObs ? 'bg-amber-500 text-white ring-4 ring-amber-100 animate-pulse' : ($step3_active ? 'bg-[#0051d5] text-white ring-4 ring-blue-100' : 'bg-slate-200 text-slate-500')) }} shadow-xs">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 font-bold text-xs {{ $step3_done ? 'bg-emerald-500 text-white' : ($hayObs ? 'bg-amber-500 text-white ring-4 ring-amber-100 dark:ring-amber-950 animate-pulse' : ($step3_active ? 'bg-[#0051d5] text-white ring-4 ring-blue-100 dark:ring-blue-950' : 'bg-slate-200 dark:bg-slate-700 text-slate-500')) }} shadow-xs">
                         <span class="material-symbols-outlined text-lg">{{ $step3_done ? 'check' : ($hayObs ? 'warning' : ($step3_active ? 'hourglass_top' : 'folder')) }}</span>
                     </div>
                     <div>
-                        <span class="text-[11px] font-bold uppercase tracking-wider {{ $step3_done ? 'text-emerald-700' : ($hayObs ? 'text-amber-700' : ($step3_active ? 'text-[#0051d5]' : 'text-slate-400')) }} block">Fase 3</span>
-                        <h3 class="text-sm font-bold text-slate-900 mt-0.5">Evaluación de Recaudos</h3>
-                        <p class="text-xs text-slate-500 mt-0.5">
+                        <span class="text-[11px] font-bold uppercase tracking-wider {{ $step3_done ? 'text-emerald-700 dark:text-emerald-400' : ($hayObs ? 'text-amber-700 dark:text-amber-400' : ($step3_active ? 'text-[#0051d5] dark:text-blue-400' : 'text-slate-400')) }} block">Fase 3</span>
+                        <h3 class="text-sm font-bold text-slate-900 dark:text-white mt-0.5">Evaluación de Recaudos</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                             @if($hayObs)
-                                <span class="text-amber-800 font-medium">{{ $observacionesAbiertas->count() }} requerimiento(s) por solventar</span>
+                                <span class="text-amber-800 dark:text-amber-300 font-medium">{{ $observacionesAbiertas->count() }} requerimiento(s) por solventar</span>
                             @elseif($step3_done)
-                                Recaudos técnicos validados
+                                <span class="text-emerald-700 dark:text-emerald-400 font-medium">Recaudos técnicos validados</span>
                             @else
                                 Revisión de recaudos en curso
                             @endif
@@ -254,18 +254,18 @@
 
                 {{-- Hito 4: Dictamen Técnico --}}
                 <div class="relative flex md:flex-col items-start gap-4 md:gap-3">
-                    <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 font-bold text-xs {{ $step4_done ? 'bg-emerald-500 text-white' : ($step4_active ? 'bg-[#0051d5] text-white ring-4 ring-blue-100' : 'bg-slate-200 text-slate-500') }} shadow-xs">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 font-bold text-xs {{ $step4_done ? 'bg-emerald-500 text-white' : ($step4_active ? 'bg-[#0051d5] text-white ring-4 ring-blue-100 dark:ring-blue-950' : 'bg-slate-200 dark:bg-slate-700 text-slate-500') }} shadow-xs">
                         <span class="material-symbols-outlined text-lg">{{ $step4_done ? 'check' : ($step4_active ? 'gavel' : 'balance') }}</span>
                     </div>
                     <div>
-                        <span class="text-[11px] font-bold uppercase tracking-wider {{ $step4_done ? 'text-emerald-700' : ($step4_active ? 'text-[#0051d5]' : 'text-slate-400') }} block">Fase 4</span>
-                        <h3 class="text-sm font-bold text-slate-900 mt-0.5">Dictamen de Calificación</h3>
-                        <p class="text-xs text-slate-500 mt-0.5">
+                        <span class="text-[11px] font-bold uppercase tracking-wider {{ $step4_done ? 'text-emerald-700 dark:text-emerald-400' : ($step4_active ? 'text-[#0051d5] dark:text-blue-400' : 'text-slate-400') }} block">Fase 4</span>
+                        <h3 class="text-sm font-bold text-slate-900 dark:text-white mt-0.5">Dictamen de Calificación</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                             {{ $revision ? 'Calificación: ' . $revision->Resultado : 'Pendiente de emisión de dictamen' }}
                         </p>
                         @if($step4_date)
-                            <span class="text-[11px] text-slate-400 font-mono mt-1 block">
-                                {{ \Carbon\Carbon::parse($step4_date)->format('d/m/Y') }}
+                            <span class="text-[11px] text-slate-400 dark:text-slate-500 font-mono mt-1 block capitalize">
+                                {{ \Carbon\Carbon::parse($step4_date)->translatedFormat('d \d\e F, Y') }}
                             </span>
                         @endif
                     </div>
@@ -273,18 +273,18 @@
 
                 {{-- Hito 5: Resolución Final --}}
                 <div class="relative flex md:flex-col items-start gap-4 md:gap-3">
-                    <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 font-bold text-xs {{ $step5_done ? 'bg-emerald-500 text-white ring-4 ring-emerald-100' : ($step5_active ? 'bg-indigo-600 text-white ring-4 ring-indigo-100' : 'bg-slate-200 text-slate-500') }} shadow-xs">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 font-bold text-xs {{ $step5_done ? 'bg-emerald-500 text-white ring-4 ring-emerald-100 dark:ring-emerald-950' : ($step5_active ? 'bg-indigo-600 text-white ring-4 ring-indigo-100 dark:ring-indigo-950' : 'bg-slate-200 dark:bg-slate-700 text-slate-500') }} shadow-xs">
                         <span class="material-symbols-outlined text-lg">{{ $step5_done ? 'verified' : ($step5_active ? 'draw' : 'task_alt') }}</span>
                     </div>
                     <div>
-                        <span class="text-[11px] font-bold uppercase tracking-wider {{ $step5_done ? 'text-emerald-700' : ($step5_active ? 'text-indigo-700' : 'text-slate-400') }} block">Fase 5</span>
-                        <h3 class="text-sm font-bold text-slate-900 mt-0.5">Resolución Final</h3>
-                        <p class="text-xs text-slate-500 mt-0.5">
+                        <span class="text-[11px] font-bold uppercase tracking-wider {{ $step5_done ? 'text-emerald-700 dark:text-emerald-400' : ($step5_active ? 'text-indigo-700 dark:text-indigo-300' : 'text-slate-400') }} block">Fase 5</span>
+                        <h3 class="text-sm font-bold text-slate-900 dark:text-white mt-0.5">Resolución Final</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                             {{ $tieneResolucion ? 'Acto emitido: ' . $ultimaResolucion->Tipo_Resolucion : 'Pendiente de firma resolutiva' }}
                         </p>
                         @if($step5_date)
-                            <span class="text-[11px] text-emerald-600 font-semibold font-mono mt-1 block">
-                                {{ \Carbon\Carbon::parse($step5_date)->format('d/m/Y') }}
+                            <span class="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold font-mono mt-1 block capitalize">
+                                {{ \Carbon\Carbon::parse($step5_date)->translatedFormat('d \d\e F, Y') }}
                             </span>
                         @endif
                     </div>

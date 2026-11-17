@@ -113,4 +113,58 @@ class Solicitud extends Model
     {
         return $this->hasMany(Resolucion::class, 'ID_Solicitud', 'ID_Solicitud');
     }
+
+    /**
+     * Determina si el expediente cuenta con aprobación documental por parte del revisor técnico.
+     */
+    public function tieneDocumentosAprobados(): bool
+    {
+        // 1. Si todos los documentos subidos están aprobados (al menos 1 documento registrado)
+        $docs = $this->relationLoaded('documentos') ? $this->documentos : $this->documentos()->get();
+        if ($docs->isNotEmpty() && $docs->every(fn (Documento $d) => $d->Estado_Doc === 'Aprobado')) {
+            return true;
+        }
+
+        // 2. Si cuenta con un dictamen de revisión técnica Aprobado o Favorable
+        $asignaciones = $this->relationLoaded('asignaciones') ? $this->asignaciones : $this->asignaciones()->with('revisiones')->get();
+        foreach ($asignaciones as $asig) {
+            foreach ($asig->revisiones as $rev) {
+                if (in_array($rev->Resultado, ['Aprobado', 'Favorable'], true)) {
+                    return true;
+                }
+            }
+        }
+
+        // 3. Si la solicitud misma tiene estado resolutivo Aprobado
+        return in_array($this->Estado_Solicitud, ['Aprobado', 'Concluido'], true);
+    }
+
+    /**
+     * Obtiene la fecha en que se produjo la aprobación documental.
+     */
+    public function fechaAprobacionDocumentos(): ?Carbon
+    {
+        if (! $this->tieneDocumentosAprobados()) {
+            return null;
+        }
+
+        // 1. Fecha del dictamen técnico favorable
+        $asignaciones = $this->relationLoaded('asignaciones') ? $this->asignaciones : $this->asignaciones()->with('revisiones')->get();
+        foreach ($asignaciones as $asig) {
+            foreach ($asig->revisiones as $rev) {
+                if (in_array($rev->Resultado, ['Aprobado', 'Favorable'], true) && $rev->Fecha_Revision) {
+                    return Carbon::parse($rev->Fecha_Revision);
+                }
+            }
+        }
+
+        // 2. Fecha de última actualización de los documentos aprobados
+        $docs = $this->relationLoaded('documentos') ? $this->documentos : $this->documentos()->get();
+        $maxDocDate = $docs->max('updated_at');
+        if ($maxDocDate) {
+            return Carbon::parse($maxDocDate);
+        }
+
+        return $this->updated_at ? Carbon::parse($this->updated_at) : now();
+    }
 }

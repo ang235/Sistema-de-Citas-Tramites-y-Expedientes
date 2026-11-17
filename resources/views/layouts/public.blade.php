@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content="{{ csrf_token() }}" />
 
+    {{-- Dark mode script inicial para evitar parpadeo --}}
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+
     {{-- SEO --}}
     <title>@yield('title', 'Portal Ciudadano') — SETC</title>
     <meta name="description" content="@yield('meta_description', 'Sistema de Expedientes de Trámites y Citas (SETC). Realiza tus trámites de forma digital, rápida y segura.')">
@@ -116,22 +126,162 @@
         };
     </script>
 
+    <style>
+        /* ── Reglas Globales de Modo Oscuro para todo el Portal Público ── */
+        html.dark {
+            color-scheme: dark;
+        }
+        html.dark body {
+            background-color: #070e17 !important;
+            color: #f1f5f9 !important;
+        }
+        html.dark .bg-white {
+            background-color: #0e1c2e !important;
+            color: #f1f5f9;
+        }
+        html.dark .bg-slate-50,
+        html.dark .bg-gray-50 {
+            background-color: #0a1626 !important;
+        }
+        html.dark .bg-slate-100,
+        html.dark .bg-gray-100 {
+            background-color: #162740 !important;
+        }
+        html.dark .bg-slate-200,
+        html.dark .bg-gray-200 {
+            background-color: #1e3557 !important;
+        }
+        html.dark .bg-blue-50,
+        html.dark .bg-sky-50,
+        html.dark .bg-\[\#eff4ff\],
+        html.dark .bg-\[\#e5eeff\],
+        html.dark .bg-\[\#dce9ff\] {
+            background-color: rgba(0, 81, 213, 0.22) !important;
+        }
+        html.dark .bg-emerald-50,
+        html.dark .bg-green-50 {
+            background-color: rgba(5, 150, 105, 0.22) !important;
+        }
+        html.dark .bg-amber-50,
+        html.dark .bg-yellow-50 {
+            background-color: rgba(217, 119, 6, 0.22) !important;
+        }
+        html.dark .bg-rose-50,
+        html.dark .bg-red-50 {
+            background-color: rgba(225, 29, 72, 0.22) !important;
+        }
+        html.dark .bg-purple-50,
+        html.dark .bg-indigo-50 {
+            background-color: rgba(99, 102, 241, 0.22) !important;
+        }
+        html.dark .text-\[\#001229\],
+        html.dark .text-\[\#0b1c30\],
+        html.dark .text-\[\#0f2744\],
+        html.dark .text-slate-900,
+        html.dark .text-slate-800,
+        html.dark .text-gray-900,
+        html.dark .text-gray-800 {
+            color: #f8fafc !important;
+        }
+        html.dark .text-slate-700,
+        html.dark .text-slate-600,
+        html.dark .text-\[\#44474d\],
+        html.dark .text-gray-700,
+        html.dark .text-gray-600 {
+            color: #cbd5e1 !important;
+        }
+        html.dark .text-slate-500,
+        html.dark .text-gray-500 {
+            color: #94a3b8 !important;
+        }
+        html.dark .text-slate-400,
+        html.dark .text-gray-400 {
+            color: #64748b !important;
+        }
+        html.dark .text-\[\#0051d5\],
+        html.dark .text-blue-600,
+        html.dark .text-blue-700 {
+            color: #60a5fa !important;
+        }
+        html.dark .border-slate-100,
+        html.dark .border-slate-200,
+        html.dark .border-slate-200\/60,
+        html.dark .border-slate-200\/80,
+        html.dark .border-slate-200\/90,
+        html.dark .border-slate-300,
+        html.dark .border-gray-200,
+        html.dark .border-gray-300,
+        html.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]),
+        html.dark .divide-slate-200 > :not([hidden]) ~ :not([hidden]) {
+            border-color: rgba(51, 65, 85, 0.6) !important;
+        }
+        html.dark button.bg-\[\#001229\],
+        html.dark a.bg-\[\#001229\],
+        html.dark .bg-\[\#001229\]:not(header):not(aside) {
+            background-color: #1a365d !important;
+            color: #ffffff !important;
+            border: 1px solid rgba(96, 165, 250, 0.35) !important;
+        }
+        html.dark input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="submit"]):not([type="button"]):not([type="hidden"]),
+        html.dark select,
+        html.dark textarea {
+            background-color: #0b1624 !important;
+            color: #f8fafc !important;
+            border-color: #334155 !important;
+        }
+        html.dark input::placeholder,
+        html.dark textarea::placeholder {
+            color: #64748b !important;
+        }
+        html.dark select option {
+            background-color: #0e1c2e !important;
+            color: #f8fafc !important;
+        }
+        html.dark table thead,
+        html.dark table thead th {
+            background-color: #0a1626 !important;
+            color: #94a3b8 !important;
+            border-color: #1e293b !important;
+        }
+        html.dark table tbody tr {
+            border-color: #1e293b !important;
+            background-color: transparent !important;
+        }
+        html.dark table tbody tr:hover,
+        html.dark .hover\:bg-slate-50:hover,
+        html.dark .hover\:bg-slate-50\/70:hover {
+            background-color: rgba(30, 41, 59, 0.55) !important;
+        }
+        html.dark table tbody td {
+            color: #e2e8f0 !important;
+        }
+        html.dark .dropdown-menu,
+        html.dark [role="dialog"],
+        html.dark .modal,
+        html.dark .shadow-xl,
+        html.dark .shadow-2xl {
+            background-color: #0e1c2e;
+            border-color: #334155;
+            color: #f1f5f9;
+        }
+    </style>
+
     {{-- Slots de head adicionales --}}
     @stack('head')
 </head>
-<body class="min-h-screen flex flex-col" style="background-color: var(--color-background); color: var(--color-on-surface);">
+<body class="min-h-screen flex flex-col bg-slate-50 dark:bg-[#070e17] text-slate-900 dark:text-slate-100 transition-colors">
 
     {{-- ═══════════════════════════════════════════════════════ HEADER PÚBLICO ══ --}}
-    <header id="main-header" class="fixed top-0 left-0 right-0 z-50"
-            style="background-color: rgba(255,255,255,0.92); backdrop-filter: blur(16px); box-shadow: var(--shadow-header);">
+    <header id="main-header" class="fixed top-0 left-0 right-0 z-50 bg-white/92 dark:bg-[#0a1626]/92 border-b border-slate-200/80 dark:border-slate-800 transition-colors"
+            style="backdrop-filter: blur(16px); box-shadow: var(--shadow-header);">
         <div class="h-20 max-w-screen-xl mx-auto px-6 lg:px-12 flex items-center justify-between gap-4">
 
             {{-- Logo + Nombre --}}
             <a href="{{ route('home') }}" class="flex items-center gap-3 shrink-0" aria-label="Ir al inicio SETC">
                 <img src="{{ asset('images/logo.png') }}" alt="Logo SETC" class="h-11 w-auto object-contain">
                 <div class="flex flex-col leading-tight">
-                    <span class="text-headline-sm font-bold tracking-tight" style="color: var(--color-primary); font-family: var(--font-display);">SETC</span>
-                    <span class="text-[11px] font-medium" style="color: var(--color-on-surface-variant);">Sistema de Expedientes de Trámites y Citas</span>
+                    <span class="text-headline-sm font-bold tracking-tight text-[#001229] dark:text-white" style="font-family: var(--font-display);">SETC</span>
+                    <span class="text-[11px] font-medium text-slate-500 dark:text-slate-400">Sistema de Expedientes de Trámites y Citas</span>
                 </div>
             </a>
 
@@ -143,7 +293,7 @@
                     <input type="text"
                            name="buscar"
                            value="{{ request('buscar') }}"
-                           class="input pl-9 w-full"
+                           class="w-full h-10 pl-9 pr-3 rounded-xl bg-slate-100 dark:bg-[#0b1624] text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-xs focus:outline-none focus:ring-2 focus:ring-[#0051d5] transition-colors"
                            placeholder="Buscar trámites, requisitos o folios..."
                            aria-label="Buscador de trámites">
                 </div>
@@ -190,6 +340,16 @@
 
             {{-- Acciones de usuario --}}
             <div class="flex items-center gap-2 shrink-0">
+
+                {{-- Botón Modo Oscuro --}}
+                <button type="button"
+                        onclick="toggleDarkMode()"
+                        class="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                        title="Cambiar modo oscuro / claro"
+                        aria-label="Alternar tema de color">
+                    <span class="material-symbols-outlined block dark:hidden text-amber-500 text-xl">dark_mode</span>
+                    <span class="material-symbols-outlined hidden dark:block text-yellow-300 text-xl">light_mode</span>
+                </button>
 
                 {{-- Notificaciones — solo para ciudadanos; roles institucionales usan su panel --}}
                 @auth
@@ -374,7 +534,10 @@
                 <div class="relative">
                     <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-sm pointer-events-none"
                           style="color: var(--color-on-surface-variant);">search</span>
-                    <input type="text" class="input pl-9" placeholder="Buscar trámites..." aria-label="Buscador mobile">
+                    <input type="text"
+                           class="w-full h-10 pl-9 pr-3 rounded-xl bg-slate-100 dark:bg-[#0b1624] text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-xs focus:outline-none focus:ring-2 focus:ring-[#0051d5] transition-colors"
+                           placeholder="Buscar trámites..."
+                           aria-label="Buscador mobile">
                 </div>
             </div>
             <nav class="px-4 pb-4 flex flex-col gap-1" aria-label="Menú mobile">
@@ -521,6 +684,17 @@
 
     {{-- ═══════════════════════════════════════════════════════ SCRIPTS ═════════ --}}
     <script>
+        // ── Modo Oscuro Toggle ──────────────────────────────────────────
+        function toggleDarkMode() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
         // ── Toggle menú mobile ──────────────────────────────────────────
         const btnMenu   = document.getElementById('btn-mobile-menu');
         const mobileNav = document.getElementById('mobile-menu');

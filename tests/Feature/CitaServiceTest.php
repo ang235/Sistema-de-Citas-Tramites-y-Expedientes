@@ -90,33 +90,150 @@ test('HTTP endpoint citas.store rechaza citas en fechas anteriores y horarios du
         'Contrasena' => bcrypt('password123'),
     ]);
 
+    $otroCiudadano = Usuario::create([
+        'Nombre' => 'Segundo Ciudadano',
+        'Email' => 'segundo_cita@setc.gob',
+        'Contrasena' => bcrypt('password123'),
+    ]);
+
     // Asignar rol ciudadano
     $rolCiudadano = Rol::firstOrCreate(['Nombre' => 'Ciudadano']);
     $usuario->roles()->attach($rolCiudadano->ID_Rol);
+    $otroCiudadano->roles()->attach($rolCiudadano->ID_Rol);
+
+    $tipo = TipoTramite::create(['Nombre' => 'Licencia de Obra']);
+    $version = VersionTramite::create(['ID_Tipo_Tramite' => $tipo->ID_Tipo_Tramite, 'No_Version' => 'v1']);
+    $solicitud1 = Solicitud::create([
+        'ID_Solicitante' => $usuario->ID_Usuarios,
+        'ID_Version_Tramite' => $version->ID_Version_Tramite,
+        'Estado_Solicitud' => 'Aprobado',
+    ]);
+    $solicitud2 = Solicitud::create([
+        'ID_Solicitante' => $otroCiudadano->ID_Usuarios,
+        'ID_Version_Tramite' => $version->ID_Version_Tramite,
+        'Estado_Solicitud' => 'Aprobado',
+    ]);
 
     // 1. Intentar fecha pasada
     $fechaPasada = now()->subDay()->toDateString();
     $response = $this->actingAs($usuario)->post(route('citas.store'), [
+        'id_solicitud' => $solicitud1->ID_Solicitud,
         'fecha' => $fechaPasada,
         'hora' => '09:30',
     ]);
     $response->assertSessionHasErrors(['fecha']);
 
     // 2. Agendar cita válida
-    $fechaFutura = now()->addDays(14)->toDateString();
+    $fechaFutura = now()->addDays(10)->toDateString();
     $responseOk = $this->actingAs($usuario)->post(route('citas.store'), [
+        'id_solicitud' => $solicitud1->ID_Solicitud,
         'fecha' => $fechaFutura,
         'hora' => '10:00',
     ]);
     $responseOk->assertSessionHasNoErrors();
     expect(Cita::whereDate('Fecha', $fechaFutura)->where('Hora', '10:00')->exists())->toBeTrue();
 
-    // 3. Intentar agendar exactamente el mismo horario y fecha (duplicado)
-    $responseDup = $this->actingAs($usuario)->post(route('citas.store'), [
+    // 3. Intentar agendar exactamente el mismo horario y fecha por otro usuario (duplicado)
+    $responseDup = $this->actingAs($otroCiudadano)->post(route('citas.store'), [
+        'id_solicitud' => $solicitud2->ID_Solicitud,
         'fecha' => $fechaFutura,
         'hora' => '10:00',
     ]);
     $responseDup->assertSessionHasErrors(['hora']);
+});
+
+test('citas.store exige que los documentos esten aprobados por el revisor antes de agendar', function () {
+    $usuario = Usuario::create([
+        'Nombre' => 'Ciudadano Sin Aprobacion',
+        'Email' => 'sin_aprobacion@setc.gob',
+        'Contrasena' => bcrypt('password123'),
+    ]);
+    $rolCiudadano = Rol::firstOrCreate(['Nombre' => 'Ciudadano']);
+    $usuario->roles()->attach($rolCiudadano->ID_Rol);
+
+    $tipo = TipoTramite::create(['Nombre' => 'Constancia']);
+    $version = VersionTramite::create(['ID_Tipo_Tramite' => $tipo->ID_Tipo_Tramite, 'No_Version' => 'v1']);
+    $solicitudPendiente = Solicitud::create([
+        'ID_Solicitante' => $usuario->ID_Usuarios,
+        'ID_Version_Tramite' => $version->ID_Version_Tramite,
+        'Estado_Solicitud' => 'En Revisión',
+    ]);
+
+    $fechaFutura = now()->addDays(5)->toDateString();
+    $response = $this->actingAs($usuario)->post(route('citas.store'), [
+        'id_solicitud' => $solicitudPendiente->ID_Solicitud,
+        'fecha' => $fechaFutura,
+        'hora' => '10:00',
+    ]);
+
+    $response->assertSessionHasErrors(['id_solicitud']);
+    expect(Cita::where('ID_Solicitud', $solicitudPendiente->ID_Solicitud)->exists())->toBeFalse();
+});
+
+test('citas.store solo permite una cita activa a la vez para el mismo usuario', function () {
+    $usuario = Usuario::create([
+        'Nombre' => 'Ciudadano Una Cita',
+        'Email' => 'una_cita@setc.gob',
+        'Contrasena' => bcrypt('password123'),
+    ]);
+    $rolCiudadano = Rol::firstOrCreate(['Nombre' => 'Ciudadano']);
+    $usuario->roles()->attach($rolCiudadano->ID_Rol);
+
+    $tipo = TipoTramite::create(['Nombre' => 'Permiso Especial']);
+    $version = VersionTramite::create(['ID_Tipo_Tramite' => $tipo->ID_Tipo_Tramite, 'No_Version' => 'v1']);
+    $solicitudAprobada = Solicitud::create([
+        'ID_Solicitante' => $usuario->ID_Usuarios,
+        'ID_Version_Tramite' => $version->ID_Version_Tramite,
+        'Estado_Solicitud' => 'Aprobado',
+    ]);
+
+    // Crear primera cita activa programada
+    Cita::create([
+        'ID_Usuarios' => $usuario->ID_Usuarios,
+        'ID_Solicitud' => $solicitudAprobada->ID_Solicitud,
+        'Fecha' => now()->addDays(3)->toDateString(),
+        'Hora' => '09:00',
+        'Estado_Citas' => 'Programada',
+    ]);
+
+    // Intentar agendar una segunda cita simultánea
+    $response = $this->actingAs($usuario)->post(route('citas.store'), [
+        'id_solicitud' => $solicitudAprobada->ID_Solicitud,
+        'fecha' => now()->addDays(6)->toDateString(),
+        'hora' => '11:00',
+    ]);
+
+    $response->assertSessionHasErrors(['cita']);
+    expect(Cita::where('ID_Usuarios', $usuario->ID_Usuarios)->count())->toBe(1);
+});
+
+test('citas.store rechaza citas agendadas fuera del plazo de 15 dias posteriores a aprobacion', function () {
+    $usuario = Usuario::create([
+        'Nombre' => 'Ciudadano Plazo 15',
+        'Email' => 'plazo15@setc.gob',
+        'Contrasena' => bcrypt('password123'),
+    ]);
+    $rolCiudadano = Rol::firstOrCreate(['Nombre' => 'Ciudadano']);
+    $usuario->roles()->attach($rolCiudadano->ID_Rol);
+
+    $tipo = TipoTramite::create(['Nombre' => 'Permiso Obra']);
+    $version = VersionTramite::create(['ID_Tipo_Tramite' => $tipo->ID_Tipo_Tramite, 'No_Version' => 'v1']);
+    $solicitudAprobada = Solicitud::create([
+        'ID_Solicitante' => $usuario->ID_Usuarios,
+        'ID_Version_Tramite' => $version->ID_Version_Tramite,
+        'Estado_Solicitud' => 'Aprobado',
+    ]);
+
+    // Fecha más allá de los 15 días permitidos (día 16)
+    $fechaExcedida = now()->addDays(16)->toDateString();
+    $response = $this->actingAs($usuario)->post(route('citas.store'), [
+        'id_solicitud' => $solicitudAprobada->ID_Solicitud,
+        'fecha' => $fechaExcedida,
+        'hora' => '10:00',
+    ]);
+
+    $response->assertSessionHasErrors(['fecha']);
+    expect(Cita::where('ID_Solicitud', $solicitudAprobada->ID_Solicitud)->exists())->toBeFalse();
 });
 
 test('cancelarCitasVencidas cancela automaticamente citas cuya fecha u hora ha expirado', function () {

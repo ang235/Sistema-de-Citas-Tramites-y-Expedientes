@@ -48,6 +48,14 @@ services:
       QUEUE_CONNECTION: database
       LOG_CHANNEL: stderr
       LOG_LEVEL: "${LOG_LEVEL:-warning}"
+      MAIL_MAILER: "${MAIL_MAILER:-smtp}"
+      MAIL_HOST: "${MAIL_HOST:-mailpit}"
+      MAIL_PORT: "${MAIL_PORT:-1025}"
+      MAIL_USERNAME: "${MAIL_USERNAME:-}"
+      MAIL_PASSWORD: "${MAIL_PASSWORD:-}"
+      MAIL_ENCRYPTION: "${MAIL_ENCRYPTION:-}"
+      MAIL_FROM_ADDRESS: "${MAIL_FROM_ADDRESS:-noreply@setc.gob.mx}"
+      MAIL_FROM_NAME: "${MAIL_FROM_NAME:-SETC Portal}"
     env_file:
       - path: .env.docker
         required: false
@@ -57,6 +65,21 @@ services:
       timeout: 10s
       retries: 3
       start_period: 20s
+    networks:
+      - setc_net
+
+  # ----------------------------------------------------------
+  #  Mailpit — servidor de correo local para desarrollo
+  #  SMTP:  mailpit:1025  (interno, usado por Laravel)
+  #  UI:    http://localhost:8025  (bandeja de entrada web)
+  # ----------------------------------------------------------
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: setc_mailpit
+    restart: unless-stopped
+    ports:
+      - "8025:8025"   # Web UI
+      - "1025:1025"   # SMTP
     networks:
       - setc_net
 

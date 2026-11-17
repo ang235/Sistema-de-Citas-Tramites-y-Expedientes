@@ -193,23 +193,16 @@
                         Correo: {{ $solicitudSeleccionada->solicitante?->Email ?? 'N/A' }} • Fecha de ingreso: {{ $solicitudSeleccionada->Fecha_Creacion_Solicitud ? $solicitudSeleccionada->Fecha_Creacion_Solicitud->format('d/m/Y H:i') : ($solicitudSeleccionada->created_at ? $solicitudSeleccionada->created_at->format('d/m/Y H:i') : '--') }}
                     </p>
                 </div>
-                <div class="flex items-center gap-2 shrink-0">
-                    <a href="{{ route('portal.expedientes.evaluar', $solicitudSeleccionada->ID_Solicitud) }}"
-                       class="px-3.5 py-2 rounded-lg bg-[#001229] hover:bg-[#0f2744] text-white text-xs font-semibold shadow-xs flex items-center gap-1.5 transition-all">
-                        <span class="material-symbols-outlined text-sm">open_in_full</span>
-                        <span>Mesa Completa</span>
-                    </a>
-                </div>
             </div>
 
-            {{-- RECAUDOS Y DOCUMENTOS DEL EXPEDIENTE --}}
+            {{-- RECAUDOS Y DOCUMENTOS DEL EXPEDIENTE CON VISOR INTEGRADO --}}
             <div class="p-5 bg-white dark:bg-[#111f33] rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col gap-4" x-data="{ activeDocIndex: 0 }">
                 <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
                     <div class="flex items-center gap-2">
                         <span class="material-symbols-outlined text-blue-600 text-lg">attachment</span>
                         <h3 class="text-sm font-bold text-[#001229] dark:text-white">Recaudos Presentados ({{ $solicitudSeleccionada->documentos->count() }})</h3>
                     </div>
-                    <span class="text-xs text-slate-400">Haga clic para calificar el recaudo</span>
+                    <span class="text-xs text-slate-400">Haga clic en un recaudo para visualizarlo y calificarlo</span>
                 </div>
 
                 @if($solicitudSeleccionada->documentos->isNotEmpty())
@@ -219,48 +212,105 @@
                             <button type="button"
                                     @click="activeDocIndex = {{ $idx }}"
                                     :class="activeDocIndex === {{ $idx }} ? 'bg-[#001229] text-white border-transparent' : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100'"
-                                    class="px-3 py-2 rounded-lg text-xs font-semibold border flex items-center gap-2 shrink-0 transition-colors">
-                                <span class="material-symbols-outlined text-sm">description</span>
+                                    class="px-3 py-2 rounded-lg text-xs font-semibold border flex items-center gap-2 shrink-0 transition-colors cursor-pointer">
+                                <span class="material-symbols-outlined text-sm">picture_as_pdf</span>
                                 <span>{{ Str::limit($doc->requisito?->Nombre ?? 'Documento #' . ($idx + 1), 22) }}</span>
-                                <span class="w-2 h-2 rounded-full {{ $doc->Estado_Doc === 'Aprobado' ? 'bg-emerald-400' : ($doc->Estado_Doc === 'Observado' ? 'bg-amber-400' : 'bg-slate-300') }}"></span>
+                                <span class="w-2 h-2 rounded-full {{ $doc->Estado_Doc === 'Aprobado' ? 'bg-emerald-400' : ($doc->Estado_Doc === 'Observado' ? 'bg-amber-400' : ($doc->Estado_Doc === 'Rechazado' ? 'bg-rose-400' : 'bg-slate-300')) }}"></span>
                             </button>
                         @endforeach
                     </div>
 
-                    {{-- Detalle del Documento Activo --}}
+                    {{-- Detalle y Visor del Documento Activo --}}
                     @foreach($solicitudSeleccionada->documentos as $idx => $doc)
-                        <div x-show="activeDocIndex === {{ $idx }}" class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 space-y-3">
+                        @php
+                            $v = $doc->versionesDoc->last();
+                            $tieneArchivo = (bool) ($v && $v->Ruta_Archivo && \Illuminate\Support\Facades\Storage::disk('local')->exists($v->Ruta_Archivo));
+                            if (!$tieneArchivo) {
+                                $archivosDir = \Illuminate\Support\Facades\Storage::disk('local')->files("expedientes/{$doc->ID_Solicitud}");
+                                $tieneArchivo = !empty($archivosDir);
+                            }
+                            $archivoUrl = route('portal.documentos.archivo', $doc->ID_Documento);
+                        @endphp
+                        <div x-show="activeDocIndex === {{ $idx }}" class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 space-y-4">
                             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-700">
-                                <div>
-                                    <h4 class="text-xs font-bold text-slate-900 dark:text-white">
-                                        {{ $doc->requisito?->Nombre ?? 'Requisito Reglamentario' }}
-                                    </h4>
-                                    <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                                        Formato exigido: {{ $doc->requisito?->Formato ?? 'PDF' }} • Estado actual:
-                                        <span class="font-bold {{ $doc->Estado_Doc === 'Aprobado' ? 'text-emerald-600' : ($doc->Estado_Doc === 'Observado' ? 'text-amber-600' : 'text-slate-600') }}">
+                                <div class="min-w-0">
+                                    <div class="flex items-center gap-2">
+                                        <h4 class="text-xs font-bold text-slate-900 dark:text-white truncate">
+                                            {{ $doc->requisito?->Nombre ?? 'Requisito Reglamentario' }}
+                                        </h4>
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-600">
+                                            {{ $doc->requisito?->Formato ?? 'PDF' }}
+                                        </span>
+                                    </div>
+                                    <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                                        Estado:
+                                        <span class="font-bold {{ $doc->Estado_Doc === 'Aprobado' ? 'text-emerald-600' : ($doc->Estado_Doc === 'Observado' ? 'text-amber-600' : ($doc->Estado_Doc === 'Rechazado' ? 'text-rose-600' : 'text-slate-600')) }}">
                                             {{ $doc->Estado_Doc }}
                                         </span>
+                                        @if($v?->Fecha_Carga)
+                                            • Subido: {{ $v->Fecha_Carga->format('d/m/Y H:i') }}
+                                        @endif
                                     </p>
                                 </div>
-                                {{-- Calificar Recaudo Rápido --}}
-                                <form action="{{ route('portal.documentos.evaluar', $doc->ID_Documento) }}" method="POST" class="flex items-center gap-1.5 shrink-0">
-                                    @csrf
-                                    <button type="submit" name="estado_doc" value="Aprobado" title="Aprobar documento" class="px-2.5 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-semibold flex items-center gap-1">
-                                        <span class="material-symbols-outlined text-sm">check</span> Aprobar
-                                    </button>
-                                    <button type="submit" name="estado_doc" value="Observado" title="Observar documento" class="px-2.5 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-semibold flex items-center gap-1">
-                                        <span class="material-symbols-outlined text-sm">warning</span> Observar
-                                    </button>
-                                    <button type="submit" name="estado_doc" value="Rechazado" title="Rechazar documento" class="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-800 text-xs font-semibold flex items-center gap-1">
-                                        <span class="material-symbols-outlined text-sm">close</span> Rechazar
-                                    </button>
-                                </form>
+
+                                <div class="flex items-center gap-2 flex-wrap shrink-0">
+                                    @if($tieneArchivo)
+                                        <a href="{{ $archivoUrl }}"
+                                           target="_blank"
+                                           class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 text-[#0051d5] dark:text-blue-300 text-xs font-semibold transition-colors"
+                                           title="Abrir en pestaña nueva a pantalla completa">
+                                            <span class="material-symbols-outlined text-sm">open_in_new</span>
+                                            <span>Pantalla Completa</span>
+                                        </a>
+                                        <a href="{{ $archivoUrl }}?descargar=1"
+                                           class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-700 hover:bg-slate-100 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 text-xs font-semibold transition-colors"
+                                           title="Descargar documento">
+                                            <span class="material-symbols-outlined text-sm">download</span>
+                                            <span>Descargar</span>
+                                        </a>
+                                    @endif
+
+                                    {{-- Calificar Recaudo Rápido --}}
+                                    <form action="{{ route('portal.documentos.evaluar', $doc->ID_Documento) }}" method="POST" class="flex items-center gap-1.5 shrink-0">
+                                        @csrf
+                                        <button type="submit" name="estado_doc" value="Aprobado" title="Aprobar documento" class="px-2.5 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-semibold flex items-center gap-1">
+                                            <span class="material-symbols-outlined text-sm">check</span> Aprobar
+                                        </button>
+                                        <button type="submit" name="estado_doc" value="Observado" title="Observar documento" class="px-2.5 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-semibold flex items-center gap-1">
+                                            <span class="material-symbols-outlined text-sm">warning</span> Observar
+                                        </button>
+                                        <button type="submit" name="estado_doc" value="Rechazado" title="Rechazar documento" class="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-800 text-xs font-semibold flex items-center gap-1">
+                                            <span class="material-symbols-outlined text-sm">close</span> Rechazar
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+
+                            {{-- Visor integrado del archivo PDF --}}
+                            <div class="relative w-full rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-inner">
+                                @if($tieneArchivo)
+                                    <div class="w-full h-[520px]">
+                                        <iframe src="{{ $archivoUrl }}"
+                                                class="w-full h-full border-0 bg-white"
+                                                title="Visualizador de {{ $doc->requisito?->Nombre ?? 'Documento' }}"></iframe>
+                                    </div>
+                                @else
+                                    <div class="w-full h-[260px] flex flex-col items-center justify-center p-8 text-center space-y-3 bg-slate-50/70 dark:bg-slate-800/40">
+                                        <div class="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 flex items-center justify-center shadow-xs">
+                                            <span class="material-symbols-outlined text-2xl">file_present</span>
+                                        </div>
+                                        <div class="space-y-1 max-w-sm">
+                                            <h4 class="text-xs font-bold text-slate-800 dark:text-slate-200">Requisito sin archivo adjunto</h4>
+                                            <p class="text-[11px] text-slate-500">El administrado no adjuntó un archivo digital para este requisito al registrar su solicitud.</p>
+                                        </div>
+                                    </div>
+                                @endif
                             </div>
 
                             <div class="flex items-center justify-between text-xs text-slate-500 pt-1">
-                                <span class="flex items-center gap-1.5">
+                                <span class="flex items-center gap-1.5 text-[11px]">
                                     <span class="material-symbols-outlined text-sm text-emerald-600">verified</span>
-                                    Recaudo digital registrado en base normativa
+                                    <span>Archivo: {{ $v?->Nombre_Original ?? (($doc->requisito?->Nombre ?? 'Documento') . '.pdf') }}</span>
                                 </span>
                                 <span class="font-mono text-[11px] text-slate-400">DOC-ID: #{{ $doc->ID_Documento }}</span>
                             </div>
@@ -395,7 +445,7 @@
                     </form>
                 @else
                     <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-400">
-                        Visualización en modo consulta o auditoría. El expediente puede abrirse en la mesa completa para asignación o dictamen pericial.
+                        Visualización en modo consulta o auditoría institucional de dictamen pericial.
                     </div>
                 @endif
             </div>

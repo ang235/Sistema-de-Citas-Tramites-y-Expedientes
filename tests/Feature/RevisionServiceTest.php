@@ -15,6 +15,7 @@ use App\Models\VersionDoc;
 use App\Models\VersionTramite;
 use App\Services\RevisionService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 
 uses(RefreshDatabase::class);
 
@@ -124,4 +125,59 @@ test('HTTP endpoint revisiones.store permite dictaminar Aprobado sin observacion
     $responseAprobado->assertSessionHasNoErrors();
     $responseAprobado->assertRedirect(route('portal.mesa-dictamen'));
     expect(Revision::where('ID_Asignacion', $asignacion->ID_Asignacion)->where('Resultado', 'Aprobado')->exists())->toBeTrue();
+});
+
+test('mesa de dictamen integra visor de recaudos directamente y no incluye boton Mesa Completa', function () {
+    $revisor = Usuario::create([
+        'Nombre' => 'Revisor Mesa',
+        'Email' => 'revisor_mesa@setc.gob',
+        'Contrasena' => bcrypt('password123'),
+    ]);
+    $rolRevisor = Rol::firstOrCreate(['Nombre' => 'Revisor']);
+    $revisor->roles()->attach($rolRevisor->ID_Rol);
+
+    $tipo = TipoTramite::create(['Nombre' => 'Tramite Prueba']);
+    $version = VersionTramite::create(['ID_Tipo_Tramite' => $tipo->ID_Tipo_Tramite, 'No_Version' => 'v1.0']);
+    $req = Requisito::create([
+        'ID_Version_Tramite' => $version->ID_Version_Tramite,
+        'Nombre' => 'Copia de DNI / Identificación',
+        'Prioridad' => 'Obligatorio',
+    ]);
+
+    $solicitud = Solicitud::create([
+        'ID_Solicitante' => $revisor->ID_Usuarios,
+        'ID_Version_Tramite' => $version->ID_Version_Tramite,
+    ]);
+
+    $doc = Documento::create([
+        'ID_Solicitud' => $solicitud->ID_Solicitud,
+        'ID_Requisitos' => $req->ID_Requisitos,
+        'Estado_Doc' => 'Pendiente',
+    ]);
+
+    Storage::fake('local');
+    $ruta = 'expedientes/'.$solicitud->ID_Solicitud.'/test.pdf';
+    Storage::disk('local')->put($ruta, '%PDF-1.4 test');
+
+    VersionDoc::create([
+        'ID_Documento' => $doc->ID_Documento,
+        'Ruta_Archivo' => $ruta,
+        'Nombre_Original' => 'dni.pdf',
+        'Fecha_Carga' => now(),
+    ]);
+
+    AsignacionRevisor::create([
+        'ID_Solicitud' => $solicitud->ID_Solicitud,
+        'ID_Revisor' => $revisor->ID_Usuarios,
+        'ID_Asignador' => $revisor->ID_Usuarios,
+        'Estado_Asignacion' => 'Activo',
+        'Fecha_Asignacion' => now(),
+    ]);
+
+    $response = $this->actingAs($revisor)->get(route('portal.mesa-dictamen', ['expediente' => $solicitud->ID_Solicitud]));
+    $response->assertOk();
+    $response->assertSee('Recaudos Presentados');
+    $response->assertSee('Copia de DNI / Identificación');
+    $response->assertSee(route('portal.documentos.archivo', $doc->ID_Documento));
+    $response->assertDontSee('Mesa Completa');
 });

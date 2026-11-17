@@ -12,24 +12,24 @@
 @section('content')
 <div class="min-h-[calc(100vh-14rem)] flex items-center justify-center py-12 px-6 lg:px-12">
     <div class="w-full max-w-md space-y-8">
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-8 sm:p-10 relative overflow-hidden">
+        <div class="bg-white dark:bg-[#0e1c2e] rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-800 p-8 sm:p-10 relative overflow-hidden">
             <div class="absolute top-0 left-0 right-0 h-1.5 bg-[#0051d5]"></div>
 
             <div class="space-y-3 text-center mb-8">
-                <div class="inline-flex w-12 h-12 rounded-xl bg-[#eff4ff] items-center justify-center text-[#0051d5] mb-1 shadow-sm">
+                <div class="inline-flex w-12 h-12 rounded-xl bg-[#eff4ff] dark:bg-blue-950/60 items-center justify-center text-[#0051d5] dark:text-blue-300 mb-1 shadow-sm">
                     <span class="material-symbols-outlined text-2xl">key</span>
                 </div>
-                <h1 class="text-2xl font-bold tracking-tight text-[#001229]" style="font-family: var(--font-display);">
+                <h1 class="text-2xl font-bold tracking-tight text-[#001229] dark:text-white" style="font-family: var(--font-display);">
                     Recuperar Contraseña
                 </h1>
-                <p class="text-sm text-[#44474d]">
+                <p class="text-sm text-[#44474d] dark:text-slate-400">
                     Ingresa el correo electrónico asociado a tu cuenta y te enviaremos las instrucciones de restablecimiento.
                 </p>
             </div>
 
             @if (session('status'))
-                <div class="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm flex items-start gap-3">
-                    <span class="material-symbols-outlined text-emerald-600 text-lg shrink-0 mt-0.5">check_circle</span>
+                <div class="mb-6 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 text-sm flex items-start gap-3">
+                    <span class="material-symbols-outlined text-emerald-600 dark:text-emerald-400 text-lg shrink-0 mt-0.5">check_circle</span>
                     <span>{{ session('status') }}</span>
                 </div>
             @endif
@@ -38,11 +38,11 @@
                 @csrf
 
                 <div class="space-y-1.5">
-                    <label for="email" class="block text-sm font-semibold text-[#0b1c30]">
+                    <label for="email" class="block text-sm font-semibold text-[#0b1c30] dark:text-slate-200">
                         Correo Electrónico
                     </label>
                     <div class="relative">
-                        <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-lg pointer-events-none">mail</span>
+                        <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 text-lg pointer-events-none">mail</span>
                         <input type="email"
                                id="email"
                                name="email"
@@ -50,22 +50,22 @@
                                required
                                autofocus
                                placeholder="tu.correo@dominio.com"
-                               class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder:text-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-[#0051d5] focus:border-transparent transition-all @error('email') border-rose-400 ring-1 ring-rose-400 @enderror">
+                               class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#0b1624] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-[#0051d5] focus:border-transparent transition-all @error('email') border-rose-400 ring-1 ring-rose-400 @enderror">
                     </div>
                     @error('email')
-                        <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
+                        <p class="text-xs text-rose-600 dark:text-rose-400 mt-1">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <button type="submit"
-                        class="w-full h-11 bg-[#001229] hover:bg-[#0f2744] text-white rounded-lg font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-sm hover:shadow active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-[#0051d5] focus:ring-offset-2">
+                        class="w-full h-11 bg-[#001229] dark:bg-blue-600 hover:bg-[#0f2744] dark:hover:bg-blue-700 text-white rounded-lg font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-sm hover:shadow active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-[#0051d5] focus:ring-offset-2 cursor-pointer">
                     <span class="material-symbols-outlined text-lg">send</span>
                     <span>Enviar Enlace de Recuperación</span>
                 </button>
             </form>
 
-            <div class="mt-8 pt-6 border-t border-slate-100 text-center">
-                <a href="{{ route('login') }}" class="inline-flex items-center gap-1.5 text-sm text-[#0051d5] font-semibold hover:underline">
+            <div class="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 text-center">
+                <a href="{{ route('login') }}" class="inline-flex items-center gap-1.5 text-sm text-[#0051d5] dark:text-blue-400 font-semibold hover:underline">
                     <span class="material-symbols-outlined text-base">arrow_back</span>
                     <span>Regresar al inicio de sesión</span>
                 </a>
@@ -74,4 +74,3 @@
     </div>
 </div>
 @endsection
-

@@ -37,10 +37,45 @@ class CitaCiudadanoController extends Controller
 
     public function create(Request $request): View
     {
-        $idSolicitud = $request->query('id_solicitud');
-        $solicitudes = Solicitud::where('ID_Solicitante', Auth::id())
-            ->with(['folio', 'versionTramite.tipoTramite'])
-            ->get();
+        $idUsuario = (int) Auth::id();
+
+        // 1. Verificar si el usuario ya tiene una cita activa programada (Solo una a la vez)
+        $citaActiva = Cita::where('ID_Usuarios', $idUsuario)
+            ->whereIn('Estado_Citas', ['Programada', 'Confirmada'])
+            ->whereDate('Fecha', '>=', today())
+            ->with(['solicitud.folio', 'solicitud.versionTramite.tipoTramite'])
+            ->first();
+
+        // 2. Filtrar expedientes del usuario: solo aquellos con recaudos aprobados por el revisor
+        $idSolicitud = $request->query('id_solicitud') ? (int) $request->query('id_solicitud') : null;
+        $solicitudes = Solicitud::where('ID_Solicitante', $idUsuario)
+            ->with(['folio', 'versionTramite.tipoTramite', 'documentos', 'asignaciones.revisiones'])
+            ->get()
+            ->filter(fn (Solicitud $sol) => $sol->tieneDocumentosAprobados())
+            ->values();
+
+        // Determinar solicitud seleccionada
+        $solicitudSeleccionada = null;
+        if ($idSolicitud) {
+            $solicitudSeleccionada = $solicitudes->firstWhere('ID_Solicitud', $idSolicitud);
+        }
+        if (! $solicitudSeleccionada && $solicitudes->isNotEmpty()) {
+            $solicitudSeleccionada = $solicitudes->first();
+            $idSolicitud = $solicitudSeleccionada->ID_Solicitud;
+        }
+
+        // Calcular ventana de 15 días posteriores a la aprobación documental
+        $minFecha = today()->format('Y-m-d');
+        $maxFecha = today()->addDays(15)->format('Y-m-d');
+
+        if ($solicitudSeleccionada) {
+            $fechaAprobacion = $solicitudSeleccionada->fechaAprobacionDocumentos();
+            if ($fechaAprobacion) {
+                $limiteAprobacion = $fechaAprobacion->copy()->addDays(15);
+                // Si la aprobación es anterior, la fecha máxima no puede superar los 15 días tras dicha aprobación
+                $maxFecha = $limiteAprobacion->format('Y-m-d');
+            }
+        }
 
         // Mapear horarios ocupados por fecha para deshabilitar en el selector visual
         $citasOcupadas = Cita::where('Estado_Citas', '!=', 'Cancelada')
@@ -54,8 +89,12 @@ class CitaCiudadanoController extends Controller
             });
 
         return view('public.citas.create', [
+            'citaActiva' => $citaActiva,
             'idSolicitudSeleccionada' => $idSolicitud,
+            'solicitudSeleccionada' => $solicitudSeleccionada,
             'solicitudes' => $solicitudes,
+            'minFecha' => $minFecha,
+            'maxFecha' => $maxFecha,
             'citasOcupadas' => $citasOcupadas,
         ]);
     }
@@ -63,16 +102,54 @@ class CitaCiudadanoController extends Controller
     public function store(StoreCitaRequest $request): RedirectResponse
     {
         $idUsuario = (int) Auth::id();
+        $idSolicitud = (int) $request->validated('id_solicitud');
         $fechaInput = $request->validated('fecha');
         $horaInput = substr((string) $request->validated('hora'), 0, 5);
 
-        // 1. Prohibir estrictamente citas en fechas anteriores
+        // 1. Regla: Solo una cita activa a la vez
+        $citaActiva = Cita::where('ID_Usuarios', $idUsuario)
+            ->whereIn('Estado_Citas', ['Programada', 'Confirmada'])
+            ->whereDate('Fecha', '>=', today())
+            ->first();
+
+        if ($citaActiva) {
+            $fechaCita = Carbon::parse($citaActiva->Fecha)->translatedFormat('l, d \d\e F \d\e Y');
+
+            return back()->withErrors([
+                'cita' => "Actualmente ya cuentas con una cita programada para el {$fechaCita} a las {$citaActiva->Hora} hrs. Solo se permite tener una cita activa a la vez.",
+            ])->withInput();
+        }
+
+        // 2. Regla: La cita solo se puede agendar para un expediente con documentos aprobados por el revisor
+        /** @var Solicitud $solicitud */
+        $solicitud = Solicitud::where('ID_Solicitante', $idUsuario)
+            ->with(['folio', 'documentos', 'asignaciones.revisiones'])
+            ->findOrFail($idSolicitud);
+
+        if (! $solicitud->tieneDocumentosAprobados()) {
+            return back()->withErrors([
+                'id_solicitud' => 'Las citas solo pueden agendarse después de que el revisor técnico haya calificado y aprobado los documentos de su expediente.',
+            ])->withInput();
+        }
+
+        // 3. Regla: Solo se puede agendar dentro de los 15 días posteriores a la aprobación
         $fechaCarbon = Carbon::parse($fechaInput)->startOfDay();
-        if ($fechaCarbon->isPast() && ! $fechaCarbon->isToday()) {
+        if ($fechaCarbon->lt(today())) {
             return back()->withErrors(['fecha' => 'No es posible agendar citas en fechas anteriores a la actual.'])->withInput();
         }
 
-        // 2. Prohibir citas duplicadas en el mismo horario y fecha
+        $fechaAprobacion = $solicitud->fechaAprobacionDocumentos();
+        $fechaLimite = $fechaAprobacion ? $fechaAprobacion->copy()->addDays(15)->endOfDay() : today()->addDays(15)->endOfDay();
+
+        if ($fechaCarbon->gt($fechaLimite)) {
+            $limiteEs = $fechaLimite->translatedFormat('d \d\e F \d\e Y');
+
+            return back()->withErrors([
+                'fecha' => "Después de la aprobación documental solo es posible agendar dentro de los próximos 15 días. Su fecha límite es el {$limiteEs}.",
+            ])->withInput();
+        }
+
+        // 4. Prohibir citas duplicadas en el mismo horario y fecha
         $fechaStr = $fechaCarbon->format('Y-m-d');
         $existe = Cita::whereDate('Fecha', $fechaStr)
             ->where(function ($q) use ($horaInput): void {
@@ -88,21 +165,22 @@ class CitaCiudadanoController extends Controller
 
         $cita = Cita::create([
             'ID_Usuarios' => $idUsuario,
-            'ID_Solicitud' => $request->validated('id_solicitud'),
+            'ID_Solicitud' => $idSolicitud,
             'Fecha' => $fechaStr,
             'Hora' => $horaInput,
             'Estado_Citas' => 'Programada',
         ]);
 
+        $folioTexto = $solicitud->folio?->Codigo_Folio ?? "EXP-{$idSolicitud}";
         Bitacora::create([
             'ID_Usuarios' => $idUsuario,
             'Accion' => 'Agendación de cita',
-            'Descripcion' => "Cita agendada para {$fechaStr} a las {$horaInput}.",
+            'Descripcion' => "Cita agendada para el expediente {$folioTexto} el {$fechaStr} a las {$horaInput}.",
             'Fecha_Creacion' => now(),
         ]);
 
         return redirect()->route('citas.pase', ['idCita' => $cita->ID_Citas])
-            ->with('success', 'Tu cita ha sido confirmada.');
+            ->with('success', 'Tu cita ha sido confirmada exitosamente.');
     }
 
     public function paseDigital(int $idCita): View
