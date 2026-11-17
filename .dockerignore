@@ -1,0 +1,54 @@
+# ============================================================
+#  .dockerignore — S_E_T_C
+#  Excluye archivos innecesarios del contexto de build
+# ============================================================
+
+# Control de versiones
+.git
+.gitignore
+.gitattributes
+
+# Node
+node_modules
+
+# Dependencias de Composer (se instalan en el build)
+vendor
+
+# Entornos locales
+.env
+.env.local
+.env.*.local
+
+# Docker (no incluirse a sí mismo)
+docker-compose*.yaml
+docker-compose*.yml
+Dockerfile*
+.dockerignore
+
+# Logs y runtime
+storage/logs/*.log
+storage/framework/cache
+storage/framework/sessions
+storage/framework/views
+bootstrap/cache/*.php
+
+# Tests (no van a producción)
+tests
+
+# Herramientas de desarrollo
+.agents
+docs
+*.md
+!README.md
+phpunit.xml
+.editorconfig
+.npmrc
+CLAUDE.md
+AGENTS.md
+
+# IDE / OS
+.idea
+.vscode
+*.DS_Store
+Thumbs.db
+
