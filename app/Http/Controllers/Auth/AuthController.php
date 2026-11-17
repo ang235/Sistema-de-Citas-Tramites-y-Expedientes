@@ -43,13 +43,6 @@ class AuthController extends Controller
             Auth::login($usuario, $request->boolean('remember'));
             $request->session()->regenerate();
 
-            Bitacora::create([
-                'ID_Usuarios' => $usuario->ID_Usuarios,
-                'Accion' => 'Inicio de sesión',
-                'Descripcion' => 'Inicio de sesión exitoso desde IP: '.$request->ip(),
-                'Fecha_Creacion' => now(),
-            ]);
-
             // Asegurar carga fresca de roles asignados
             $usuario->load('roles');
 
@@ -110,17 +103,6 @@ class AuthController extends Controller
 
     public function logout(Request $request): RedirectResponse
     {
-        $idUsuario = Auth::id();
-
-        if ($idUsuario !== null) {
-            Bitacora::create([
-                'ID_Usuarios' => $idUsuario,
-                'Accion' => 'Cierre de sesión',
-                'Descripcion' => 'Sesión cerrada por el usuario.',
-                'Fecha_Creacion' => now(),
-            ]);
-        }
-
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

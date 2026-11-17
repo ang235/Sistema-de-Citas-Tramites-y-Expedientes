@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $ID_Solicitud
  * @property int $ID_Revisor
  * @property int $ID_Asignador
+ * @property string $Estado_Asignacion
  * @property Carbon|null $Fecha_Asignacion
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -25,7 +26,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read Usuario $asignador
  * @property-read Collection<int, Revision> $revisiones
  */
-#[Fillable(['ID_Solicitud', 'ID_Revisor', 'ID_Asignador', 'Fecha_Asignacion'])]
+#[Fillable(['ID_Solicitud', 'ID_Revisor', 'ID_Asignador', 'Estado_Asignacion', 'Fecha_Asignacion'])]
 class AsignacionRevisor extends Model
 {
     use HasFactory;

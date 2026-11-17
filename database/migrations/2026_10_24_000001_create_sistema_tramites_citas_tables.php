@@ -136,6 +136,7 @@ return new class extends Migration
             $table->foreignId('ID_Solicitud')->constrained('solicitudes', 'ID_Solicitud')->onDelete('cascade');
             $table->foreignId('ID_Revisor')->constrained('usuarios', 'ID_Usuarios')->onDelete('cascade');
             $table->foreignId('ID_Asignador')->constrained('usuarios', 'ID_Usuarios')->onDelete('cascade');
+            $table->string('Estado_Asignacion', 50)->default('Activo');
             $table->timestamp('Fecha_Asignacion')->useCurrent();
             $table->timestamps();
         });

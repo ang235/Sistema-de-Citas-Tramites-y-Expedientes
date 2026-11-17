@@ -76,12 +76,27 @@ class AsignacionController extends Controller
         $idAsignador = (int) Auth::id();
 
         DB::transaction(function () use ($request, $idAsignador): void {
+            $idSolicitud = (int) $request->validated('id_solicitud');
+            $idRevisor = (int) $request->validated('id_revisor');
+
+            // Marcar asignaciones previas como reasignadas
+            AsignacionRevisor::where('ID_Solicitud', $idSolicitud)
+                ->where('Estado_Asignacion', 'Activo')
+                ->update(['Estado_Asignacion' => 'Reasignado']);
+
             $asignacion = AsignacionRevisor::create([
-                'ID_Solicitud' => $request->validated('id_solicitud'),
-                'ID_Revisor' => $request->validated('id_revisor'),
+                'ID_Solicitud' => $idSolicitud,
+                'ID_Revisor' => $idRevisor,
                 'ID_Asignador' => $idAsignador,
+                'Estado_Asignacion' => 'Activo',
                 'Fecha_Asignacion' => now(),
             ]);
+
+            // Actualizar la solicitud al estado En_Revision
+            $solicitud = Solicitud::with('folio')->find($idSolicitud);
+            $solicitud?->update(['Estado_Solicitud' => 'En_Revision']);
+
+            $revisor = Usuario::find($idRevisor);
 
             // Iniciar ciclo de revisión
             Revision::create([
@@ -90,10 +105,11 @@ class AsignacionController extends Controller
                 'Fecha_Revision' => now(),
             ]);
 
+            $codigoFolio = $solicitud?->folio?->Codigo_Folio ?? "EXP-{$idSolicitud}";
             Bitacora::create([
                 'ID_Usuarios' => $idAsignador,
-                'Accion' => 'Asignación de expediente',
-                'Descripcion' => "Solicitud #{$request->validated('id_solicitud')} asignada al revisor #{$request->validated('id_revisor')}.",
+                'Accion' => 'Asignación de expediente a revisor',
+                'Descripcion' => "Expediente {$codigoFolio} asignado formalmente al revisor técnico {$revisor?->Nombre} (#{$idRevisor}) para examen documental.",
                 'Fecha_Creacion' => now(),
             ]);
         });
@@ -131,8 +147,11 @@ class AsignacionController extends Controller
                     'ID_Solicitud' => $solicitud->ID_Solicitud,
                     'ID_Revisor' => $revisor->ID_Usuarios,
                     'ID_Asignador' => $idAsignador,
+                    'Estado_Asignacion' => 'Activo',
                     'Fecha_Asignacion' => now(),
                 ]);
+
+                $solicitud->update(['Estado_Solicitud' => 'En_Revision']);
 
                 Revision::create([
                     'ID_Asignacion' => $asig->ID_Asignacion,
@@ -146,8 +165,8 @@ class AsignacionController extends Controller
 
             Bitacora::create([
                 'ID_Usuarios' => $idAsignador,
-                'Accion' => 'Asignación inteligente y balanceo',
-                'Descripcion' => "Se asignaron {$asignados} expedientes balanceados entre el equipo pericial.",
+                'Accion' => 'Distribución automática de expedientes',
+                'Descripcion' => "Se distribuyeron automáticamente {$asignados} expedientes entre los revisores técnicos activos.",
                 'Fecha_Creacion' => now(),
             ]);
         });

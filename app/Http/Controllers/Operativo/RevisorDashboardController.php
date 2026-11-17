@@ -34,25 +34,29 @@ class RevisorDashboardController extends Controller
         // Métricas exclusivas del Revisor Técnico
         $metricas = [
             'asignados' => AsignacionRevisor::where('ID_Revisor', $idRevisor)
-                ->where('Estado_Asignacion', 'Activo')
+                ->where(fn ($q) => $q->where('Estado_Asignacion', 'Activo')->orWhereNull('Estado_Asignacion'))
                 ->count(),
             'en_revision' => Solicitud::whereHas('asignaciones', function ($q) use ($idRevisor): void {
-                $q->where('ID_Revisor', $idRevisor)->where('Estado_Asignacion', 'Activo');
+                $q->where('ID_Revisor', $idRevisor)
+                    ->where(fn ($sub) => $sub->where('Estado_Asignacion', 'Activo')->orWhereNull('Estado_Asignacion'));
             })->where('Estado_Solicitud', 'En_Revision')->count(),
             'con_observaciones' => Solicitud::whereHas('asignaciones', function ($q) use ($idRevisor): void {
-                $q->where('ID_Revisor', $idRevisor)->where('Estado_Asignacion', 'Activo');
+                $q->where('ID_Revisor', $idRevisor)
+                    ->where(fn ($sub) => $sub->where('Estado_Asignacion', 'Activo')->orWhereNull('Estado_Asignacion'));
             })->where('Estado_Solicitud', 'Observado')->count(),
             'dictaminados' => Solicitud::whereHas('asignaciones', function ($q) use ($idRevisor): void {
                 $q->where('ID_Revisor', $idRevisor);
             })->whereIn('Estado_Solicitud', ['Aprobado', 'Rechazado'])->count(),
             'documentos_pendientes' => Documento::whereHas('solicitud.asignaciones', function ($q) use ($idRevisor): void {
-                $q->where('ID_Revisor', $idRevisor)->where('Estado_Asignacion', 'Activo');
+                $q->where('ID_Revisor', $idRevisor)
+                    ->where(fn ($sub) => $sub->where('Estado_Asignacion', 'Activo')->orWhereNull('Estado_Asignacion'));
             })->where('Estado_Doc', 'Pendiente')->count(),
         ];
 
         // Expedientes que el supervisor le asignó a este revisor
         $expedientesAsignados = Solicitud::whereHas('asignaciones', function ($q) use ($idRevisor): void {
-            $q->where('ID_Revisor', $idRevisor)->where('Estado_Asignacion', 'Activo');
+            $q->where('ID_Revisor', $idRevisor)
+                ->where(fn ($sub) => $sub->where('Estado_Asignacion', 'Activo')->orWhereNull('Estado_Asignacion'));
         })
             ->with([
                 'solicitante',

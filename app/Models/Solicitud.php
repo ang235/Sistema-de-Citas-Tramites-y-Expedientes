@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property int $ID_Solicitud
  * @property int $ID_Solicitante
  * @property int $ID_Version_Tramite
+ * @property string $Estado_Solicitud
  * @property Carbon|null $Fecha_Creacion_Solicitud
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -29,7 +30,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property-read Collection<int, Cita> $citas
  * @property-read Collection<int, Resolucion> $resoluciones
  */
-#[Fillable(['ID_Solicitante', 'ID_Version_Tramite', 'Fecha_Creacion_Solicitud'])]
+#[Fillable(['ID_Solicitante', 'ID_Version_Tramite', 'Fecha_Creacion_Solicitud', 'Estado_Solicitud'])]
 class Solicitud extends Model
 {
     use HasFactory;

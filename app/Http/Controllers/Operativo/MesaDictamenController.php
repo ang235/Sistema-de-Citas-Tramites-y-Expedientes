@@ -57,7 +57,8 @@ class MesaDictamenController extends Controller
         // Si es revisor y no es supervisor ni admin, filtrar estrictamente los expedientes que el supervisor le asignó
         if ($esRevisor && ! $esSupervisor && ! $esAdmin) {
             $query->whereHas('asignaciones', function ($q) use ($idUsuario): void {
-                $q->where('ID_Revisor', $idUsuario)->where('Estado_Asignacion', 'Activo');
+                $q->where('ID_Revisor', $idUsuario)
+                    ->where(fn ($sub) => $sub->where('Estado_Asignacion', 'Activo')->orWhereNull('Estado_Asignacion'));
             });
         }
 
@@ -87,7 +88,7 @@ class MesaDictamenController extends Controller
                 'folio',
                 'datosSolicitud',
                 'documentos.requisito',
-                'documentos.versiones',
+                'documentos.versionesDoc',
                 'asignaciones.revisor',
                 'asignaciones.revisiones.observaciones',
                 'resoluciones',
@@ -95,7 +96,8 @@ class MesaDictamenController extends Controller
 
             if ($esRevisor && ! $esSupervisor && ! $esAdmin) {
                 $querySelected->whereHas('asignaciones', function ($q) use ($idUsuario): void {
-                    $q->where('ID_Revisor', $idUsuario)->where('Estado_Asignacion', 'Activo');
+                    $q->where('ID_Revisor', $idUsuario)
+                        ->where(fn ($sub) => $sub->where('Estado_Asignacion', 'Activo')->orWhereNull('Estado_Asignacion'));
                 });
             }
 
@@ -110,7 +112,7 @@ class MesaDictamenController extends Controller
                 'folio',
                 'datosSolicitud',
                 'documentos.requisito',
-                'documentos.versiones',
+                'documentos.versionesDoc',
                 'asignaciones.revisor',
                 'asignaciones.revisiones.observaciones',
                 'resoluciones',
@@ -120,8 +122,7 @@ class MesaDictamenController extends Controller
         $asignacionActiva = null;
         if ($solicitudSeleccionada) {
             $asignacionActiva = $solicitudSeleccionada->asignaciones
-                ->where('ID_Revisor', Auth::id())
-                ->where('Estado_Asignacion', 'Activo')
+                ->filter(fn ($a) => (int) $a->ID_Revisor === $idUsuario && in_array($a->Estado_Asignacion, ['Activo', null]))
                 ->last()
                 ?? ($esAdmin ? $solicitudSeleccionada->asignaciones->last() : null);
         }
@@ -151,7 +152,7 @@ class MesaDictamenController extends Controller
         ]);
     }
 
-    public function show(int $idSolicitud): View|RedirectResponse
+    public function show(Request $request, int $idSolicitud): View|RedirectResponse
     {
         /** @var Usuario $usuario */
         $usuario = Auth::user();
@@ -169,32 +170,37 @@ class MesaDictamenController extends Controller
             'folio',
             'datosSolicitud',
             'documentos.requisito',
-            'documentos.versiones',
+            'documentos.versionesDoc',
             'asignaciones.revisor',
             'asignaciones.revisiones.observaciones.respuestas',
-            'resoluciones',
+            'resoluciones.supervisor',
         ])->findOrFail($idSolicitud);
 
-        // Si es revisor y no es supervisor ni admin, verificar asignación obligatoria previa por el supervisor
-        if ($usuario->esRevisor() && ! $usuario->esSupervisor() && ! $usuario->esAdministrador()) {
-            $asignacionPropia = $solicitud->asignaciones
-                ->where('ID_Revisor', $idUsuario)
-                ->where('Estado_Asignacion', 'Activo')
-                ->last();
+        $asignacionPropia = $solicitud->asignaciones
+            ->filter(fn ($a) => (int) $a->ID_Revisor === $idUsuario && in_array($a->Estado_Asignacion, ['Activo', null]))
+            ->last();
 
-            if (! $asignacionPropia) {
+        $esConcluido = $solicitud->resoluciones->isNotEmpty() || in_array($solicitud->Estado_Solicitud, ['Aprobado', 'Rechazado']);
+        $esSoloLectura = $request->boolean('readonly') || $esConcluido || ($usuario->esSupervisor() && ! $asignacionPropia) || ($usuario->esAdministrador() && ! $asignacionPropia);
+
+        // Si es revisor y no es supervisor ni admin, verificar asignación obligatoria previa por el supervisor
+        // O si ya fue concluido / visto en modo auditoría o solo lectura
+        if ($usuario->esRevisor() && ! $usuario->esSupervisor() && ! $usuario->esAdministrador()) {
+            if (! $asignacionPropia && ! $esConcluido && ! $request->boolean('readonly')) {
                 abort(403, 'Acceso no autorizado: Este expediente aún no ha sido asignado a su mesa por el supervisor en la Matriz de Cargas.');
             }
 
             $asignacionActiva = $asignacionPropia;
         } else {
-            $asignacionActiva = $solicitud->asignaciones->where('Estado_Asignacion', 'Activo')->last()
+            $asignacionActiva = $solicitud->asignaciones->filter(fn ($a) => in_array($a->Estado_Asignacion, ['Activo', null]))->last()
                 ?? $solicitud->asignaciones->last();
         }
 
         return view('portal.evaluacion', [
             'solicitud' => $solicitud,
             'asignacionActiva' => $asignacionActiva,
+            'esSoloLectura' => $esSoloLectura,
+            'esConcluido' => $esConcluido,
         ]);
     }
 
@@ -205,14 +211,19 @@ class MesaDictamenController extends Controller
         ]);
 
         /** @var Documento $documento */
-        $documento = Documento::findOrFail($idDocumento);
+        $documento = Documento::with('solicitud.resoluciones')->findOrFail($idDocumento);
+        $solicitud = $documento->solicitud;
+
+        if ($solicitud && ($solicitud->resoluciones->isNotEmpty() || in_array($solicitud->Estado_Solicitud, ['Aprobado', 'Rechazado']))) {
+            return back()->with('error', 'El expediente ya se encuentra concluido y en modo inmutable de auditoría (solo lectura). No se permiten modificaciones.');
+        }
 
         /** @var Usuario $usuario */
         $usuario = Auth::user();
         if ($usuario->esRevisor() && ! $usuario->esSupervisor() && ! $usuario->esAdministrador()) {
             $asignado = AsignacionRevisor::where('ID_Solicitud', $documento->ID_Solicitud)
                 ->where('ID_Revisor', $usuario->ID_Usuarios)
-                ->where('Estado_Asignacion', 'Activo')
+                ->where(fn ($q) => $q->where('Estado_Asignacion', 'Activo')->orWhereNull('Estado_Asignacion'))
                 ->exists();
 
             if (! $asignado) {
@@ -235,12 +246,17 @@ class MesaDictamenController extends Controller
     public function registrarRevision(StoreRevisionRequest $request, int $idAsignacion): RedirectResponse
     {
         /** @var AsignacionRevisor $asignacion */
-        $asignacion = AsignacionRevisor::findOrFail($idAsignacion);
+        $asignacion = AsignacionRevisor::with('solicitud.resoluciones')->findOrFail($idAsignacion);
+        $solicitud = $asignacion->solicitud;
+
+        if ($solicitud && ($solicitud->resoluciones->isNotEmpty() || in_array($solicitud->Estado_Solicitud, ['Aprobado', 'Rechazado']))) {
+            return back()->with('error', 'El expediente ya se encuentra concluido y cuenta con resolución formal emitida. No se pueden registrar más dictámenes.');
+        }
 
         /** @var Usuario $usuario */
         $usuario = Auth::user();
         if ($usuario->esRevisor() && ! $usuario->esSupervisor() && ! $usuario->esAdministrador()) {
-            if ($asignacion->ID_Revisor !== $usuario->ID_Usuarios || $asignacion->Estado_Asignacion !== 'Activo') {
+            if ($asignacion->ID_Revisor !== $usuario->ID_Usuarios || ! in_array($asignacion->Estado_Asignacion, ['Activo', null])) {
                 abort(403, 'No tiene autorización para dictaminar sobre esta asignación.');
             }
         }
@@ -277,10 +293,11 @@ class MesaDictamenController extends Controller
                 }
             }
 
+            $folio = $solicitud?->folio?->Codigo_Folio ?? "EXP-{$asignacion->ID_Solicitud}";
             Bitacora::create([
                 'ID_Usuarios' => (int) Auth::id(),
-                'Accion' => 'Dictamen de revisión registrado',
-                'Descripcion' => "Revisión #{$revision->ID_Revision} concluida con resultado: {$revision->Resultado}.",
+                'Accion' => 'Expediente Calificado: Dictamen de revisión',
+                'Descripcion' => "Expediente {$folio} (#{$asignacion->ID_Solicitud}) calificado con dictamen técnico: {$resultado}.",
                 'Fecha_Creacion' => now(),
             ]);
         });

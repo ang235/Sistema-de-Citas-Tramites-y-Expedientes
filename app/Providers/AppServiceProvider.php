@@ -29,6 +29,12 @@ class AppServiceProvider extends ServiceProvider
                     $table->boolean('Activo')->default(true);
                 });
             }
+
+            if (Schema::hasTable('asignacion_revisor') && ! Schema::hasColumn('asignacion_revisor', 'Estado_Asignacion')) {
+                Schema::table('asignacion_revisor', function (Blueprint $table) {
+                    $table->string('Estado_Asignacion', 50)->default('Activo');
+                });
+            }
         } catch (\Throwable) {
             // Ignorar si ya está aplicada en concurrencia
         }
