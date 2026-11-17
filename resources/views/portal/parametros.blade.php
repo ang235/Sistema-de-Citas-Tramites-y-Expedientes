@@ -1,14 +1,12 @@
 @extends('layouts.portal')
 
-@section('title', 'Constructor TUPA — Configuración de Trámites y Requisitos')
+@section('title', 'Gestion de tramites y requisitos')
 
 @section('breadcrumb')
     <span class="material-symbols-outlined text-xs">chevron_right</span>
     <span>Administración Central</span>
     <span class="material-symbols-outlined text-xs">chevron_right</span>
-    <span>Parámetros y Requisitos</span>
-    <span class="material-symbols-outlined text-xs">chevron_right</span>
-    <span class="current">Constructor TUPA</span>
+    <span class="current">Gestion de tramites y requisitos</span>
 @endsection
 
 @section('content')
@@ -18,6 +16,7 @@
     showEditTramiteModal: false,
     showNewVersionModal: false,
     showNewReqModal: false,
+    expandedTramiteId: null,
     currentTramiteId: null,
     currentTramiteName: '',
     currentTramiteDesc: '',
@@ -33,7 +32,7 @@
         <span class="material-symbols-outlined text-sm text-slate-400">chevron_right</span>
         <a class="hover:text-blue-700 transition-colors" href="#">Administración Central</a>
         <span class="material-symbols-outlined text-sm text-slate-400">chevron_right</span>
-        <span class="text-blue-900 font-semibold">Constructor TUPA</span>
+        <span class="text-blue-900 font-semibold">Gestion de tramites y requisitos</span>
     </nav>
     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div class="max-w-3xl">
@@ -43,25 +42,20 @@
                 </div>
                 <div>
                     <h1 class="text-2xl lg:text-[26px] font-bold text-slate-900 tracking-tight leading-snug" style="font-family: var(--font-display);">
-                        Configuración de Procedimientos y Requisitos (Constructor TUPA)
+                        Gestion de tramites y requisitos
                     </h1>
                     <p class="text-xs lg:text-sm text-slate-600 mt-1 leading-relaxed">
-                        Gestión del catálogo normativo, parametrización de recaudos admisibles, tiempos de SLA, aranceles y flujos de inspección técnica según el Texto Único de Procedimientos Administrativos vigente.
+                        Administración del catálogo normativo, parametrización de recaudos admisibles, tiempos de SLA y gestión de requisitos por versión. Haz clic en cualquier trámite para visualizar sus requisitos.
                     </p>
                 </div>
             </div>
         </div>
         <div class="flex items-center flex-wrap gap-2.5 self-start lg:self-center">
-            <a href="{{ route('tramites.index') }}" target="_blank"
-               class="px-3.5 py-2 rounded-lg bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 font-medium text-xs flex items-center gap-1.5 shadow-xs transition-colors">
-                <span class="material-symbols-outlined text-base text-blue-600">visibility</span>
-                <span>Previsualizar Catálogo Ciudadano</span>
-            </a>
             <button type="button"
                     @click="showNewTramiteModal = true"
                     class="px-4 py-2 rounded-lg bg-[#001229] hover:bg-[#0f2744] text-white font-semibold text-xs flex items-center gap-1.5 shadow-sm hover:shadow transition-all cursor-pointer">
                 <span class="material-symbols-outlined text-base">add_circle</span>
-                <span>+ Nuevo Trámite TUPA</span>
+                <span>+ Nuevo Trámite</span>
             </button>
         </div>
     </div>
@@ -176,12 +170,22 @@
                         $version = $tipo->versionesTramite->where('Vigente', true)->first() ?? $tipo->versionesTramite->last();
                         $esInactivo = ($tipo->Estado_Tipo_Tr === 'Inactivo');
                     @endphp
-                    <tr class="hover:bg-slate-50 transition-colors {{ $esInactivo ? 'bg-slate-50/70 opacity-80' : '' }}">
-                        <td class="py-3.5 px-6">
-                            <span class="font-mono font-bold text-blue-700 text-[11px]">TUPA-{{ str_pad($tipo->ID_Tipo_Tramite, 3, '0', STR_PAD_LEFT) }}</span>
+                    <tr class="hover:bg-slate-50 transition-colors {{ $esInactivo ? 'bg-slate-50/70 opacity-80' : '' }}"
+                        :class="expandedTramiteId === {{ $tipo->ID_Tipo_Tramite }} ? 'bg-blue-50/30' : ''">
+                        <td class="py-3.5 px-6 cursor-pointer"
+                            @click="expandedTramiteId = (expandedTramiteId === {{ $tipo->ID_Tipo_Tramite }} ? null : {{ $tipo->ID_Tipo_Tramite }})">
+                            <div class="flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-base text-blue-600 transition-transform duration-200"
+                                      :class="expandedTramiteId === {{ $tipo->ID_Tipo_Tramite }} ? 'rotate-90' : ''">chevron_right</span>
+                                <span class="font-mono font-bold text-blue-700 text-[11px]">TUPA-{{ str_pad($tipo->ID_Tipo_Tramite, 3, '0', STR_PAD_LEFT) }}</span>
+                            </div>
                         </td>
-                        <td class="py-3.5 px-4">
-                            <span class="font-semibold text-[#0b1c30]">{{ $tipo->Nombre }}</span>
+                        <td class="py-3.5 px-4 cursor-pointer group"
+                            @click="expandedTramiteId = (expandedTramiteId === {{ $tipo->ID_Tipo_Tramite }} ? null : {{ $tipo->ID_Tipo_Tramite }})">
+                            <div class="flex items-center gap-1">
+                                <span class="font-semibold text-[#0b1c30] group-hover:text-blue-700 transition-colors">{{ $tipo->Nombre }}</span>
+                                <span class="text-[10px] text-blue-600 font-medium px-1.5 py-0.2 rounded bg-blue-50 opacity-0 group-hover:opacity-100 transition-opacity">Ver requisitos</span>
+                            </div>
                             <p class="text-[11px] text-slate-400 mt-0.5 line-clamp-1">{{ $tipo->Descripcion ?? '' }}</p>
                         </td>
                         <td class="py-3.5 px-4">
@@ -191,7 +195,13 @@
                                 <span class="text-slate-400">—</span>
                             @endif
                         </td>
-                        <td class="py-3.5 px-4 font-semibold text-[#0b1c30]">{{ $version?->requisitos->count() ?? '0' }}</td>
+                        <td class="py-3.5 px-4 cursor-pointer"
+                            @click="expandedTramiteId = (expandedTramiteId === {{ $tipo->ID_Tipo_Tramite }} ? null : {{ $tipo->ID_Tipo_Tramite }})">
+                            <button type="button" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 hover:bg-blue-100 text-blue-700 transition-colors cursor-pointer">
+                                <span class="material-symbols-outlined text-xs">checklist</span>
+                                <span>{{ $version?->requisitos->count() ?? '0' }} reqs</span>
+                            </button>
+                        </td>
                         <td class="py-3.5 px-4 text-slate-600">{{ $tipo->SLA_dias ?? '15' }}d</td>
                         <td class="py-3.5 px-4">
                             @if ($esInactivo)
@@ -207,15 +217,22 @@
                         <td class="py-3.5 px-4 text-right">
                             <div class="flex items-center justify-end gap-1.5 flex-wrap">
                                 <button type="button"
+                                        @click="expandedTramiteId = (expandedTramiteId === {{ $tipo->ID_Tipo_Tramite }} ? null : {{ $tipo->ID_Tipo_Tramite }})"
+                                        class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 text-[11px] font-semibold transition-colors cursor-pointer"
+                                        title="Ver requisitos de este trámite">
+                                    <span class="material-symbols-outlined text-xs">visibility</span>
+                                    <span>Requisitos</span>
+                                </button>
+                                <button type="button"
                                         @click="showEditTramiteModal = true; currentTramiteId = {{ $tipo->ID_Tipo_Tramite }}; currentTramiteName = '{{ addslashes($tipo->Nombre) }}'; currentTramiteDesc = '{{ addslashes($tipo->Descripcion ?? '') }}'; currentTramiteEstado = '{{ $tipo->Estado_Tipo_Tr ?? 'Activo' }}';"
-                                        class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-600 text-[11px] font-semibold transition-colors cursor-pointer"
+                                        class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 text-[11px] font-semibold transition-colors cursor-pointer"
                                         title="Editar procedimiento">
                                     <span class="material-symbols-outlined text-xs">edit</span>
                                     <span>Editar</span>
                                 </button>
                                 <button type="button"
                                         @click="showNewVersionModal = true; currentTramiteId = {{ $tipo->ID_Tipo_Tramite }}; currentTramiteName = '{{ addslashes($tipo->Nombre) }}';"
-                                        class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 text-[11px] font-semibold transition-colors cursor-pointer"
+                                        class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-semibold transition-colors cursor-pointer"
                                         title="Nueva versión normativa">
                                     <span class="material-symbols-outlined text-xs">history_edu</span>
                                     <span>+ Versión</span>
@@ -239,6 +256,87 @@
                                         <span>{{ $esInactivo ? 'Reactivar' : 'Deshabilitar' }}</span>
                                     </button>
                                 </form>
+                            </div>
+                        </td>
+                    </tr>
+
+                    {{-- DETALLE DESPLEGABLE DE REQUISITOS DEL TRÁMITE --}}
+                    <tr x-show="expandedTramiteId === {{ $tipo->ID_Tipo_Tramite }}" x-cloak class="bg-blue-50/40 border-b border-blue-100">
+                        <td colspan="7" class="p-5">
+                            <div class="bg-white rounded-xl border border-blue-200/80 p-5 shadow-xs space-y-4">
+                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                                    <div class="flex items-center gap-2.5">
+                                        <div class="w-8 h-8 rounded-lg bg-blue-100 text-[#0051d5] flex items-center justify-center font-bold text-xs shrink-0">
+                                            <span class="material-symbols-outlined text-lg">checklist</span>
+                                        </div>
+                                        <div>
+                                            <h4 class="text-sm font-bold text-[#0b1c30]">
+                                                Requisitos Normativos de: {{ $tipo->Nombre }}
+                                            </h4>
+                                            <p class="text-xs text-slate-500">
+                                                Versión vigente: <span class="font-semibold text-slate-700">{{ $version ? 'v' . $version->No_Version : 'Sin versión activa' }}</span>
+                                                &bull; Total de requisitos: {{ $version?->requisitos->count() ?? 0 }}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    @if($version)
+                                        <button type="button"
+                                                @click="showNewReqModal = true; currentVersionId = {{ $version->ID_Version_Tramite }}; currentTramiteName = '{{ addslashes($tipo->Nombre) }} (v{{ $version->No_Version }})';"
+                                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer shrink-0">
+                                            <span class="material-symbols-outlined text-sm">add_task</span>
+                                            <span>+ Agregar Requisito</span>
+                                        </button>
+                                    @endif
+                                </div>
+
+                                {{-- Listado de requisitos de la versión --}}
+                                @if($version && $version->requisitos->isNotEmpty())
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        @foreach($version->requisitos as $reqIndex => $req)
+                                            <div class="flex items-start justify-between gap-3 p-3 rounded-xl bg-slate-50 border border-slate-200 hover:border-slate-300 transition-all">
+                                                <div class="flex items-start gap-2.5 min-w-0">
+                                                    <span class="w-6 h-6 rounded-full bg-[#001229] text-white flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5">
+                                                        {{ $reqIndex + 1 }}
+                                                    </span>
+                                                    <div class="min-w-0">
+                                                        <h5 class="text-xs font-bold text-slate-900 leading-snug truncate">{{ $req->Nombre }}</h5>
+                                                        <div class="flex items-center gap-2 text-[11px] text-slate-500 mt-1">
+                                                            <span class="font-mono uppercase px-1.5 py-0.5 rounded bg-white border border-slate-200 text-[10px]">
+                                                                {{ $req->Formato ?? 'PDF' }}
+                                                            </span>
+                                                            <span>&bull;</span>
+                                                            <span class="font-medium {{ $req->Prioridad === 'Obligatorio' ? 'text-amber-700' : 'text-slate-600' }}">
+                                                                {{ $req->Prioridad }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <form method="POST" action="{{ route('portal.requisitos.destroy', $req->ID_Requisitos) }}" onsubmit="return confirm('¿Desea eliminar este requisito normativo?');" class="shrink-0">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="p-1 text-slate-400 hover:text-rose-600 rounded transition-colors" title="Eliminar requisito">
+                                                        <span class="material-symbols-outlined text-base">delete</span>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <div class="p-6 text-center rounded-xl bg-slate-50 border border-dashed border-slate-200 space-y-2">
+                                        <span class="material-symbols-outlined text-3xl text-slate-400">rule_folder</span>
+                                        <p class="text-xs font-semibold text-slate-700">Este trámite no tiene requisitos registrados en su versión activa.</p>
+                                        @if($version)
+                                            <button type="button"
+                                                    @click="showNewReqModal = true; currentVersionId = {{ $version->ID_Version_Tramite }}; currentTramiteName = '{{ addslashes($tipo->Nombre) }} (v{{ $version->No_Version }})';"
+                                                    class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#001229] text-white text-xs font-semibold hover:bg-[#0f2744] transition-colors cursor-pointer mt-1">
+                                                <span class="material-symbols-outlined text-sm">add</span>
+                                                <span>Crear el primer requisito</span>
+                                            </button>
+                                        @endif
+                                    </div>
+                                @endif
                             </div>
                         </td>
                     </tr>

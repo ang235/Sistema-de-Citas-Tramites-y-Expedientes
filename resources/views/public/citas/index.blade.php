@@ -28,6 +28,14 @@
         </a>
     </div>
 
+    {{-- Aclaración sobre anticipación --}}
+    <div class="p-4 rounded-xl bg-amber-50 border border-amber-200/90 text-amber-950 flex items-center gap-3 text-xs">
+        <span class="material-symbols-outlined text-amber-700 text-xl shrink-0">info</span>
+        <p>
+            <strong>Aclaración:</strong> Se solicita que las citas se hagan con 2 semanas de anticipación para garantizar la disponibilidad del personal técnico e inspectores.
+        </p>
+    </div>
+
     {{-- Lista de Citas --}}
     <div class="space-y-4">
         @forelse ($citas as $cita)

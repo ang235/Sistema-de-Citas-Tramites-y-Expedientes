@@ -191,6 +191,9 @@
                 </div>
                 <h3 class="text-base font-bold text-[#001229]">Atención Presencial y Virtual</h3>
                 <p class="text-xs text-slate-500">Agenda tu turno telemático o presencial en ventanilla metropolitana sin hacer filas.</p>
+                <p class="text-[11px] font-semibold text-amber-700 bg-amber-50 p-2 rounded-lg border border-amber-200/80">
+                    * Aclaración: Se solicita que las citas se hagan con 2 semanas de anticipación.
+                </p>
                 <div class="pt-2">
                     <a href="{{ route('citas.create') }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold rounded-lg transition-colors">
                         <span>Agendar Cita</span>

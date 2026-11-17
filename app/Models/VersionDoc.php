@@ -16,12 +16,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $ID_Version_Doc
  * @property int $ID_Documento
  * @property Carbon|null $Fecha_Carga
+ * @property string|null $Ruta_Archivo
+ * @property string|null $Nombre_Original
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read Documento $documento
  * @property-read Collection<int, Respuesta> $respuestas
  */
-#[Fillable(['ID_Documento', 'Fecha_Carga'])]
+#[Fillable(['ID_Documento', 'Fecha_Carga', 'Ruta_Archivo', 'Nombre_Original'])]
 class VersionDoc extends Model
 {
     use HasFactory;

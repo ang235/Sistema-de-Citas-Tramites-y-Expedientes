@@ -79,6 +79,7 @@ class AuthController extends Controller
             'Email' => $request->validated('email'),
             'Contrasena' => Hash::make($request->validated('password')),
             'Fecha_Creacion' => now(),
+            'Activo' => true,
         ]);
 
         // Asignar rol Ciudadano por defecto si existe
@@ -89,6 +90,8 @@ class AuthController extends Controller
             $usuario->roles()->attach($rolCiudadano->ID_Rol);
         }
 
+        $usuario->load('roles');
+
         Auth::login($usuario);
 
         Bitacora::create([
@@ -98,7 +101,7 @@ class AuthController extends Controller
             'Fecha_Creacion' => now(),
         ]);
 
-        return redirect()->route('expedientes.index')->with('success', 'Cuenta creada con éxito.');
+        return redirect()->intended(route('expedientes.index'))->with('success', 'Cuenta creada con éxito.');
     }
 
     public function logout(Request $request): RedirectResponse

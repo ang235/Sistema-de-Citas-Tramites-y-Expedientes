@@ -112,14 +112,20 @@
     </div>
 
     {{-- Botones de Navegación --}}
-    <div class="flex items-center justify-between">
+    <div class="flex flex-wrap items-center justify-between gap-3">
         <a href="{{ route('citas.index') }}" class="text-xs text-[#0051d5] font-semibold hover:underline flex items-center gap-1">
             <span class="material-symbols-outlined text-sm">arrow_back</span>
             <span>Volver a mis citas</span>
         </a>
-        <a href="{{ route('expedientes.index') }}" class="text-xs text-slate-600 hover:text-[#001229] font-medium">
-            Ir a mis expedientes
-        </a>
+        <div class="flex items-center gap-3">
+            <a href="{{ route('profile.show') }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#eff4ff] hover:bg-[#dce9ff] text-[#0051d5] text-xs font-semibold transition-colors">
+                <span class="material-symbols-outlined text-sm">person</span>
+                <span>Ver en Mi Perfil</span>
+            </a>
+            <a href="{{ route('expedientes.index') }}" class="text-xs text-slate-600 hover:text-[#001229] font-medium">
+                Ir a mis expedientes
+            </a>
+        </div>
     </div>
 </div>
 @endsection

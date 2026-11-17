@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Models\Bitacora;
 use App\Models\Cita;
+use App\Models\Rol;
 use App\Models\Solicitud;
 use App\Models\TipoTramite;
 use App\Models\Usuario;
@@ -80,4 +81,135 @@ test('agendarCita rechaza fechas u horas en el pasado', function () {
 
     expect(fn () => $service->agendarCita($usuario, null, $fechaPasada, '10:00'))
         ->toThrow(DomainException::class, 'No se pueden agendar citas en fechas u horas pasadas.');
+});
+
+test('HTTP endpoint citas.store rechaza citas en fechas anteriores y horarios duplicados', function () {
+    $usuario = Usuario::create([
+        'Nombre' => 'Ciudadano Cita',
+        'Email' => 'ciudadano_cita@setc.gob',
+        'Contrasena' => bcrypt('password123'),
+    ]);
+
+    // Asignar rol ciudadano
+    $rolCiudadano = Rol::firstOrCreate(['Nombre' => 'Ciudadano']);
+    $usuario->roles()->attach($rolCiudadano->ID_Rol);
+
+    // 1. Intentar fecha pasada
+    $fechaPasada = now()->subDay()->toDateString();
+    $response = $this->actingAs($usuario)->post(route('citas.store'), [
+        'fecha' => $fechaPasada,
+        'hora' => '09:30',
+    ]);
+    $response->assertSessionHasErrors(['fecha']);
+
+    // 2. Agendar cita válida
+    $fechaFutura = now()->addDays(14)->toDateString();
+    $responseOk = $this->actingAs($usuario)->post(route('citas.store'), [
+        'fecha' => $fechaFutura,
+        'hora' => '10:00',
+    ]);
+    $responseOk->assertSessionHasNoErrors();
+    expect(Cita::whereDate('Fecha', $fechaFutura)->where('Hora', '10:00')->exists())->toBeTrue();
+
+    // 3. Intentar agendar exactamente el mismo horario y fecha (duplicado)
+    $responseDup = $this->actingAs($usuario)->post(route('citas.store'), [
+        'fecha' => $fechaFutura,
+        'hora' => '10:00',
+    ]);
+    $responseDup->assertSessionHasErrors(['hora']);
+});
+
+test('cancelarCitasVencidas cancela automaticamente citas cuya fecha u hora ha expirado', function () {
+    $usuario = Usuario::create([
+        'Nombre' => 'Usuario Vencido',
+        'Email' => 'vencido@setc.gob',
+        'Contrasena' => 'secret123',
+    ]);
+
+    // Cita de hace 2 días en estado Programada
+    $citaAyer = Cita::create([
+        'ID_Usuarios' => $usuario->ID_Usuarios,
+        'Fecha' => now()->subDays(2)->toDateString(),
+        'Hora' => '09:00:00',
+        'Estado_Citas' => 'Programada',
+    ]);
+
+    // Cita futura que debe mantenerse Programada
+    $citaFutura = Cita::create([
+        'ID_Usuarios' => $usuario->ID_Usuarios,
+        'Fecha' => now()->addDays(5)->toDateString(),
+        'Hora' => '11:00:00',
+        'Estado_Citas' => 'Programada',
+    ]);
+
+    $service = new CitaService;
+    $canceladas = $service->cancelarCitasVencidas();
+
+    expect($canceladas)->toBe(1);
+    expect($citaAyer->fresh()->Estado_Citas)->toBe('Cancelada');
+    expect($citaFutura->fresh()->Estado_Citas)->toBe('Programada');
+    expect(Bitacora::where('Accion', 'Cancelación automática por vencimiento')->exists())->toBeTrue();
+});
+
+test('perfil del usuario muestra sus citas agendadas', function () {
+    $usuario = Usuario::create([
+        'Nombre' => 'Ciudadano Perfil',
+        'Email' => 'perfil@setc.gob',
+        'Contrasena' => bcrypt('password123'),
+    ]);
+
+    $rolCiudadano = Rol::firstOrCreate(['Nombre' => 'Ciudadano']);
+    $usuario->roles()->attach($rolCiudadano->ID_Rol);
+
+    $fecha = now()->addDays(14)->toDateString();
+    Cita::create([
+        'ID_Usuarios' => $usuario->ID_Usuarios,
+        'Fecha' => $fecha,
+        'Hora' => '10:30:00',
+        'Estado_Citas' => 'Programada',
+    ]);
+
+    $response = $this->actingAs($usuario)->get(route('profile.show'));
+    $response->assertOk();
+    $response->assertSee('Mis Citas Agendadas');
+    $response->assertSee('10:30');
+    $response->assertSee('Programada');
+});
+
+test('agenda de citas de administracion muestra todas las citas por defecto', function () {
+    $admin = Usuario::create([
+        'Nombre' => 'Admin Citas',
+        'Email' => 'admin_citas@setc.gob',
+        'Contrasena' => bcrypt('admin123'),
+    ]);
+    $rolAdmin = Rol::firstOrCreate(['Nombre' => 'Administrador']);
+    $admin->roles()->attach($rolAdmin->ID_Rol);
+
+    $ciudadano = Usuario::create([
+        'Nombre' => 'Ciudadano Uno',
+        'Email' => 'c1@setc.gob',
+        'Contrasena' => '123',
+    ]);
+
+    // Cita pasada atendida
+    Cita::create([
+        'ID_Usuarios' => $ciudadano->ID_Usuarios,
+        'Fecha' => now()->subDays(5)->toDateString(),
+        'Hora' => '10:00:00',
+        'Estado_Citas' => 'Atendida',
+    ]);
+
+    // Cita futura
+    Cita::create([
+        'ID_Usuarios' => $ciudadano->ID_Usuarios,
+        'Fecha' => now()->addDays(7)->toDateString(),
+        'Hora' => '11:00:00',
+        'Estado_Citas' => 'Programada',
+    ]);
+
+    $response = $this->actingAs($admin)->get(route('portal.citas'));
+    $response->assertOk();
+    $response->assertSee('Todas las Citas Registradas');
+    $response->assertSee('Atendida');
+    $response->assertSee('Ciudadano Uno');
 });

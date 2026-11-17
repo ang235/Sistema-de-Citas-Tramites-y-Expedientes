@@ -7,6 +7,7 @@ use App\Models\Bitacora;
 use App\Models\Documento;
 use App\Models\Requisito;
 use App\Models\Revision;
+use App\Models\Rol;
 use App\Models\Solicitud;
 use App\Models\TipoTramite;
 use App\Models\Usuario;
@@ -90,4 +91,37 @@ test('dictaminarRevision rechaza resultados invalidos', function () {
 
     expect(fn () => $service->dictaminarRevision($revision, 'ResultadoInexistente', $revisor))
         ->toThrow(DomainException::class);
+});
+
+test('HTTP endpoint revisiones.store permite dictaminar Aprobado sin observaciones y valida requerimientos en Observado', function () {
+    $revisor = Usuario::create([
+        'Nombre' => 'Lic Revisor',
+        'Email' => 'lic_revisor@setc.gob',
+        'Contrasena' => bcrypt('password123'),
+    ]);
+    $rolRevisor = Rol::firstOrCreate(['Nombre' => 'Revisor']);
+    $revisor->roles()->attach($rolRevisor->ID_Rol);
+
+    $tipo = TipoTramite::create(['Nombre' => 'Tramite TUPA']);
+    $version = VersionTramite::create(['ID_Tipo_Tramite' => $tipo->ID_Tipo_Tramite, 'No_Version' => 'v1']);
+    $solicitud = Solicitud::create(['ID_Solicitante' => $revisor->ID_Usuarios, 'ID_Version_Tramite' => $version->ID_Version_Tramite]);
+
+    $asignacion = AsignacionRevisor::create([
+        'ID_Solicitud' => $solicitud->ID_Solicitud,
+        'ID_Revisor' => $revisor->ID_Usuarios,
+        'ID_Asignador' => $revisor->ID_Usuarios,
+        'Estado_Asignacion' => 'Activo',
+        'Fecha_Asignacion' => now(),
+    ]);
+
+    // 1. Enviar 'Aprobado' con campo observaciones vacío (el caso que causaba validation.required_with)
+    $responseAprobado = $this->actingAs($revisor)->post(route('portal.revisiones.store', $asignacion->ID_Asignacion), [
+        'resultado' => 'Aprobado',
+        'observaciones' => [
+            0 => ['detalles' => ''],
+        ],
+    ]);
+    $responseAprobado->assertSessionHasNoErrors();
+    $responseAprobado->assertRedirect(route('portal.mesa-dictamen'));
+    expect(Revision::where('ID_Asignacion', $asignacion->ID_Asignacion)->where('Resultado', 'Aprobado')->exists())->toBeTrue();
 });

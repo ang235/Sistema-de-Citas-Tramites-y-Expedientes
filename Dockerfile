@@ -103,6 +103,9 @@ WORKDIR /var/www/setc
 COPY --from=composer_builder --chown=setc:setc /app .
 COPY --from=node_builder     --chown=setc:setc /app/public/build ./public/build
 
+# Respaldar migraciones de la aplicación para sincronizarlas con volúmenes montados
+RUN cp -r /var/www/setc/database/migrations /var/www/setc/database_defaults_migrations
+
 # ---------- permisos de storage y bootstrap/cache ----------
 RUN mkdir -p storage/framework/{sessions,views,cache} \
              storage/logs \

@@ -58,28 +58,30 @@
 
     {{-- ══ KPI SUMMARY CARDS ══ --}}
     @php
-        $totalCitas = $citas->total();
-        $programadasCount = $citas->where('Estado_Citas', 'Programada')->count();
-        $atendidasCount = $citas->where('Estado_Citas', 'Atendida')->count();
-        $canceladasCount = $citas->whereIn('Estado_Citas', ['Cancelada', 'No asistió'])->count();
+        $totalCitas = $kpiTotal ?? $citas->total();
+        $programadasCount = $kpiProgramadas ?? $citas->where('Estado_Citas', 'Programada')->count();
+        $atendidasCount = $kpiAtendidas ?? $citas->where('Estado_Citas', 'Atendida')->count();
+        $canceladasCount = $kpiCanceladas ?? $citas->whereIn('Estado_Citas', ['Cancelada', 'No asistió'])->count();
     @endphp
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="bg-white p-4 rounded-xl border border-slate-200/90 shadow-xs flex flex-col justify-between">
             <div class="flex items-start justify-between">
-                <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Total Programadas</span>
+                <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Total Citas</span>
                 <div class="w-8 h-8 rounded-lg bg-blue-50 text-secondary flex items-center justify-center">
                     <span class="material-symbols-outlined text-base">event</span>
                 </div>
             </div>
             <div class="mt-2">
                 <span class="text-2xl font-bold text-slate-900">{{ $totalCitas }}</span>
-                <span class="text-[11px] text-slate-400 block mt-0.5">Fecha: {{ \Carbon\Carbon::parse($fechaFiltro)->format('d/m/Y') }}</span>
+                <span class="text-[11px] text-slate-400 block mt-0.5">
+                    {{ $fechaFiltro ? 'Fecha: ' . \Carbon\Carbon::parse($fechaFiltro)->format('d/m/Y') : 'Todas las fechas' }}
+                </span>
             </div>
         </div>
 
         <div class="bg-white p-4 rounded-xl border border-slate-200/90 shadow-xs flex flex-col justify-between">
             <div class="flex items-start justify-between">
-                <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">En Espera / Pendientes</span>
+                <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Programadas</span>
                 <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center">
                     <span class="material-symbols-outlined text-base">hourglass_top</span>
                 </div>
@@ -92,7 +94,7 @@
 
         <div class="bg-white p-4 rounded-xl border border-slate-200/90 shadow-xs flex flex-col justify-between">
             <div class="flex items-start justify-between">
-                <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Atendidas</span>
+                <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Realizadas / Atendidas</span>
                 <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center">
                     <span class="material-symbols-outlined text-base">check_circle</span>
                 </div>
@@ -105,7 +107,7 @@
 
         <div class="bg-white p-4 rounded-xl border border-slate-200/90 shadow-xs flex flex-col justify-between">
             <div class="flex items-start justify-between">
-                <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Canceladas / No Asistió</span>
+                <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Canceladas / Vencidas</span>
                 <div class="w-8 h-8 rounded-lg bg-rose-50 text-rose-700 flex items-center justify-center">
                     <span class="material-symbols-outlined text-base">cancel</span>
                 </div>
@@ -121,7 +123,7 @@
     <div class="p-4 bg-white rounded-xl border border-slate-200/90 shadow-xs">
         <form action="{{ route('portal.citas') }}" method="GET" class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-3 items-end">
             <div class="space-y-1">
-                <label class="block text-xs font-semibold text-slate-700">Fecha de Atención</label>
+                <label class="block text-xs font-semibold text-slate-700">Fecha de Atención (Opcional)</label>
                 <input type="date"
                        name="fecha"
                        value="{{ $fechaFiltro }}"
@@ -133,7 +135,7 @@
                 <select name="estado" class="w-full px-3 py-2 bg-slate-50 hover:bg-slate-100/60 rounded-lg text-xs text-slate-800 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-secondary/20 focus:border-secondary focus:bg-white cursor-pointer">
                     <option value="">Todos los estados</option>
                     <option value="Programada" @selected($estadoFiltro === 'Programada')>Programada</option>
-                    <option value="Atendida" @selected($estadoFiltro === 'Atendida')>Atendida</option>
+                    <option value="Atendida" @selected($estadoFiltro === 'Atendida')>Atendida (Realizada)</option>
                     <option value="Cancelada" @selected($estadoFiltro === 'Cancelada')>Cancelada</option>
                     <option value="No asistió" @selected($estadoFiltro === 'No asistió')>No asistió</option>
                 </select>
@@ -143,11 +145,18 @@
                 <button type="submit" class="flex-1 py-2 px-4 bg-primary-container hover:bg-[#1a3860] text-white rounded-lg text-xs font-semibold transition-all">
                     Filtrar Agenda
                 </button>
-                @if ($estadoFiltro || $fechaFiltro !== today()->toDateString())
-                    <a href="{{ route('portal.citas') }}" class="p-2 text-rose-600 hover:bg-rose-50 rounded-lg border border-slate-200" title="Restablecer hoy">
-                        <span class="material-symbols-outlined text-base">today</span>
+                @if ($estadoFiltro || $fechaFiltro)
+                    <a href="{{ route('portal.citas') }}" class="py-2 px-3 text-xs font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-lg border border-slate-200 transition-colors" title="Ver todas las citas sin filtro">
+                        Ver Todas
                     </a>
                 @endif
+            </div>
+
+            <div>
+                <a href="{{ route('portal.citas', ['fecha' => today()->toDateString()]) }}" class="inline-flex items-center gap-1.5 py-2 px-3 text-xs font-semibold text-[#0051d5] hover:bg-blue-50 rounded-lg transition-colors">
+                    <span class="material-symbols-outlined text-sm">today</span>
+                    <span>Ver Citas de Hoy</span>
+                </a>
             </div>
         </form>
     </div>
@@ -156,9 +165,13 @@
     <div class="bg-white rounded-xl border border-slate-200/90 shadow-xs overflow-hidden flex flex-col">
         <div class="px-5 py-3.5 bg-slate-50/80 border-b border-slate-200 flex items-center justify-between">
             <div class="flex items-center gap-2">
-                <span class="material-symbols-outlined text-primary-container text-lg">schedule</span>
+                <span class="material-symbols-outlined text-primary-container text-lg">calendar_month</span>
                 <span class="font-headline-sm text-sm font-bold text-slate-900">
-                    Turnos Asignados — {{ \Carbon\Carbon::parse($fechaFiltro)->isoFormat('dddd, D [de] MMMM [de] YYYY') }}
+                    @if ($fechaFiltro)
+                        Citas del {{ \Carbon\Carbon::parse($fechaFiltro)->isoFormat('dddd, D [de] MMMM [de] YYYY') }}
+                    @else
+                        Todas las Citas Registradas (Histórico Completo)
+                    @endif
                 </span>
             </div>
             <span class="text-xs text-slate-500 font-medium">Mostrando {{ $citas->count() }} de {{ $citas->total() }} turnos</span>
@@ -168,22 +181,26 @@
             <table class="w-full text-left text-xs text-slate-700">
                 <thead class="bg-slate-50 text-[11px] font-semibold text-slate-500 uppercase tracking-wider border-b border-slate-200">
                     <tr>
-                        <th class="py-3 px-4">Hora / Turno</th>
+                        <th class="py-3 px-4">Fecha y Turno</th>
                         <th class="py-3 px-4">Ciudadano Solicitante</th>
                         <th class="py-3 px-4">Expediente / Trámite Asociado</th>
                         <th class="py-3 px-4 text-center">Estado del Turno</th>
-                        <th class="py-3 px-4 text-right">Actualizar Estado</th>
+                        <th class="py-3 px-4 text-right">Pase Digital</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
                     @forelse ($citas as $cita)
                         <tr class="hover:bg-slate-50 transition-colors">
                             <td class="py-3.5 px-4">
-                                <div class="flex items-center gap-2">
-                                    <span class="font-mono font-bold text-sm text-primary-container">
-                                        {{ substr($cita->Hora, 0, 5) }}
+                                <div class="font-bold text-[#001229] flex items-center gap-1.5">
+                                    <span class="material-symbols-outlined text-xs text-[#0051d5]">calendar_today</span>
+                                    <span>{{ \Carbon\Carbon::parse($cita->Fecha)->format('d/m/Y') }}</span>
+                                </div>
+                                <div class="flex items-center gap-2 mt-0.5">
+                                    <span class="font-mono font-bold text-xs text-primary-container">
+                                        {{ substr((string)$cita->Hora, 0, 5) }} hrs
                                     </span>
-                                    <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-secondary border border-blue-200/60">
+                                    <span class="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-blue-50 text-secondary border border-blue-200/60">
                                         Ventanilla 04
                                     </span>
                                 </div>
@@ -220,19 +237,10 @@
                             </td>
 
                             <td class="py-3.5 px-4 text-right">
-                                <form action="{{ route('portal.citas.estado', $cita->ID_Citas) }}" method="POST" class="inline-flex items-center gap-1.5">
-                                    @csrf
-                                    @method('PATCH')
-                                    <select name="estado_citas" onchange="this.form.submit()" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:border-slate-300 focus:outline-none focus:ring-1 focus:ring-secondary cursor-pointer shadow-xs">
-                                        <option value="Programada" @selected($cita->Estado_Citas === 'Programada')>Programada</option>
-                                        <option value="Atendida" @selected($cita->Estado_Citas === 'Atendida')>Atendida</option>
-                                        <option value="No asistió" @selected($cita->Estado_Citas === 'No asistió')>No asistió</option>
-                                        <option value="Cancelada" @selected($cita->Estado_Citas === 'Cancelada')>Cancelada</option>
-                                    </select>
-                                    <a href="{{ route('citas.pase', $cita->ID_Citas) }}" target="_blank" class="p-1 rounded-md text-slate-400 hover:text-[#0051d5] hover:bg-slate-100 transition-colors" title="Ver Pase Digital QR">
-                                        <span class="material-symbols-outlined text-base">qr_code_2</span>
-                                    </a>
-                                </form>
+                                <a href="{{ route('citas.pase', $cita->ID_Citas) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-[#0051d5] bg-[#eff4ff] hover:bg-[#dce9ff] transition-colors" title="Ver Pase Digital con código QR">
+                                    <span class="material-symbols-outlined text-sm">qr_code_2</span>
+                                    <span>Ver Pase</span>
+                                </a>
                             </td>
                         </tr>
                     @empty

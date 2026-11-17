@@ -96,6 +96,7 @@ Route::prefix('portal')->name('portal.')->middleware('auth')->group(function ():
     Route::get('/expedientes', [MesaDictamenController::class, 'index'])->name('expedientes');
     Route::get('/expedientes/{idSolicitud}', [MesaDictamenController::class, 'show'])->name('expedientes.show');
     Route::get('/expedientes/{idSolicitud}/evaluar', [MesaDictamenController::class, 'show'])->name('expedientes.evaluar');
+    Route::get('/documentos/{idDocumento}/archivo', [MesaDictamenController::class, 'verArchivo'])->name('documentos.archivo');
     Route::post('/documentos/{idDocumento}/evaluar', [MesaDictamenController::class, 'evaluarDocumento'])->name('documentos.evaluar');
     Route::post('/asignaciones/{idAsignacion}/revision', [MesaDictamenController::class, 'registrarRevision'])->name('revisiones.store');
 

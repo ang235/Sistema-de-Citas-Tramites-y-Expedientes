@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Bitacora;
 use App\Models\Cita;
 use App\Models\Usuario;
+use App\Services\CitaService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,7 +16,7 @@ use Illuminate\View\View;
 
 class CitaOperativaController extends Controller
 {
-    public function index(Request $request): View|RedirectResponse
+    public function index(Request $request, CitaService $citaService): View|RedirectResponse
     {
         /** @var Usuario|null $currentUser */
         $currentUser = Auth::user();
@@ -27,22 +28,38 @@ class CitaOperativaController extends Controller
             return redirect()->route('expedientes.index');
         }
 
-        $fecha = $request->query('fecha', today()->toDateString());
+        // Cancelar automáticamente citas vencidas
+        $citaService->cancelarCitasVencidas();
+
+        $fecha = $request->query('fecha');
         $estado = $request->query('estado');
 
-        $citas = Cita::query()
-            ->whereDate('Fecha', $fecha)
-            ->when($estado, function ($query, $st): void {
-                $query->where('Estado_Citas', $st);
+        $query = Cita::query()
+            ->when($fecha && $fecha !== 'todas', function ($q) use ($fecha): void {
+                $q->whereDate('Fecha', $fecha);
+            })
+            ->when($estado, function ($q, $st): void {
+                $q->where('Estado_Citas', $st);
             })
             ->with(['usuario', 'solicitud.folio', 'solicitud.versionTramite.tipoTramite'])
-            ->orderBy('Hora', 'asc')
-            ->paginate(20);
+            ->orderBy('Fecha', 'desc')
+            ->orderBy('Hora', 'desc');
+
+        $citas = $query->paginate(20)->withQueryString();
+
+        $kpiQuery = Cita::query()
+            ->when($fecha && $fecha !== 'todas', function ($q) use ($fecha): void {
+                $q->whereDate('Fecha', $fecha);
+            });
 
         return view('portal.citas', [
             'citas' => $citas,
             'fechaFiltro' => $fecha,
             'estadoFiltro' => $estado,
+            'kpiTotal' => (clone $kpiQuery)->count(),
+            'kpiProgramadas' => (clone $kpiQuery)->where('Estado_Citas', 'Programada')->count(),
+            'kpiAtendidas' => (clone $kpiQuery)->where('Estado_Citas', 'Atendida')->count(),
+            'kpiCanceladas' => (clone $kpiQuery)->whereIn('Estado_Citas', ['Cancelada', 'No asistió'])->count(),
         ]);
     }
 

@@ -113,6 +113,55 @@ class CitaService
     }
 
     /**
+     * Cancela automáticamente las citas pasadas que sigan en estado 'Programada'.
+     * Regla: Las citas vencidas se cancelan automáticamente después de su fecha/hora.
+     */
+    public function cancelarCitasVencidas(): int
+    {
+        $hoy = today()->toDateString();
+        $horaActual = now()->format('H:i:s');
+
+        // Seleccionar citas vencidas para auditar en bitácora
+        $citasVencidas = Cita::where('Estado_Citas', 'Programada')
+            ->where(function ($query) use ($hoy, $horaActual): void {
+                $query->whereDate('Fecha', '<', $hoy)
+                    ->orWhere(function ($q) use ($hoy, $horaActual): void {
+                        $q->whereDate('Fecha', '=', $hoy)
+                            ->where('Hora', '<', $horaActual);
+                    });
+            })
+            ->get();
+
+        if ($citasVencidas->isEmpty()) {
+            return 0;
+        }
+
+        $ids = $citasVencidas->pluck('ID_Citas')->all();
+
+        $afectadas = Cita::whereIn('ID_Citas', $ids)
+            ->update([
+                'Estado_Citas' => 'Cancelada',
+                'updated_at' => now(),
+            ]);
+
+        foreach ($citasVencidas as $cita) {
+            Bitacora::create([
+                'ID_Usuarios' => $cita->ID_Usuarios,
+                'Accion' => 'Cancelación automática por vencimiento',
+                'Descripcion' => sprintf(
+                    'La cita #%d programada para el %s a las %s fue cancelada automáticamente por superar la fecha/hora de atención.',
+                    $cita->ID_Citas,
+                    (string) $cita->Fecha,
+                    substr((string) $cita->Hora, 0, 5)
+                ),
+                'Fecha_Creacion' => now(),
+            ]);
+        }
+
+        return $afectadas;
+    }
+
+    /**
      * Cancela una cita y registra la justificación en bitácora.
      */
     public function cancelarCita(Cita $cita, Usuario $usuario, string $motivo): Cita

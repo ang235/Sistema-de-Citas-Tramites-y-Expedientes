@@ -24,4 +24,17 @@ class StoreCitaRequest extends FormRequest
             'hora' => ['required', 'date_format:H:i'],
         ];
     }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'fecha.required' => 'La fecha de la cita es obligatoria.',
+            'fecha.after_or_equal' => 'No se permiten citas en fechas anteriores a la actual.',
+            'hora.required' => 'Debe seleccionar un horario disponible para su cita.',
+            'hora.date_format' => 'El formato del horario no es válido.',
+        ];
+    }
 }

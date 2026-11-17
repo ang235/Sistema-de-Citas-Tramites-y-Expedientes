@@ -18,7 +18,10 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class MesaDictamenController extends Controller
 {
@@ -304,5 +307,53 @@ class MesaDictamenController extends Controller
 
         return redirect()->route('portal.mesa-dictamen')
             ->with('success', 'Dictamen técnico registrado exitosamente.');
+    }
+
+    /**
+     * Permite la visualización o descarga segura del archivo digital cargado por el ciudadano.
+     */
+    public function verArchivo(Request $request, int $idDocumento): Response|BinaryFileResponse
+    {
+        /** @var Usuario|null $usuario */
+        $usuario = Auth::user();
+        abort_if(! $usuario, 401);
+
+        /** @var Documento $documento */
+        $documento = Documento::with(['solicitud', 'versionesDoc', 'requisito'])->findOrFail($idDocumento);
+
+        // Si es ciudadano, solo puede consultar documentos de sus propias solicitudes
+        if ($usuario->esCiudadano() && (int) $documento->solicitud?->ID_Solicitante !== (int) $usuario->ID_Usuarios) {
+            abort(403, 'No tiene autorización para visualizar este archivo.');
+        }
+
+        $ultimaVersion = $documento->versionesDoc->last();
+        $ruta = $ultimaVersion?->Ruta_Archivo;
+
+        // Búsqueda de respaldo por carpeta de expediente si no está la ruta exacta
+        if (! $ruta || ! Storage::disk('local')->exists($ruta)) {
+            $dir = "expedientes/{$documento->ID_Solicitud}";
+            $archivos = Storage::disk('local')->files($dir);
+            if (! empty($archivos)) {
+                $docIds = $documento->solicitud->documentos()->orderBy('ID_Documento')->pluck('ID_Documento')->values();
+                $pos = $docIds->search($idDocumento);
+                $ruta = $archivos[$pos !== false ? $pos : 0] ?? $archivos[0];
+            }
+        }
+
+        if (! $ruta || ! Storage::disk('local')->exists($ruta)) {
+            abort(404, 'El archivo digital no fue encontrado en el almacenamiento institucional.');
+        }
+
+        $nombreDescarga = $ultimaVersion?->Nombre_Original ?? (($documento->requisito?->Nombre ?? 'documento').'.pdf');
+        $nombreLimpio = preg_replace('/[^A-Za-z0-9_\-\.]/', '_', $nombreDescarga);
+
+        return Storage::disk('local')->response(
+            $ruta,
+            $nombreLimpio,
+            [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => ($request->query('descargar') ? 'attachment' : 'inline').'; filename="'.$nombreLimpio.'"',
+            ]
+        );
     }
 }

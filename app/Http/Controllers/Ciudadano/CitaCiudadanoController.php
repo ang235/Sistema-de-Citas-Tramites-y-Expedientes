@@ -9,6 +9,8 @@ use App\Http\Requests\Ciudadano\StoreCitaRequest;
 use App\Models\Bitacora;
 use App\Models\Cita;
 use App\Models\Solicitud;
+use App\Services\CitaService;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,8 +18,10 @@ use Illuminate\View\View;
 
 class CitaCiudadanoController extends Controller
 {
-    public function index(): View
+    public function index(CitaService $citaService): View
     {
+        $citaService->cancelarCitasVencidas();
+
         $idUsuario = (int) Auth::id();
 
         $citas = Cita::where('ID_Usuarios', $idUsuario)
@@ -38,38 +42,62 @@ class CitaCiudadanoController extends Controller
             ->with(['folio', 'versionTramite.tipoTramite'])
             ->get();
 
+        // Mapear horarios ocupados por fecha para deshabilitar en el selector visual
+        $citasOcupadas = Cita::where('Estado_Citas', '!=', 'Cancelada')
+            ->whereDate('Fecha', '>=', today())
+            ->get(['Fecha', 'Hora'])
+            ->groupBy(function ($c) {
+                return $c->Fecha ? Carbon::parse($c->Fecha)->format('Y-m-d') : '';
+            })
+            ->map(function ($group) {
+                return $group->map(fn ($c) => substr((string) $c->Hora, 0, 5))->unique()->values();
+            });
+
         return view('public.citas.create', [
             'idSolicitudSeleccionada' => $idSolicitud,
             'solicitudes' => $solicitudes,
+            'citasOcupadas' => $citasOcupadas,
         ]);
     }
 
     public function store(StoreCitaRequest $request): RedirectResponse
     {
         $idUsuario = (int) Auth::id();
+        $fechaInput = $request->validated('fecha');
+        $horaInput = substr((string) $request->validated('hora'), 0, 5);
 
-        // Validar si ya existe cita para ese día y hora en la sede o usuario
-        $existe = Cita::where('Fecha', $request->validated('fecha'))
-            ->where('Hora', $request->validated('hora'))
+        // 1. Prohibir estrictamente citas en fechas anteriores
+        $fechaCarbon = Carbon::parse($fechaInput)->startOfDay();
+        if ($fechaCarbon->isPast() && ! $fechaCarbon->isToday()) {
+            return back()->withErrors(['fecha' => 'No es posible agendar citas en fechas anteriores a la actual.'])->withInput();
+        }
+
+        // 2. Prohibir citas duplicadas en el mismo horario y fecha
+        $fechaStr = $fechaCarbon->format('Y-m-d');
+        $existe = Cita::whereDate('Fecha', $fechaStr)
+            ->where(function ($q) use ($horaInput): void {
+                $q->where('Hora', $horaInput)
+                    ->orWhere('Hora', 'like', "{$horaInput}%");
+            })
             ->where('Estado_Citas', '!=', 'Cancelada')
             ->exists();
 
         if ($existe) {
-            return back()->withErrors(['hora' => 'El horario seleccionado ya se encuentra ocupado.'])->withInput();
+            return back()->withErrors(['hora' => 'El horario y fecha seleccionados ya se encuentran ocupados. Por favor elija otro horario disponible.'])->withInput();
         }
 
         $cita = Cita::create([
             'ID_Usuarios' => $idUsuario,
             'ID_Solicitud' => $request->validated('id_solicitud'),
-            'Fecha' => $request->validated('fecha'),
-            'Hora' => $request->validated('hora'),
+            'Fecha' => $fechaStr,
+            'Hora' => $horaInput,
             'Estado_Citas' => 'Programada',
         ]);
 
         Bitacora::create([
             'ID_Usuarios' => $idUsuario,
             'Accion' => 'Agendación de cita',
-            'Descripcion' => "Cita agendada para {$cita->Fecha->format('Y-m-d')} a las {$cita->Hora}.",
+            'Descripcion' => "Cita agendada para {$fechaStr} a las {$horaInput}.",
             'Fecha_Creacion' => now(),
         ]);
 

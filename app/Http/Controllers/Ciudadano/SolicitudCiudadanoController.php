@@ -21,19 +21,28 @@ use Illuminate\View\View;
 
 class SolicitudCiudadanoController extends Controller
 {
-    public function create(int $idTipoTramite): View
+    public function create(int $idTipoTramite): View|RedirectResponse
     {
-        /** @var TipoTramite $tramite */
-        $tramite = TipoTramite::where('Estado_Tipo_Tr', 'Activo')
+        /** @var TipoTramite|null $tramite */
+        $tramite = TipoTramite::where('Estado_Tipo_Tr', '!=', 'Inactivo')
             ->with(['versiones' => function ($query): void {
-                $query->where('Estado_Ver_Tr', 'Vigente')->with('requisitos');
+                $query->with('requisitos');
             }])
-            ->findOrFail($idTipoTramite);
+            ->find($idTipoTramite);
+
+        if (! $tramite) {
+            return redirect()->route('tramites.index')
+                ->with('error', 'El trámite seleccionado no se encuentra disponible.');
+        }
 
         /** @var VersionTramite|null $versionVigente */
-        $versionVigente = $tramite->versiones->first();
+        $versionVigente = $tramite->versiones->where('Estado_Ver_Tr', 'Vigente')->first()
+            ?? $tramite->versiones->first();
 
-        abort_if($versionVigente === null, 404, 'El trámite no cuenta con una versión vigente para inicio.');
+        if (! $versionVigente) {
+            return redirect()->route('tramites.index')
+                ->with('error', 'El trámite no cuenta con una versión vigente para inicio telemático.');
+        }
 
         return view('public.solicitudes.create', [
             'tramite' => $tramite,
@@ -48,7 +57,6 @@ class SolicitudCiudadanoController extends Controller
         /** @var VersionTramite $versionTramite */
         $versionTramite = VersionTramite::with('requisitos')
             ->where('ID_Version_Tramite', $request->validated('id_version_tramite'))
-            ->where('Estado_Ver_Tr', 'Vigente')
             ->firstOrFail();
 
         $solicitud = DB::transaction(function () use ($request, $idUsuario, $versionTramite): Solicitud {
@@ -57,10 +65,26 @@ class SolicitudCiudadanoController extends Controller
                 'ID_Solicitante' => $idUsuario,
                 'ID_Version_Tramite' => $versionTramite->ID_Version_Tramite,
                 'Fecha_Creacion_Solicitud' => now(),
+                'Estado_Solicitud' => 'Radicada',
             ]);
 
             // 2. Generar el Folio oficial
-            $codigoFolio = sprintf('SETC-%s-%05d', date('Y'), $solicitud->ID_Solicitud);
+            $year = date('Y');
+            $ultimoFolio = Folio::query()
+                ->where('Codigo_Folio', 'LIKE', "SETC-{$year}-%")
+                ->lockForUpdate()
+                ->latest('ID_Folio')
+                ->first();
+
+            $consecutivo = 1;
+            if ($ultimoFolio !== null && preg_match('/SETC-\d{4}-(\d+)/', (string) $ultimoFolio->Codigo_Folio, $matches)) {
+                $consecutivo = ((int) $matches[1]) + 1;
+            } else {
+                $consecutivo = (int) $solicitud->ID_Solicitud;
+            }
+
+            $codigoFolio = sprintf('SETC-%s-%05d', $year, $consecutivo);
+
             Folio::create([
                 'ID_Solicitud' => $solicitud->ID_Solicitud,
                 'Codigo_Folio' => $codigoFolio,
@@ -87,11 +111,13 @@ class SolicitudCiudadanoController extends Controller
 
                 if (isset($archivos[$requisito->ID_Requisitos])) {
                     $file = $archivos[$requisito->ID_Requisitos];
-                    $file->store("expedientes/{$solicitud->ID_Solicitud}");
+                    $ruta = $file->store("expedientes/{$solicitud->ID_Solicitud}");
 
                     VersionDoc::create([
                         'ID_Documento' => $doc->ID_Documento,
                         'Fecha_Carga' => now(),
+                        'Ruta_Archivo' => $ruta,
+                        'Nombre_Original' => $file->getClientOriginalName(),
                     ]);
                 }
             }

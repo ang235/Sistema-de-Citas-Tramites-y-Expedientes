@@ -12,12 +12,42 @@
 @endsection
 
 @section('content')
-<div class="max-w-7xl mx-auto px-6 lg:px-12 py-8 w-full space-y-10" x-data="{
+<div class="max-w-7xl mx-auto px-6 lg:px-12 py-8 w-full space-y-8" x-data="{
     modalidad: 'presencial',
-    fecha: '{{ date('Y-m-d', strtotime('+1 day')) }}',
+    fecha: '{{ date('Y-m-d', strtotime('+14 days')) }}',
     hora: '09:30',
-    solicitudId: '{{ $idSolicitudSeleccionada ?? ($solicitudes->first()?->ID_Solicitud ?? '') }}'
-}">
+    solicitudId: '{{ $idSolicitudSeleccionada ?? ($solicitudes->first()?->ID_Solicitud ?? '') }}',
+    citasOcupadas: {{ json_encode($citasOcupadas ?? []) }},
+    slots: ['08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30'],
+    isSlotOccupied(slot) {
+        let ocupados = this.citasOcupadas[this.fecha] || [];
+        return ocupados.includes(slot);
+    },
+    selectSlot(slot) {
+        if (!this.isSlotOccupied(slot)) {
+            this.hora = slot;
+        }
+    },
+    checkSlotAvailable() {
+        if (this.isSlotOccupied(this.hora)) {
+            let available = this.slots.find(s => !this.isSlotOccupied(s));
+            this.hora = available || '';
+        }
+    }
+}" x-init="checkSlotAvailable()">
+
+    {{-- ACLARACIÓN DE ANTICIPACIÓN OBLIGATORIA --}}
+    <div class="p-4 sm:p-5 rounded-2xl bg-amber-50 border border-amber-200/90 text-amber-950 flex items-start gap-3.5 shadow-xs">
+        <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-2xl">event_upcoming</span>
+        </div>
+        <div class="space-y-1">
+            <h3 class="text-sm font-bold text-amber-950">Aclaración Institucional sobre Agendamiento</h3>
+            <p class="text-xs text-amber-900 leading-relaxed">
+                Por disposición normativa del SETC, <strong>se solicita que las citas se hagan con 2 semanas de anticipación</strong> para garantizar la debida preparación del expediente técnico y la asignación del especialista.
+            </p>
+        </div>
+    </div>
 
     {{-- ══════════════════════════════════════════ HEADER & STEPPER ══ --}}
     <div class="relative overflow-hidden rounded-2xl bg-white border border-slate-200/80 p-8 shadow-xs">
@@ -187,29 +217,46 @@
 
                     <div class="space-y-4">
                         <div>
-                            <label for="fecha" class="block text-xs font-semibold text-[#0b1c30] mb-1">
-                                Fecha de la Cita
-                            </label>
+                            <div class="flex items-center justify-between mb-1">
+                                <label for="fecha" class="block text-xs font-semibold text-[#0b1c30]">
+                                    Fecha de la Cita
+                                </label>
+                                <span class="text-[11px] text-amber-700 font-medium">Recomendado: 2 semanas de anticipación</span>
+                            </div>
                             <input type="date"
                                    name="fecha"
                                    id="fecha"
                                    x-model="fecha"
+                                   @change="checkSlotAvailable()"
                                    min="{{ date('Y-m-d') }}"
                                    required
                                    class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#0051d5]">
+                            <p class="text-[11px] text-slate-500 mt-1 flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs text-blue-600">info</span>
+                                No se admiten citas en fechas pasadas. Las citas deben programarse con 2 semanas de anticipación.
+                            </p>
                         </div>
 
                         <div>
-                            <span class="block text-xs font-semibold text-[#0b1c30] mb-2">Horarios Disponibles</span>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="block text-xs font-semibold text-[#0b1c30]">Horarios Disponibles para la Fecha</span>
+                                <span class="text-[11px] text-slate-400">Los horarios ocupados se bloquean automáticamente</span>
+                            </div>
                             <div class="grid grid-cols-3 sm:grid-cols-4 gap-2.5">
-                                @foreach (['08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30'] as $slot)
+                                <template x-for="slot in slots" :key="slot">
                                     <button type="button"
-                                            @click="hora = '{{ $slot }}'"
-                                            :class="hora === '{{ $slot }}' ? 'bg-[#001229] text-white shadow-xs font-bold' : 'bg-slate-50 hover:bg-slate-100 text-slate-700'"
-                                            class="py-2.5 rounded-lg text-xs transition-all text-center">
-                                        {{ $slot }}
+                                            @click="selectSlot(slot)"
+                                            :disabled="isSlotOccupied(slot)"
+                                            :class="{
+                                                'bg-[#001229] text-white shadow-xs font-bold ring-2 ring-blue-500 cursor-pointer': hora === slot && !isSlotOccupied(slot),
+                                                'bg-slate-50 hover:bg-slate-100 text-slate-700 cursor-pointer': hora !== slot && !isSlotOccupied(slot),
+                                                'bg-slate-100 text-slate-400 cursor-not-allowed line-through opacity-60 border border-slate-200': isSlotOccupied(slot)
+                                            }"
+                                            class="py-2.5 px-1.5 rounded-lg text-xs transition-all text-center flex flex-col items-center justify-center gap-0.5 min-h-[46px]">
+                                        <span x-text="slot"></span>
+                                        <span x-show="isSlotOccupied(slot)" class="text-[9px] font-bold text-rose-600 no-underline">Ocupado</span>
                                     </button>
-                                @endforeach
+                                </template>
                             </div>
                             <input type="hidden" name="hora" :value="hora">
                         </div>

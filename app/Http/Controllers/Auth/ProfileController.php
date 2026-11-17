@@ -6,7 +6,10 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Bitacora;
+use App\Models\Cita;
+use App\Models\Solicitud;
 use App\Models\Usuario;
+use App\Services\CitaService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,14 +19,33 @@ use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
-    public function show(): View
+    public function show(CitaService $citaService): View
     {
+        // Cancelar citas que hayan vencido automáticamente
+        $citaService->cancelarCitasVencidas();
+
         /** @var Usuario $usuario */
         $usuario = Auth::user();
+        if (! $usuario->relationLoaded('roles')) {
+            $usuario->load('roles');
+        }
 
-        return view('public.home', [
-            'seccion' => 'profile',
+        $citas = Cita::where('ID_Usuarios', $usuario->ID_Usuarios)
+            ->with(['solicitud.folio', 'solicitud.versionTramite.tipoTramite'])
+            ->orderBy('Fecha', 'desc')
+            ->orderBy('Hora', 'desc')
+            ->get();
+
+        $solicitudes = Solicitud::where('ID_Solicitante', $usuario->ID_Usuarios)
+            ->with(['folio', 'versionTramite.tipoTramite'])
+            ->latest('ID_Solicitud')
+            ->take(5)
+            ->get();
+
+        return view('public.profile.show', [
             'usuario' => $usuario,
+            'citas' => $citas,
+            'solicitudes' => $solicitudes,
         ]);
     }
 

@@ -91,11 +91,14 @@ class ExpedienteCiudadanoController extends Controller
                 // Asociar al primer documento que corresponda
                 $doc = $solicitud->documentos->first();
                 if ($doc !== null) {
-                    $request->file('archivo')->store("expedientes/{$solicitud->ID_Solicitud}");
+                    $archivo = $request->file('archivo');
+                    $ruta = $archivo->store("expedientes/{$solicitud->ID_Solicitud}");
 
                     $versionDoc = VersionDoc::create([
                         'ID_Documento' => $doc->ID_Documento,
                         'Fecha_Carga' => now(),
+                        'Ruta_Archivo' => $ruta,
+                        'Nombre_Original' => $archivo->getClientOriginalName(),
                     ]);
                     $idVersionDoc = $versionDoc->ID_Version_Doc;
 

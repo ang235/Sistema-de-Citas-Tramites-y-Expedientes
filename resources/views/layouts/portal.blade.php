@@ -214,7 +214,7 @@
                         <div class="sidebar-btn-icon bg-rose-500/20 text-rose-300 border border-rose-400/20">
                             <span class="material-symbols-outlined text-base">tune</span>
                         </div>
-                        <span class="flex-1 truncate">Trámites y Requisitos</span>
+                        <span class="flex-1 truncate">Gestion de tramites y requisitos</span>
                     </a>
 
                     <a href="{{ route('portal.auditoria') }}"

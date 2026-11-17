@@ -102,84 +102,137 @@
             {{ session('error') }}
         </div>
     @endif
+    @if ($errors->any())
+        <div class="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 text-xs font-semibold space-y-1">
+            <div class="flex items-center gap-2 font-bold">
+                <span class="material-symbols-outlined text-base">error</span>
+                <span>Por favor verifique los siguientes requerimientos:</span>
+            </div>
+            <ul class="list-disc list-inside pl-5 space-y-0.5 font-normal">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
     {{-- WORKSPACE: DOCUMENTOS (IZQ) & DICTAMEN (DER) --}}
-    <div class="grid grid-cols-1 xl:grid-cols-12 gap-space-lg items-start">
+    @php
+        $docsData = $solicitud->documentos->map(function($d) {
+            $v = $d->versionesDoc->last();
+            $tieneArchivo = (bool) ($v && $v->Ruta_Archivo && \Illuminate\Support\Facades\Storage::disk('local')->exists($v->Ruta_Archivo));
+            if (!$tieneArchivo) {
+                $archivosDir = \Illuminate\Support\Facades\Storage::disk('local')->files("expedientes/{$d->ID_Solicitud}");
+                $tieneArchivo = !empty($archivosDir);
+            }
+
+            return [
+                'id' => $d->ID_Documento,
+                'nombre' => $d->requisito?->Nombre ?? ('Documento #' . $d->ID_Documento),
+                'formato' => $d->requisito?->Formato ?? 'PDF',
+                'prioridad' => $d->requisito?->Prioridad ?? 'Obligatorio',
+                'estado' => $d->Estado_Doc,
+                'tiene_archivo' => $tieneArchivo,
+                'archivo_url' => route('portal.documentos.archivo', $d->ID_Documento),
+                'archivo_nombre' => $v?->Nombre_Original ?? (($d->requisito?->Nombre ?? 'Documento') . '.pdf'),
+                'fecha_carga' => $v?->Fecha_Carga ? $v->Fecha_Carga->format('d/m/Y H:i') : null,
+                'versiones_count' => $d->versionesDoc->count(),
+            ];
+        })->values();
+    @endphp
+
+    <div class="grid grid-cols-1 xl:grid-cols-12 gap-space-lg items-start"
+         x-data="{
+             docs: {{ json_encode($docsData) }},
+             activeIndex: 0,
+             get activeDoc() { return this.docs[this.activeIndex] || null; },
+             selectDoc(idx) { this.activeIndex = idx; }
+         }">
 
         {{-- COLUMNA IZQUIERDA: VISOR DE DOCUMENTOS Y RECAUDOS --}}
         <div class="xl:col-span-7 flex flex-col gap-space-md">
 
-            {{-- TABS DE DOCUMENTOS --}}
+            {{-- VISOR INTERACTIVO DE DOCUMENTOS --}}
             <div class="p-5 bg-white dark:bg-[#111f33] rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col gap-4">
+                {{-- Selector de pestañas de recaudos --}}
                 <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-50 dark:bg-slate-800/60 p-2 rounded-xl">
-                    <div class="flex items-center gap-1 overflow-x-auto">
+                    <div class="flex items-center gap-1.5 overflow-x-auto max-w-full pb-1 sm:pb-0">
                         @forelse($solicitud->documentos as $idx => $doc)
-                            <button class="px-3.5 py-2 rounded-lg text-xs font-bold shadow-xs flex items-center gap-2 transition-colors {{ $idx === 0 ? 'bg-white dark:bg-slate-700 text-[#0051d5]' : 'text-slate-500 hover:text-slate-800' }}" type="button">
-                                <span class="material-symbols-outlined text-sm">description</span>
-                                <span>{{ Str::limit($doc->requisito?->Nombre ?? 'Doc #' . ($idx + 1), 18) }}</span>
-                                <span class="w-2 h-2 rounded-full {{ $doc->Estado_Doc === 'Aprobado' ? 'bg-emerald-500' : ($doc->Estado_Doc === 'Observado' ? 'bg-amber-500' : 'bg-slate-300') }}"></span>
+                            <button type="button"
+                                    @click="selectDoc({{ $idx }})"
+                                    :class="activeIndex === {{ $idx }} ? 'bg-white dark:bg-slate-700 text-[#0051d5] dark:text-blue-400 shadow-xs font-bold ring-1 ring-blue-200 dark:ring-blue-900' : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700/50'"
+                                    class="px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 transition-all shrink-0 cursor-pointer">
+                                <span class="material-symbols-outlined text-sm">picture_as_pdf</span>
+                                <span class="truncate max-w-[140px]">{{ $doc->requisito?->Nombre ?? 'Doc #' . ($idx + 1) }}</span>
+                                <span class="w-2 h-2 rounded-full shrink-0 {{ $doc->Estado_Doc === 'Aprobado' ? 'bg-emerald-500' : ($doc->Estado_Doc === 'Observado' ? 'bg-amber-500' : ($doc->Estado_Doc === 'Rechazado' ? 'bg-rose-500' : 'bg-slate-400')) }}"></span>
                             </button>
                         @empty
-                            <button class="px-3.5 py-2 rounded-lg bg-white dark:bg-slate-700 text-[#0051d5] text-xs font-bold shadow-xs flex items-center gap-2" type="button">
-                                <span class="material-symbols-outlined text-sm">description</span>
-                                <span>Recaudo Digital</span>
-                            </button>
+                            <span class="text-xs text-slate-500 px-3 py-2">Sin documentos adjuntos</span>
                         @endforelse
                     </div>
-                    <div class="flex items-center gap-1 px-2">
-                        <button class="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-800" title="Acercar" type="button"><span class="material-symbols-outlined text-base">zoom_in</span></button>
-                        <button class="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-800" title="Alejar" type="button"><span class="material-symbols-outlined text-base">zoom_out</span></button>
-                        <button class="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-800" title="Rotar" type="button"><span class="material-symbols-outlined text-base">rotate_right</span></button>
-                        <button class="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-800" title="Pantalla completa" type="button"><span class="material-symbols-outlined text-base">fullscreen</span></button>
+
+                    {{-- Herramientas de visualización rápida --}}
+                    <div class="flex items-center gap-1.5 shrink-0 ml-auto" x-show="activeDoc?.tiene_archivo">
+                        <a :href="activeDoc?.archivo_url"
+                           target="_blank"
+                           class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-[#0051d5] text-xs font-semibold transition-colors"
+                           title="Abrir en pestaña nueva a pantalla completa">
+                            <span class="material-symbols-outlined text-sm">open_in_new</span>
+                            <span class="hidden sm:inline">Pantalla Completa</span>
+                        </a>
+                        <a :href="activeDoc?.archivo_url + '?descargar=1'"
+                           class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors"
+                           title="Descargar documento">
+                            <span class="material-symbols-outlined text-sm">download</span>
+                            <span class="hidden sm:inline">Descargar</span>
+                        </a>
                     </div>
                 </div>
 
-                {{-- Mockup del Recaudo Digital --}}
-                <div class="relative w-full h-[380px] bg-slate-50 dark:bg-slate-800/40 rounded-xl overflow-hidden flex items-center justify-center p-6 border border-slate-200 dark:border-slate-700">
-                    <div class="relative w-full max-w-md h-full bg-white dark:bg-[#0c1a2e] rounded-lg shadow-md p-6 flex flex-col justify-between overflow-hidden border border-slate-100 dark:border-slate-700">
-                        <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-700">
-                            <div class="flex items-center gap-2.5">
-                                <div class="w-8 h-8 rounded-lg bg-[#0f2744] text-white flex items-center justify-center font-bold text-xs">SETC</div>
-                                <div class="flex flex-col">
-                                    <span class="text-[11px] font-bold text-[#0b1c30] dark:text-white uppercase tracking-wider">Recaudo Digital Verificado</span>
-                                    <span class="text-[10px] text-slate-400 font-mono">EXP-{{ $solicitud->ID_Solicitud }}-RECAUDO-01</span>
-                                </div>
-                            </div>
-                            <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[10px] font-mono">Pag. 1 / 1</span>
+                {{-- Ficha del Documento Activo --}}
+                <div class="flex flex-wrap items-center justify-between gap-2 px-1 text-xs">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <span class="font-bold text-[#001229] dark:text-white truncate" x-text="activeDoc?.nombre"></span>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300" x-text="activeDoc?.formato || 'PDF'"></span>
+                    </div>
+                    <div class="flex items-center gap-2 text-slate-500 text-[11px]">
+                        <span x-show="activeDoc?.fecha_carga" x-text="'Cargado: ' + activeDoc?.fecha_carga"></span>
+                        <span class="w-1 h-1 rounded-full bg-slate-300"></span>
+                        <span class="font-semibold"
+                              :class="{
+                                  'text-emerald-700 dark:text-emerald-400': activeDoc?.estado === 'Aprobado',
+                                  'text-amber-700 dark:text-amber-400': activeDoc?.estado === 'Observado',
+                                  'text-rose-700 dark:text-rose-400': activeDoc?.estado === 'Rechazado',
+                                  'text-slate-600 dark:text-slate-400': activeDoc?.estado !== 'Aprobado' && activeDoc?.estado !== 'Observado' && activeDoc?.estado !== 'Rechazado'
+                              }"
+                              x-text="'Estado: ' + (activeDoc?.estado || 'Pendiente')"></span>
+                    </div>
+                </div>
+
+                {{-- Visor Real del Archivo PDF Cargado por el Ciudadano --}}
+                <div class="relative w-full rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-900 shadow-inner">
+                    {{-- Caso 1: Archivo disponible --}}
+                    <div x-show="activeDoc?.tiene_archivo" class="w-full h-[620px]">
+                        <iframe :src="activeDoc?.archivo_url"
+                                class="w-full h-full border-0 bg-white"
+                                title="Visualizador oficial del documento adjunto"></iframe>
+                    </div>
+
+                    {{-- Caso 2: Archivo no cargado aún por el ciudadano --}}
+                    <div x-show="!activeDoc?.tiene_archivo"
+                         class="w-full h-[400px] flex flex-col items-center justify-center p-8 text-center space-y-3 bg-slate-50/70 dark:bg-slate-800/40">
+                        <div class="w-14 h-14 rounded-2xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 flex items-center justify-center shadow-xs">
+                            <span class="material-symbols-outlined text-3xl">file_present</span>
                         </div>
-                        <div class="space-y-2.5 my-auto">
-                            <div class="h-2 bg-slate-100 dark:bg-slate-700 rounded w-3/4"></div>
-                            <div class="h-2 bg-slate-100 dark:bg-slate-700 rounded w-full"></div>
-                            <div class="h-2 bg-slate-100 dark:bg-slate-700 rounded w-5/6"></div>
-                            <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg space-y-1.5 border border-slate-100 dark:border-slate-700 text-[11px]">
-                                <div class="flex justify-between">
-                                    <span class="text-slate-500">Titular Solicitante:</span>
-                                    <span class="text-[#0b1c30] dark:text-white font-bold">{{ $solicitud->solicitante?->Nombre ?? 'Ciudadano' }}</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-slate-500">Procedimiento:</span>
-                                    <span class="text-[#0b1c30] dark:text-slate-200 font-semibold">{{ Str::limit($solicitud->versionTramite?->tipoTramite?->Nombre ?? 'Tramite Ordinario', 30) }}</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-slate-500">Firma Electronica:</span>
-                                    <span class="text-emerald-700 font-semibold flex items-center gap-1">
-                                        <span class="material-symbols-outlined text-[13px]">verified</span>
-                                        Valida (RENIEC / ONPE)
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="h-2 bg-slate-100 dark:bg-slate-700 rounded w-2/3"></div>
+                        <div class="space-y-1 max-w-sm">
+                            <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200">Requisito sin archivo adjunto</h3>
+                            <p class="text-xs text-slate-500 leading-relaxed">
+                                El ciudadano no adjuntó un archivo digital para este requisito al registrar su expediente telemático.
+                            </p>
                         </div>
-                        <div class="flex items-end justify-between pt-3 border-t border-slate-100 dark:border-slate-700">
-                            <div class="flex flex-col">
-                                <span class="text-[10px] text-slate-400 font-mono">Hash SHA-256</span>
-                                <span class="text-[10px] text-[#0b1c30] dark:text-slate-200 font-mono font-bold">e8a9...4b12_VALIDATED</span>
-                            </div>
-                            <div class="px-2 py-1 rounded bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 border border-emerald-200 text-[10px] font-bold flex items-center gap-1">
-                                <span class="material-symbols-outlined text-xs">verified</span>
-                                Cedula Timbrada
-                            </div>
-                        </div>
+                        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
+                            Requisito: <span x-text="activeDoc?.prioridad || 'Obligatorio'"></span>
+                        </span>
                     </div>
                 </div>
             </div>
@@ -203,20 +256,28 @@
                 </div>
 
                 <div class="divide-y divide-slate-100 dark:divide-slate-800">
-                    @forelse ($solicitud->documentos as $doc)
+                    @forelse ($solicitud->documentos as $index => $doc)
                         <div class="py-3.5 space-y-2">
                             <div class="flex items-start justify-between gap-4">
                                 <div class="space-y-0.5">
                                     <div class="flex items-center gap-2">
-                                        <span class="material-symbols-outlined text-base text-slate-400">attach_file</span>
-                                        <h3 class="text-xs font-semibold text-slate-900 dark:text-slate-100">
-                                            {{ $doc->requisito?->Nombre ?? 'Documento Normativo #' . $doc->ID_Documento }}
-                                        </h3>
+                                        <button type="button"
+                                                @click="selectDoc({{ $index }})"
+                                                class="text-left font-semibold text-xs text-slate-900 dark:text-slate-100 hover:text-[#0051d5] dark:hover:text-blue-400 flex items-center gap-1.5 transition-colors cursor-pointer">
+                                            <span class="material-symbols-outlined text-base text-blue-600">visibility</span>
+                                            <span>{{ $doc->requisito?->Nombre ?? 'Documento Normativo #' . $doc->ID_Documento }}</span>
+                                        </button>
                                     </div>
                                     <div class="flex items-center gap-2 text-[11px] text-slate-400 pl-6">
                                         <span>Formato: {{ $doc->requisito?->Formato ?? 'PDF' }}</span>
                                         <span>&bull;</span>
                                         <span>{{ $doc->versionesDoc->count() }} {{ Str::plural('version', $doc->versionesDoc->count()) }} cargadas</span>
+                                        @if($doc->versionesDoc->last()?->Ruta_Archivo)
+                                            <span>&bull;</span>
+                                            <span class="text-emerald-700 dark:text-emerald-400 font-semibold flex items-center gap-0.5">
+                                                <span class="material-symbols-outlined text-xs">attach_file</span> Archivo disponible
+                                            </span>
+                                        @endif
                                     </div>
                                 </div>
                                 <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold border {{ $doc->Estado_Doc === 'Aprobado' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : ($doc->Estado_Doc === 'Observado' ? 'bg-amber-50 text-amber-800 border-amber-200' : ($doc->Estado_Doc === 'Rechazado' ? 'bg-rose-50 text-rose-800 border-rose-200' : 'bg-slate-100 text-slate-700 border-slate-200')) }}">
@@ -226,23 +287,40 @@
 
                             {{-- Botones de calificacion: solo visibles si NO es modo de solo lectura --}}
                             @if (!($esSoloLectura ?? false))
-                                <form action="{{ route('portal.documentos.evaluar', $doc->ID_Documento) }}" method="POST" class="flex items-center gap-2 pl-6 pt-1">
-                                    @csrf
-                                    <span class="text-[11px] text-slate-500 font-medium">Calificar:</span>
-                                    <button type="submit" name="estado_doc" value="Aprobado" class="px-2.5 py-1 rounded-md bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-[11px] font-semibold transition-colors flex items-center gap-1">
-                                        <span class="material-symbols-outlined text-[13px]">check</span> Aprobar
+                                <div class="flex flex-wrap items-center justify-between gap-2 pl-6 pt-1">
+                                    <form action="{{ route('portal.documentos.evaluar', $doc->ID_Documento) }}" method="POST" class="flex items-center gap-2">
+                                        @csrf
+                                        <span class="text-[11px] text-slate-500 font-medium">Calificar:</span>
+                                        <button type="submit" name="estado_doc" value="Aprobado" class="px-2.5 py-1 rounded-md bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-[11px] font-semibold transition-colors flex items-center gap-1 cursor-pointer">
+                                            <span class="material-symbols-outlined text-[13px]">check</span> Aprobar
+                                        </button>
+                                        <button type="submit" name="estado_doc" value="Observado" class="px-2.5 py-1 rounded-md bg-amber-50 hover:bg-amber-100 text-amber-900 text-[11px] font-semibold transition-colors flex items-center gap-1 cursor-pointer">
+                                            <span class="material-symbols-outlined text-[13px]">warning</span> Observar
+                                        </button>
+                                        <button type="submit" name="estado_doc" value="Rechazado" class="px-2.5 py-1 rounded-md bg-rose-50 hover:bg-rose-100 text-rose-800 text-[11px] font-semibold transition-colors flex items-center gap-1 cursor-pointer">
+                                            <span class="material-symbols-outlined text-[13px]">close</span> Rechazar
+                                        </button>
+                                    </form>
+
+                                    <button type="button"
+                                            @click="selectDoc({{ $index }})"
+                                            class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-medium transition-colors cursor-pointer">
+                                        <span class="material-symbols-outlined text-xs">preview</span>
+                                        Ver en visor arriba
                                     </button>
-                                    <button type="submit" name="estado_doc" value="Observado" class="px-2.5 py-1 rounded-md bg-amber-50 hover:bg-amber-100 text-amber-900 text-[11px] font-semibold transition-colors flex items-center gap-1">
-                                        <span class="material-symbols-outlined text-[13px]">warning</span> Observar
-                                    </button>
-                                    <button type="submit" name="estado_doc" value="Rechazado" class="px-2.5 py-1 rounded-md bg-rose-50 hover:bg-rose-100 text-rose-800 text-[11px] font-semibold transition-colors flex items-center gap-1">
-                                        <span class="material-symbols-outlined text-[13px]">close</span> Rechazar
-                                    </button>
-                                </form>
+                                </div>
                             @else
-                                <div class="pl-6 pt-1 flex items-center gap-1.5 text-[11px] text-slate-400">
-                                    <span class="material-symbols-outlined text-[14px]">lock</span>
-                                    Calificacion inmutable &mdash; solo lectura de auditoria
+                                <div class="pl-6 pt-1 flex items-center justify-between gap-2 text-[11px] text-slate-400">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="material-symbols-outlined text-[14px]">lock</span>
+                                        Calificacion inmutable &mdash; solo lectura de auditoria
+                                    </div>
+                                    <button type="button"
+                                            @click="selectDoc({{ $index }})"
+                                            class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-medium transition-colors cursor-pointer">
+                                        <span class="material-symbols-outlined text-xs">preview</span>
+                                        Ver en visor arriba
+                                    </button>
                                 </div>
                             @endif
                         </div>
@@ -462,6 +540,8 @@
                                 Fundamentacion Juridica / Observacion Tecnica <span class="text-rose-500">*</span>
                             </label>
                             <textarea name="observaciones[0][detalles]"
+                                      :disabled="decision === 'Aprobado'"
+                                      :required="decision === 'Observado' || decision === 'Rechazado'"
                                       rows="4"
                                       placeholder="Describa con precision los recaudos observados, articulos de la norma aplicable y el plazo conferido para subsanar..."
                                       class="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-secondary/20 focus:border-secondary"></textarea>

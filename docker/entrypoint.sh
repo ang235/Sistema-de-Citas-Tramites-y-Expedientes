@@ -24,13 +24,19 @@ mkdir -p \
 chmod -R 775 storage bootstrap/cache
 
 # ------------------------------------------------------------------
-# 2. Verificar que existe la base de datos SQLite
+# 2. Verificar que existe la base de datos SQLite y sincronizar migraciones
 # ------------------------------------------------------------------
 DB_PATH="${DB_DATABASE:-/var/www/setc/database/database.sqlite}"
 
 if [ ! -f "$DB_PATH" ]; then
     echo "[entrypoint] Creando base de datos SQLite en $DB_PATH ..."
     touch "$DB_PATH"
+fi
+
+if [ -d "/var/www/setc/database_defaults_migrations" ]; then
+    echo "[entrypoint] Sincronizando migraciones de la aplicación..."
+    mkdir -p /var/www/setc/database/migrations
+    cp -r /var/www/setc/database_defaults_migrations/* /var/www/setc/database/migrations/ 2>/dev/null || true
 fi
 
 # ------------------------------------------------------------------
