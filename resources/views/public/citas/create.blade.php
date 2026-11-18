@@ -18,11 +18,33 @@
     fecha: '{{ $minFecha ?? date('Y-m-d') }}',
     hora: '09:30',
     solicitudId: '{{ $idSolicitudSeleccionada ?? ($solicitudes->first()?->ID_Solicitud ?? '') }}',
-    citasOcupadas: {{ json_encode($citasOcupadas ?? []) }},
+    revisorId: '{{ $idRevisorDefault ?? ($revisores->first()?->ID_Usuarios ?? '') }}',
+    revisoresPorSolicitud: {{ json_encode($revisoresPorSolicitud ?? []) }},
+    citasOcupadasPorRevisor: {{ json_encode($citasOcupadasPorRevisor ?? []) }},
     slots: ['08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30'],
+    onSolicitudChange() {
+        let rev = this.revisoresPorSolicitud[this.solicitudId];
+        if (rev && rev.id) {
+            this.revisorId = String(rev.id);
+        }
+        this.checkSlotAvailable();
+    },
+    getRevisorNombre() {
+        let rev = this.revisoresPorSolicitud[this.solicitudId];
+        return rev ? rev.nombre : 'Revisor Técnico Asignado';
+    },
+    getRevisorEmail() {
+        let rev = this.revisoresPorSolicitud[this.solicitudId];
+        return rev ? rev.email : '';
+    },
+    getRevisorRol() {
+        let rev = this.revisoresPorSolicitud[this.solicitudId];
+        return rev ? rev.rol : 'Revisor Técnico';
+    },
     isSlotOccupied(slot) {
-        let ocupados = this.citasOcupadas[this.fecha] || [];
-        return ocupados.includes(slot);
+        if (!this.revisorId) return false;
+        let ocupadosRevisor = (this.citasOcupadasPorRevisor[this.revisorId] || {})[this.fecha] || [];
+        return ocupadosRevisor.includes(slot);
     },
     selectSlot(slot) {
         if (!this.isSlotOccupied(slot)) { this.hora = slot; }
@@ -44,7 +66,11 @@
         const sel = document.getElementById('id_solicitud_select');
         return sel ? sel.options[sel.selectedIndex]?.text : '';
     },
-    canStep1() { return this.solicitudId !== '' && this.solicitudId !== null && this.solicitudId !== undefined; },
+    getRevisorLabel() {
+        const sel = document.getElementById('id_revisor_select');
+        return sel ? sel.options[sel.selectedIndex]?.text : '';
+    },
+    canStep1() { return this.solicitudId !== '' && this.solicitudId !== null && this.solicitudId !== undefined && this.revisorId !== ''; },
     canStep2() { return this.fecha !== '' && this.hora !== ''; },
     goTo(n) {
         this.step = n;
@@ -235,10 +261,11 @@
             @csrf
             <input type="hidden" name="modalidad" :value="modalidad">
             <input type="hidden" name="id_solicitud" :value="solicitudId">
+            <input type="hidden" name="id_revisor" :value="revisorId">
             <input type="hidden" name="fecha" :value="fecha">
             <input type="hidden" name="hora" :value="hora">
 
-            {{-- ───── PASO 1: Modalidad + Expediente ───── --}}
+            {{-- ───── PASO 1: Modalidad + Expediente + Revisor ───── --}}
             <div x-show="step === 1"
                  x-transition:enter="transition ease-out duration-250"
                  x-transition:enter-start="opacity-0 translate-y-3"
@@ -297,6 +324,7 @@
                         </label>
                         <select id="id_solicitud_select"
                                 x-model="solicitudId"
+                                @change="onSolicitudChange()"
                                 class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-[#0051d5]">
                             @foreach ($solicitudes as $sol)
                                 <option value="{{ $sol->ID_Solicitud }}" {{ (isset($idSolicitudSeleccionada) && $idSolicitudSeleccionada == $sol->ID_Solicitud) ? 'selected' : '' }}>
@@ -308,6 +336,49 @@
                             Solo se muestran expedientes cuyos recaudos han sido calificados favorablemente por el revisor técnico.
                         </p>
                     </div>
+                </div>
+
+                {{-- 3. Especialista Técnico Asignado Automáticamente --}}
+                <div class="bg-white dark:bg-[#111f33] p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-base font-bold text-[#001229] dark:text-white flex items-center gap-2" style="font-family: var(--font-display);">
+                            <span class="material-symbols-outlined text-[#0051d5] dark:text-blue-400">badge</span>
+                            3. Especialista Asignado para la Cita
+                        </h2>
+                        <span class="text-xs px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-semibold border border-emerald-200 dark:border-emerald-800">
+                            Asignación Automática
+                        </span>
+                    </div>
+
+                    <div class="p-4 rounded-xl bg-[#eff4ff]/60 dark:bg-slate-800/60 border border-blue-100 dark:border-slate-700 flex items-center justify-between gap-4">
+                        <div class="flex items-center gap-3.5 min-w-0">
+                            <div class="w-11 h-11 rounded-xl bg-[#0051d5] text-white flex items-center justify-center font-bold text-base shadow-xs shrink-0">
+                                <span class="material-symbols-outlined text-2xl">support_agent</span>
+                            </div>
+                            <div class="min-w-0">
+                                <span class="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider block">
+                                    Revisor Técnico que calificó tus documentos
+                                </span>
+                                <h3 class="text-sm font-bold text-[#0b1c30] dark:text-white truncate" x-text="getRevisorNombre()">
+                                    {{ $revisorDefault['nombre'] ?? 'Revisor Técnico Institucional' }}
+                                </h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 truncate" x-text="getRevisorEmail()">
+                                    {{ $revisorDefault['email'] ?? '' }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="text-right shrink-0 hidden sm:block">
+                            <span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-white dark:bg-slate-900 text-[#0051d5] dark:text-blue-400 border border-slate-200 dark:border-slate-700 shadow-2xs" x-text="getRevisorRol()">
+                                {{ $revisorDefault['rol'] ?? 'Revisor Técnico' }}
+                            </span>
+                            <span class="block text-[10px] text-slate-400 dark:text-slate-500 mt-1">Ventanilla de Atención</span>
+                        </div>
+                    </div>
+
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                        Para garantizar la trazabilidad de tu trámite, la cita presencial o virtual es atendida por el mismo especialista técnico que evaluó y dictaminó tus recaudos. La disponibilidad de turnos se sincroniza directamente con su agenda.
+                    </p>
                 </div>
 
                 {{-- Botón continuar al Paso 2 --}}
@@ -500,6 +571,10 @@
                                 <div class="flex items-center justify-between py-3">
                                     <span class="text-slate-500 dark:text-slate-400 text-xs">Expediente</span>
                                     <span class="font-bold text-[#001229] dark:text-white text-right max-w-xs truncate" x-text="getSolicitudLabel()"></span>
+                                </div>
+                                <div class="flex items-center justify-between py-3">
+                                    <span class="text-slate-500 dark:text-slate-400 text-xs">Especialista Asignado</span>
+                                    <span class="font-bold text-[#0051d5] dark:text-blue-400 text-right max-w-xs truncate" x-text="getRevisorNombre()"></span>
                                 </div>
                                 <div class="flex items-center justify-between py-3">
                                     <span class="text-slate-500 dark:text-slate-400 text-xs">Fecha</span>

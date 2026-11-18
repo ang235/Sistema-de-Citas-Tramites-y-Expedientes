@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $ID_Citas
  * @property int $ID_Usuarios
  * @property int|null $ID_Solicitud
+ * @property int|null $ID_Revisor
  * @property Carbon $Fecha
  * @property string $Hora
  * @property string $Estado_Citas
@@ -21,8 +22,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property Carbon|null $updated_at
  * @property-read Usuario $usuario
  * @property-read Solicitud|null $solicitud
+ * @property-read Usuario|null $revisor
  */
-#[Fillable(['ID_Usuarios', 'ID_Solicitud', 'Fecha', 'Hora', 'Estado_Citas'])]
+#[Fillable(['ID_Usuarios', 'ID_Solicitud', 'ID_Revisor', 'Fecha', 'Hora', 'Estado_Citas'])]
 class Cita extends Model
 {
     use HasFactory;
@@ -56,5 +58,13 @@ class Cita extends Model
     public function solicitud(): BelongsTo
     {
         return $this->belongsTo(Solicitud::class, 'ID_Solicitud', 'ID_Solicitud');
+    }
+
+    /**
+     * Revisor técnico asignado para atender la cita.
+     */
+    public function revisor(): BelongsTo
+    {
+        return $this->belongsTo(Usuario::class, 'ID_Revisor', 'ID_Usuarios');
     }
 }

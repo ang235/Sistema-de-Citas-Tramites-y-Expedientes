@@ -385,7 +385,7 @@
                     </a>
 
                 @elseif($isRevisor)
-                    {{-- ─── REVISOR TÉCNICO (EXCLUSIVAMENTE SUS 2 APARTADOS DESIGNADOS) ── --}}
+                    {{-- ─── REVISOR TÉCNICO (MANDO, DICTAMEN Y CITAS ASIGNADAS) ── --}}
                     <div class="px-2 pt-2 pb-1 text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
                         <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
                         Revisión Técnica
@@ -405,6 +405,19 @@
                             <span class="material-symbols-outlined text-base">fact_check</span>
                         </div>
                         <span class="flex-1 truncate">Mesa de Calificación Documental</span>
+                    </a>
+
+                    <div class="px-2 pt-3 pb-1 text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-teal-400"></span>
+                        Atención & Agenda
+                    </div>
+
+                    <a href="{{ route('portal.citas') }}"
+                       class="sidebar-btn-item {{ Request::routeIs('portal.citas*') ? 'active' : '' }}">
+                        <div class="sidebar-btn-icon bg-teal-500/20 text-teal-300 border border-teal-400/20">
+                            <span class="material-symbols-outlined text-base">calendar_month</span>
+                        </div>
+                        <span class="flex-1 truncate">Mis Citas Asignadas</span>
                     </a>
 
                 @elseif($isSupervisor)

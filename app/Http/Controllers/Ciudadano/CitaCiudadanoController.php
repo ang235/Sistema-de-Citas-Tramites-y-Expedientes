@@ -9,6 +9,7 @@ use App\Http\Requests\Ciudadano\StoreCitaRequest;
 use App\Models\Bitacora;
 use App\Models\Cita;
 use App\Models\Solicitud;
+use App\Models\Usuario;
 use App\Services\CitaService;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
@@ -25,7 +26,7 @@ class CitaCiudadanoController extends Controller
         $idUsuario = (int) Auth::id();
 
         $citas = Cita::where('ID_Usuarios', $idUsuario)
-            ->with(['solicitud.folio', 'solicitud.versionTramite.tipoTramite'])
+            ->with(['solicitud.folio', 'solicitud.versionTramite.tipoTramite', 'revisor'])
             ->orderBy('Fecha', 'desc')
             ->orderBy('Hora', 'desc')
             ->paginate(10);
@@ -43,13 +44,13 @@ class CitaCiudadanoController extends Controller
         $citaActiva = Cita::where('ID_Usuarios', $idUsuario)
             ->whereIn('Estado_Citas', ['Programada', 'Confirmada'])
             ->whereDate('Fecha', '>=', today())
-            ->with(['solicitud.folio', 'solicitud.versionTramite.tipoTramite'])
+            ->with(['solicitud.folio', 'solicitud.versionTramite.tipoTramite', 'revisor'])
             ->first();
 
         // 2. Filtrar expedientes del usuario: solo aquellos con recaudos aprobados por el revisor
         $idSolicitud = $request->query('id_solicitud') ? (int) $request->query('id_solicitud') : null;
         $solicitudes = Solicitud::where('ID_Solicitante', $idUsuario)
-            ->with(['folio', 'versionTramite.tipoTramite', 'documentos', 'asignaciones.revisiones'])
+            ->with(['folio', 'versionTramite.tipoTramite', 'documentos', 'asignaciones.revisiones', 'asignaciones.revisor'])
             ->get()
             ->filter(fn (Solicitud $sol) => $sol->tieneDocumentosAprobados())
             ->values();
@@ -64,6 +65,30 @@ class CitaCiudadanoController extends Controller
             $idSolicitud = $solicitudSeleccionada->ID_Solicitud;
         }
 
+        // Catálogo de revisores técnicos disponibles
+        $revisores = Usuario::whereHas('roles', function ($q): void {
+            $q->where('Nombre', 'like', '%Revisor%')
+                ->orWhere('Nombre', 'like', '%Supervisor%');
+        })->where('Activo', true)->orderBy('Nombre')->get();
+
+        // Revisor técnico asignado automáticamente según quién revisó y aprobó cada expediente
+        $revisoresPorSolicitud = [];
+        foreach ($solicitudes as $sol) {
+            $rev = $sol->revisorAprobador() ?? $revisores->first();
+            $revisoresPorSolicitud[$sol->ID_Solicitud] = [
+                'id' => $rev?->ID_Usuarios,
+                'nombre' => $rev?->Nombre ?? 'Revisor Técnico Institucional',
+                'email' => $rev?->Email ?? '',
+                'rol' => $rev?->roles->first()?->Nombre ?? 'Revisor Técnico',
+            ];
+        }
+
+        $revisorDefault = $solicitudSeleccionada
+            ? ($revisoresPorSolicitud[$solicitudSeleccionada->ID_Solicitud] ?? null)
+            : ($revisoresPorSolicitud[$solicitudes->first()?->ID_Solicitud ?? 0] ?? null);
+
+        $idRevisorDefault = $revisorDefault['id'] ?? $revisores->first()?->ID_Usuarios;
+
         // Calcular ventana de 15 días posteriores a la aprobación documental
         $minFecha = today()->format('Y-m-d');
         $maxFecha = today()->addDays(15)->format('Y-m-d');
@@ -72,30 +97,47 @@ class CitaCiudadanoController extends Controller
             $fechaAprobacion = $solicitudSeleccionada->fechaAprobacionDocumentos();
             if ($fechaAprobacion) {
                 $limiteAprobacion = $fechaAprobacion->copy()->addDays(15);
-                // Si la aprobación es anterior, la fecha máxima no puede superar los 15 días tras dicha aprobación
                 $maxFecha = $limiteAprobacion->format('Y-m-d');
             }
         }
 
-        // Mapear horarios ocupados por fecha para deshabilitar en el selector visual
-        $citasOcupadas = Cita::where('Estado_Citas', '!=', 'Cancelada')
+        // Mapear horarios ocupados por fecha y agrupados por cada revisor específico
+        $citasOcupadasPorRevisor = [];
+        foreach ($revisores as $rev) {
+            $citasOcupadasPorRevisor[$rev->ID_Usuarios] = [];
+        }
+
+        $citasActivas = Cita::where('Estado_Citas', '!=', 'Cancelada')
             ->whereDate('Fecha', '>=', today())
-            ->get(['Fecha', 'Hora'])
-            ->groupBy(function ($c) {
-                return $c->Fecha ? Carbon::parse($c->Fecha)->format('Y-m-d') : '';
-            })
-            ->map(function ($group) {
-                return $group->map(fn ($c) => substr((string) $c->Hora, 0, 5))->unique()->values();
-            });
+            ->whereNotNull('ID_Revisor')
+            ->get(['ID_Revisor', 'Fecha', 'Hora']);
+
+        foreach ($citasActivas as $c) {
+            $fechaKey = $c->Fecha ? Carbon::parse($c->Fecha)->format('Y-m-d') : '';
+            $horaKey = substr((string) $c->Hora, 0, 5);
+            if ($fechaKey && $c->ID_Revisor) {
+                $citasOcupadasPorRevisor[$c->ID_Revisor][$fechaKey][] = $horaKey;
+            }
+        }
+
+        foreach ($citasOcupadasPorRevisor as $revId => $fechas) {
+            foreach ($fechas as $f => $horas) {
+                $citasOcupadasPorRevisor[$revId][$f] = array_values(array_unique($horas));
+            }
+        }
 
         return view('public.citas.create', [
             'citaActiva' => $citaActiva,
             'idSolicitudSeleccionada' => $idSolicitud,
             'solicitudSeleccionada' => $solicitudSeleccionada,
             'solicitudes' => $solicitudes,
+            'revisores' => $revisores,
+            'revisoresPorSolicitud' => $revisoresPorSolicitud,
+            'idRevisorDefault' => $idRevisorDefault,
+            'revisorDefault' => $revisorDefault,
             'minFecha' => $minFecha,
             'maxFecha' => $maxFecha,
-            'citasOcupadas' => $citasOcupadas,
+            'citasOcupadasPorRevisor' => $citasOcupadasPorRevisor,
         ]);
     }
 
@@ -103,6 +145,7 @@ class CitaCiudadanoController extends Controller
     {
         $idUsuario = (int) Auth::id();
         $idSolicitud = (int) $request->validated('id_solicitud');
+        $idRevisorInput = $request->validated('id_revisor') ? (int) $request->validated('id_revisor') : null;
         $fechaInput = $request->validated('fecha');
         $horaInput = substr((string) $request->validated('hora'), 0, 5);
 
@@ -123,7 +166,7 @@ class CitaCiudadanoController extends Controller
         // 2. Regla: La cita solo se puede agendar para un expediente con documentos aprobados por el revisor
         /** @var Solicitud $solicitud */
         $solicitud = Solicitud::where('ID_Solicitante', $idUsuario)
-            ->with(['folio', 'documentos', 'asignaciones.revisiones'])
+            ->with(['folio', 'documentos', 'asignaciones.revisiones', 'asignaciones.revisor'])
             ->findOrFail($idSolicitud);
 
         if (! $solicitud->tieneDocumentosAprobados()) {
@@ -149,33 +192,65 @@ class CitaCiudadanoController extends Controller
             ])->withInput();
         }
 
-        // 4. Prohibir citas duplicadas en el mismo horario y fecha
-        $fechaStr = $fechaCarbon->format('Y-m-d');
-        $existe = Cita::whereDate('Fecha', $fechaStr)
-            ->where(function ($q) use ($horaInput): void {
-                $q->where('Hora', $horaInput)
-                    ->orWhere('Hora', 'like', "{$horaInput}%");
-            })
-            ->where('Estado_Citas', '!=', 'Cancelada')
-            ->exists();
+        // Regla: El revisor se asigna AUTOMÁTICAMENTE según quién revisó y aprobó los documentos del expediente
+        $revisorAprobador = $solicitud->revisorAprobador();
+        $idRevisor = $revisorAprobador?->ID_Usuarios;
 
-        if ($existe) {
-            return back()->withErrors(['hora' => 'El horario y fecha seleccionados ya se encuentran ocupados. Por favor elija otro horario disponible.'])->withInput();
+        // Fallback en caso de expedientes sin asignación previa registrada
+        if (! $idRevisor) {
+            $idRevisor = $idRevisorInput ?? Usuario::whereHas('roles', fn ($q) => $q->where('Nombre', 'like', '%Revisor%'))
+                ->where('Activo', true)
+                ->value('ID_Usuarios');
+        }
+
+        $fechaStr = $fechaCarbon->format('Y-m-d');
+
+        // 4. Prohibir citas duplicadas para el MISMO revisor en el mismo horario y fecha
+        if ($idRevisor) {
+            $existeRevisorOcupado = Cita::where('ID_Revisor', $idRevisor)
+                ->whereDate('Fecha', $fechaStr)
+                ->where(function ($q) use ($horaInput): void {
+                    $q->where('Hora', $horaInput)
+                        ->orWhere('Hora', 'like', "{$horaInput}%");
+                })
+                ->where('Estado_Citas', '!=', 'Cancelada')
+                ->exists();
+
+            if ($existeRevisorOcupado) {
+                $nombreRevisor = $revisorAprobador?->Nombre ?? 'asignado';
+
+                return back()->withErrors(['hora' => "El especialista técnico que dictaminó su expediente ({$nombreRevisor}) ya cuenta con una cita en ese horario. Por favor elija otro horario disponible."])->withInput();
+            }
+        } else {
+            $existeGeneral = Cita::whereNull('ID_Revisor')
+                ->whereDate('Fecha', $fechaStr)
+                ->where(function ($q) use ($horaInput): void {
+                    $q->where('Hora', $horaInput)
+                        ->orWhere('Hora', 'like', "{$horaInput}%");
+                })
+                ->where('Estado_Citas', '!=', 'Cancelada')
+                ->exists();
+
+            if ($existeGeneral) {
+                return back()->withErrors(['hora' => 'El horario y fecha seleccionados ya se encuentran ocupados. Por favor elija otro horario disponible.'])->withInput();
+            }
         }
 
         $cita = Cita::create([
             'ID_Usuarios' => $idUsuario,
             'ID_Solicitud' => $idSolicitud,
+            'ID_Revisor' => $idRevisor,
             'Fecha' => $fechaStr,
             'Hora' => $horaInput,
             'Estado_Citas' => 'Programada',
         ]);
 
+        $revisorObj = $idRevisor ? Usuario::find($idRevisor) : null;
         $folioTexto = $solicitud->folio?->Codigo_Folio ?? "EXP-{$idSolicitud}";
         Bitacora::create([
             'ID_Usuarios' => $idUsuario,
             'Accion' => 'Agendación de cita',
-            'Descripcion' => "Cita agendada para el expediente {$folioTexto} el {$fechaStr} a las {$horaInput}.",
+            'Descripcion' => "Cita agendada para el expediente {$folioTexto} el {$fechaStr} a las {$horaInput} con el revisor: ".($revisorObj?->Nombre ?? 'Sin asignar').'.',
             'Fecha_Creacion' => now(),
         ]);
 
@@ -186,7 +261,7 @@ class CitaCiudadanoController extends Controller
     public function paseDigital(int $idCita): View
     {
         /** @var Cita $cita */
-        $cita = Cita::with(['usuario', 'solicitud.folio', 'solicitud.versionTramite.tipoTramite'])
+        $cita = Cita::with(['usuario', 'solicitud.folio', 'solicitud.versionTramite.tipoTramite', 'revisor'])
             ->where('ID_Usuarios', Auth::id())
             ->findOrFail($idCita);
 

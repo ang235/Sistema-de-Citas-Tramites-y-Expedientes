@@ -30,6 +30,17 @@
                 </p>
             </div>
 
+            {{-- Mensajes de éxito / estado --}}
+            @if (session('success') || session('status'))
+                <div class="mb-6 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 text-sm flex items-start gap-3">
+                    <span class="material-symbols-outlined text-emerald-600 dark:text-emerald-400 text-lg shrink-0 mt-0.5">check_circle</span>
+                    <div>
+                        <span class="font-semibold block">¡Operación exitosa!</span>
+                        <span class="text-xs">{{ session('success') ?? session('status') }}</span>
+                    </div>
+                </div>
+            @endif
+
             {{-- Errores generales si existieran --}}
             @if ($errors->any())
                 <div class="mb-6 p-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200 text-sm flex items-start gap-3">

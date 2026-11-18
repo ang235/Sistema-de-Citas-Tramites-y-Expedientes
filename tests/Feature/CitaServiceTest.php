@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
+use App\Models\AsignacionRevisor;
 use App\Models\Bitacora;
 use App\Models\Cita;
+use App\Models\Revision;
 use App\Models\Rol;
 use App\Models\Solicitud;
 use App\Models\TipoTramite;
@@ -42,6 +44,65 @@ test('agendarCita valida regla de 1 hora de atencion y 30 minutos de margen entr
 
     // Auditoría en bitácora
     expect(Bitacora::where('Accion', 'Agendamiento de Cita')->count())->toBe(2);
+});
+
+test('agendarCita permite citas simultaneas en el mismo horario cuando son con distintos revisores', function () {
+    $ciudadanoA = Usuario::create(['Nombre' => 'Ciudadano A', 'Email' => 'ca@setc.gob', 'Contrasena' => '123']);
+    $ciudadanoB = Usuario::create(['Nombre' => 'Ciudadano B', 'Email' => 'cb@setc.gob', 'Contrasena' => '123']);
+    $ciudadanoC = Usuario::create(['Nombre' => 'Ciudadano C', 'Email' => 'cc@setc.gob', 'Contrasena' => '123']);
+
+    $revisor1 = Usuario::create(['Nombre' => 'Revisor 1', 'Email' => 'r1@setc.gob', 'Contrasena' => '123']);
+    $revisor2 = Usuario::create(['Nombre' => 'Revisor 2', 'Email' => 'r2@setc.gob', 'Contrasena' => '123']);
+
+    $service = new CitaService;
+    $fecha = now()->addDays(3)->toDateString();
+
+    // 1. Ciudadano A agenda a las 10:00 con Revisor 1
+    $citaA = $service->agendarCita($ciudadanoA, null, $fecha, '10:00', $revisor1);
+    expect($citaA->Estado_Citas)->toBe('Programada');
+    expect($citaA->ID_Revisor)->toBe($revisor1->ID_Usuarios);
+
+    // 2. Ciudadano B agenda EXACTAMENTE al mismo horario (10:00) pero con Revisor 2 -> Debe permitirse sin afectarse
+    $citaB = $service->agendarCita($ciudadanoB, null, $fecha, '10:00', $revisor2);
+    expect($citaB->Estado_Citas)->toBe('Programada');
+    expect($citaB->ID_Revisor)->toBe($revisor2->ID_Usuarios);
+
+    // 3. Ciudadano C intenta agendar a las 10:00 con Revisor 1 (ya ocupado) -> Debe rechazarse
+    expect(fn () => $service->agendarCita($ciudadanoC, null, $fecha, '10:00', $revisor1))
+        ->toThrow(DomainException::class);
+});
+
+test('citas se asignan automaticamente al revisor que evaluo y aprobo los documentos del expediente', function () {
+    $ciudadano = Usuario::create(['Nombre' => 'Ciudadano Solicitante', 'Email' => 'solicitante_auto@setc.gob', 'Contrasena' => '123']);
+    $revisorEvaluador = Usuario::create(['Nombre' => 'Ing. Revisor Evaluador', 'Email' => 'evaluador@setc.gob', 'Contrasena' => '123']);
+
+    $tipo = TipoTramite::create(['Nombre' => 'Trámite Especial']);
+    $version = VersionTramite::create(['ID_Tipo_Tramite' => $tipo->ID_Tipo_Tramite, 'No_Version' => 'v1.0']);
+    $solicitud = Solicitud::create(['ID_Solicitante' => $ciudadano->ID_Usuarios, 'ID_Version_Tramite' => $version->ID_Version_Tramite, 'Estado_Solicitud' => 'Aprobado']);
+
+    $asignacion = AsignacionRevisor::create([
+        'ID_Solicitud' => $solicitud->ID_Solicitud,
+        'ID_Revisor' => $revisorEvaluador->ID_Usuarios,
+        'ID_Asignador' => $revisorEvaluador->ID_Usuarios,
+        'Estado_Asignacion' => 'Activo',
+        'Fecha_Asignacion' => now(),
+    ]);
+
+    Revision::create([
+        'ID_Asignacion' => $asignacion->ID_Asignacion,
+        'Resultado' => 'Aprobado',
+        'Fecha_Revision' => now(),
+    ]);
+
+    $service = new CitaService;
+    $fecha = now()->addDays(4)->toDateString();
+
+    // Se agenda la cita pasando únicamente el usuario y la solicitud (sin especificar revisor manualmente)
+    $cita = $service->agendarCita($ciudadano, $solicitud, $fecha, '11:00');
+
+    // Debe asignarse automáticamente al revisor que dictaminó los recaudos
+    expect($cita->ID_Revisor)->toBe($revisorEvaluador->ID_Usuarios);
+    expect($cita->revisor->Nombre)->toBe('Ing. Revisor Evaluador');
 });
 
 test('agendarCita impide vincular una solicitud de otro ciudadano', function () {

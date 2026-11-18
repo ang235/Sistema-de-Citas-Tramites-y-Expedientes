@@ -88,8 +88,10 @@ class ExpedienteCiudadanoController extends Controller
             $idVersionDoc = null;
 
             if ($request->hasFile('archivo')) {
-                // Asociar al primer documento que corresponda
-                $doc = $solicitud->documentos->first();
+                // Asociar preferentemente al documento que tenga estado Observado, Rechazado o Pendiente
+                $doc = $solicitud->documentos->first(fn ($d) => in_array($d->Estado_Doc, ['Observado', 'Rechazado', 'Pendiente'], true))
+                    ?? $solicitud->documentos->first();
+
                 if ($doc !== null) {
                     $archivo = $request->file('archivo');
                     $ruta = $archivo->store("expedientes/{$solicitud->ID_Solicitud}");
@@ -114,6 +116,16 @@ class ExpedienteCiudadanoController extends Controller
             ]);
 
             $observacion->update(['Estado_Obs' => 'Subsanada']);
+
+            // Si no quedan más observaciones abiertas en la solicitud, regresa a estado 'En_Revision'
+            $otrasObsAbiertas = Observacion::whereHas('revision.asignacion', fn ($q) => $q->where('ID_Solicitud', $solicitud->ID_Solicitud))
+                ->where('Estado_Obs', 'Abierta')
+                ->where('ID_Observacion', '!=', $observacion->ID_Observacion)
+                ->exists();
+
+            if (! $otrasObsAbiertas && $solicitud->Estado_Solicitud === 'Observado') {
+                $solicitud->update(['Estado_Solicitud' => 'En_Revision']);
+            }
 
             Bitacora::create([
                 'ID_Usuarios' => (int) Auth::id(),

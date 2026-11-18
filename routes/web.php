@@ -36,6 +36,7 @@ Route::middleware(['auth', 'role:ciudadano'])->group(function (): void {
     // Expedientes y Seguimiento (sólo trámites propios del ciudadano)
     Route::get('/expedientes', [ExpedienteCiudadanoController::class, 'index'])->name('expedientes.index');
     Route::get('/expedientes/{codigoFolio}', [ExpedienteCiudadanoController::class, 'show'])->name('expedientes.show');
+    Route::get('/expedientes/documentos/{idDocumento}/archivo', [MesaDictamenController::class, 'verArchivo'])->name('expedientes.documentos.archivo');
     Route::post('/expedientes/observacion/{idObservacion}/solventar', [ExpedienteCiudadanoController::class, 'solventarObservacion'])->name('expedientes.solventar');
 
     // Inicio de solicitud de trámite ciudadano

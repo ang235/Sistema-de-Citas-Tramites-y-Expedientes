@@ -31,6 +31,7 @@ test('emitirResolucion permite a supervisor emitir resolucion final y registra a
     expect($resolucion->Tipo_Resolucion)->toBe('Aprobada');
     expect($resolucion->ID_Supervisor)->toBe($supervisor->ID_Usuarios);
     expect($resolucion->ID_Solicitud)->toBe($solicitud->ID_Solicitud);
+    expect($solicitud->fresh()->Estado_Solicitud)->toBe('Aprobado');
 
     // Valida auditoría en bitácora
     expect(Bitacora::where('Accion', 'Emisión de Resolución')->exists())->toBeTrue();

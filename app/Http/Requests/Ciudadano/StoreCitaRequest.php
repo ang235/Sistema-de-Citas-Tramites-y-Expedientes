@@ -20,6 +20,7 @@ class StoreCitaRequest extends FormRequest
     {
         return [
             'id_solicitud' => ['required', 'integer', 'exists:solicitudes,ID_Solicitud'],
+            'id_revisor' => ['nullable', 'integer', 'exists:usuarios,ID_Usuarios'],
             'fecha' => ['required', 'date', 'after_or_equal:today'],
             'hora' => ['required', 'date_format:H:i'],
         ];

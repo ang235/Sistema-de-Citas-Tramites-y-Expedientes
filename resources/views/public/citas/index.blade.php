@@ -68,6 +68,12 @@
                             <p class="text-xs text-[#44474d] dark:text-slate-400 mt-0.5">
                                 {{ $cita->solicitud?->versionTramite?->tipoTramite?->Nombre ?? 'Orientación y Asesoría Técnica General' }}
                             </p>
+                            @if ($cita->revisor)
+                                <p class="text-xs text-[#0051d5] dark:text-blue-400 font-medium mt-1 flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">badge</span>
+                                    <span>Especialista asignado: {{ $cita->revisor->Nombre }}</span>
+                                </p>
+                            @endif
                         </div>
                     </div>
                 </div>

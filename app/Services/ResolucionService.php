@@ -51,6 +51,14 @@ class ResolucionService
                 'Tipo_Resolucion' => $tipoResolucion,
             ]);
 
+            // Sincronizar el estado del expediente con la resolución emitida
+            $nuevoEstado = match ($tipoResolucion) {
+                'Aprobada', 'Concluida' => 'Aprobado',
+                'Rechazada', 'Improcedente' => 'Rechazado',
+                default => 'Concluido',
+            };
+            $solicitud->update(['Estado_Solicitud' => $nuevoEstado]);
+
             // Regla: Auditoría y Bitácora obligatoria (Emisión de resolución)
             Bitacora::create([
                 'ID_Usuarios' => $supervisor->ID_Usuarios,

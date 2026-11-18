@@ -108,6 +108,14 @@ class Usuario extends Authenticatable
     }
 
     /**
+     * Citas técnicas asignadas a este usuario para su atención presencial o virtual.
+     */
+    public function citasComoRevisor(): HasMany
+    {
+        return $this->hasMany(Cita::class, 'ID_Revisor', 'ID_Usuarios');
+    }
+
+    /**
      * Registros de bitácora generados por las acciones del usuario.
      */
     public function bitacoras(): HasMany

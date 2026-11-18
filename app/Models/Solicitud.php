@@ -167,4 +167,32 @@ class Solicitud extends Model
 
         return $this->updated_at ? Carbon::parse($this->updated_at) : now();
     }
+
+    /**
+     * Revisor técnico que evaluó y aprobó los recaudos de este expediente.
+     */
+    public function revisorAprobador(): ?Usuario
+    {
+        $asignaciones = $this->relationLoaded('asignaciones')
+            ? $this->asignaciones
+            : $this->asignaciones()->with(['revisor.roles', 'revisiones'])->get();
+
+        // 1. Buscar asignación con dictamen técnico favorable/aprobado
+        foreach ($asignaciones as $asig) {
+            foreach ($asig->revisiones as $rev) {
+                if (in_array($rev->Resultado, ['Aprobado', 'Favorable'], true) && $asig->revisor) {
+                    return $asig->revisor;
+                }
+            }
+        }
+
+        // 2. Buscar asignación activa más reciente
+        $activa = $asignaciones->whereIn('Estado_Asignacion', ['Activo', null])->last();
+        if ($activa && $activa->revisor) {
+            return $activa->revisor;
+        }
+
+        // 3. Cualquier asignación asociada
+        return $asignaciones->first()?->revisor;
+    }
 }

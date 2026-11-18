@@ -35,9 +35,10 @@ class CitaService
         Usuario $usuario,
         ?Solicitud $solicitud,
         Carbon|string $fecha,
-        string $hora
+        string $hora,
+        ?Usuario $revisor = null
     ): Cita {
-        return DB::transaction(function () use ($usuario, $solicitud, $fecha, $hora): Cita {
+        return DB::transaction(function () use ($usuario, $solicitud, $fecha, $hora, $revisor): Cita {
             $fechaObj = $fecha instanceof Carbon ? $fecha : Carbon::parse($fecha);
             $fechaString = $fechaObj->toDateString();
 
@@ -60,36 +61,83 @@ class CitaService
                 }
             }
 
-            // Consultar citas activas programadas para la misma fecha (del usuario o generales)
-            $citasExistentes = Cita::query()
-                ->whereDate('Fecha', $fechaString)
-                ->where('Estado_Citas', '!=', 'Cancelada')
-                ->where(function ($query) use ($usuario) {
-                    $query->where('ID_Usuarios', $usuario->ID_Usuarios);
-                })
-                ->lockForUpdate()
-                ->get();
+            // Regla: Asignar automáticamente el revisor que evaluó y aprobó los documentos del expediente
+            if ($revisor === null && $solicitud !== null) {
+                $revisor = $solicitud->revisorAprobador();
+            }
 
             // Ventana total por cita = 60 min de atención + 30 min de margen = 90 minutos
             $ventanaTotalMinutos = self::DURACION_MINUTOS + self::MARGEN_MINUTOS;
 
-            foreach ($citasExistentes as $existente) {
+            // 1. Validar que el ciudadano no tenga colisión de horario consigo mismo
+            $citasCiudadano = Cita::query()
+                ->where('ID_Usuarios', $usuario->ID_Usuarios)
+                ->whereDate('Fecha', $fechaString)
+                ->where('Estado_Citas', '!=', 'Cancelada')
+                ->lockForUpdate()
+                ->get();
+
+            foreach ($citasCiudadano as $existente) {
                 $horaInicioExistente = Carbon::parse($fechaString.' '.$existente->Hora);
                 $diferenciaMinutos = abs($horaInicioCandidata->diffInMinutes($horaInicioExistente, false));
 
                 if ($diferenciaMinutos < $ventanaTotalMinutos) {
                     throw new DomainException(sprintf(
-                        'Horario no disponible: ya existe una cita programada a las %s. Cada cita dura %d hora y requiere mínimo %d minutos de separación.',
-                        substr((string) $existente->Hora, 0, 5),
-                        self::DURACION_MINUTOS / 60,
-                        self::MARGEN_MINUTOS
+                        'Horario no disponible: ya cuentas con una cita programada a las %s.',
+                        substr((string) $existente->Hora, 0, 5)
                     ));
+                }
+            }
+
+            // 2. Si hay revisor asignado, validar que ese revisor específico no tenga colisión
+            if ($revisor !== null) {
+                $citasRevisor = Cita::query()
+                    ->where('ID_Revisor', $revisor->ID_Usuarios)
+                    ->whereDate('Fecha', $fechaString)
+                    ->where('Estado_Citas', '!=', 'Cancelada')
+                    ->lockForUpdate()
+                    ->get();
+
+                foreach ($citasRevisor as $existente) {
+                    $horaInicioExistente = Carbon::parse($fechaString.' '.$existente->Hora);
+                    $diferenciaMinutos = abs($horaInicioCandidata->diffInMinutes($horaInicioExistente, false));
+
+                    if ($diferenciaMinutos < $ventanaTotalMinutos) {
+                        throw new DomainException(sprintf(
+                            'El especialista técnico %s ya cuenta con una cita asignada a las %s. Cada cita dura %d hora y requiere %d minutos de separación.',
+                            $revisor->Nombre,
+                            substr((string) $existente->Hora, 0, 5),
+                            self::DURACION_MINUTOS / 60,
+                            self::MARGEN_MINUTOS
+                        ));
+                    }
+                }
+            } else {
+                // Si no hay revisor asignado, aplicar restricción general sobre citas sin revisor
+                $citasGenerales = Cita::query()
+                    ->whereNull('ID_Revisor')
+                    ->whereDate('Fecha', $fechaString)
+                    ->where('Estado_Citas', '!=', 'Cancelada')
+                    ->lockForUpdate()
+                    ->get();
+
+                foreach ($citasGenerales as $existente) {
+                    $horaInicioExistente = Carbon::parse($fechaString.' '.$existente->Hora);
+                    $diferenciaMinutos = abs($horaInicioCandidata->diffInMinutes($horaInicioExistente, false));
+
+                    if ($diferenciaMinutos < $ventanaTotalMinutos) {
+                        throw new DomainException(sprintf(
+                            'Horario no disponible: ya existe una cita general programada a las %s.',
+                            substr((string) $existente->Hora, 0, 5)
+                        ));
+                    }
                 }
             }
 
             $cita = Cita::create([
                 'ID_Usuarios' => $usuario->ID_Usuarios,
                 'ID_Solicitud' => $solicitud?->ID_Solicitud,
+                'ID_Revisor' => $revisor?->ID_Usuarios,
                 'Fecha' => $fechaString,
                 'Hora' => $horaInicioCandidata->format('H:i:s'),
                 'Estado_Citas' => 'Programada',
@@ -100,10 +148,11 @@ class CitaService
                 'ID_Usuarios' => $usuario->ID_Usuarios,
                 'Accion' => 'Agendamiento de Cita',
                 'Descripcion' => sprintf(
-                    'Cita #%d agendada para el %s a las %s (1 hora de atención + 30 min de margen).',
+                    'Cita #%d agendada para el %s a las %s con el revisor: %s.',
                     $cita->ID_Citas,
                     $fechaString,
-                    $horaInicioCandidata->format('H:i')
+                    $cita->Hora,
+                    $revisor?->Nombre ?? 'Asignación automática'
                 ),
                 'Fecha_Creacion' => now(),
             ]);

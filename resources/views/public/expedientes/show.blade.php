@@ -393,14 +393,24 @@
                     </div>
 
                     <div class="flex items-center gap-3">
+                        @if($doc->versionesDoc->isNotEmpty())
+                            <a href="{{ route('expedientes.documentos.archivo', $doc->ID_Documento) }}"
+                               target="_blank"
+                               title="Previsualizar o descargar documento digital"
+                               class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-[#eff4ff] dark:bg-blue-950/60 text-[#0051d5] dark:text-blue-300 border border-blue-200/60 dark:border-blue-800 hover:bg-[#dce9ff] dark:hover:bg-blue-900/60 transition-colors">
+                                <span class="material-symbols-outlined text-sm">visibility</span>
+                                <span>Ver Archivo</span>
+                            </a>
+                        @endif
+
                         @php
                             $estado = $doc->Estado_Doc;
                             $badgeClass = match($estado) {
-                                'Aprobado' => 'bg-[#ecfdf5] text-[#065f46] border-emerald-200',
-                                'Observado' => 'bg-amber-50 text-amber-900 border-amber-200',
-                                'Rechazado' => 'bg-rose-50 text-rose-800 border-rose-200',
-                                'Subsanado' => 'bg-blue-50 text-blue-800 border-blue-200',
-                                default => 'bg-slate-100 text-slate-700 border-slate-200',
+                                'Aprobado' => 'bg-[#ecfdf5] dark:bg-emerald-950/40 text-[#065f46] dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
+                                'Observado' => 'bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 border-amber-200 dark:border-amber-800',
+                                'Rechazado' => 'bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 border-rose-200 dark:border-rose-800',
+                                'Subsanado' => 'bg-blue-50 dark:bg-blue-950/40 text-blue-800 dark:text-blue-300 border-blue-200 dark:border-blue-800',
+                                default => 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700',
                             };
                         @endphp
                         <span class="px-2.5 py-1 rounded-full text-xs font-semibold border {{ $badgeClass }}">

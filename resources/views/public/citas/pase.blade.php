@@ -90,6 +90,17 @@
                         </div>
                     @endif
 
+                    @if ($cita->revisor)
+                        <div class="pt-2">
+                            <span class="text-slate-400 dark:text-slate-500 block text-[11px]">Especialista / Revisor Asignado</span>
+                            <span class="text-xs font-semibold text-[#0051d5] dark:text-blue-400 flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm">badge</span>
+                                <span>{{ $cita->revisor->Nombre }}</span>
+                            </span>
+                            <span class="text-[11px] text-slate-500 dark:text-slate-400 block">{{ $cita->revisor->Email }}</span>
+                        </div>
+                    @endif
+
                     <div class="pt-2">
                         <span class="text-slate-400 dark:text-slate-500 block text-[11px]">Sede de Atención</span>
                         <span class="text-xs font-semibold text-[#0b1c30] dark:text-white">Sede Central • Mesa de Control y Dictamen</span>
