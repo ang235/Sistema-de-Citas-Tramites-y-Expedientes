@@ -10,26 +10,26 @@
 @endsection
 
 @section('content')
-<div class="max-w-7xl mx-auto px-6 lg:px-12 py-8 w-full space-y-12">
+<div class="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-12 py-5 sm:py-8 w-full space-y-8 sm:space-y-12">
 
     {{-- ══════════════════════════════════════════ HERO DE BIENVENIDA & BUSCADOR ══ --}}
-    <section class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#eff4ff] via-[#f8f9ff] to-[#e5eeff] dark:from-[#0b1624] dark:via-[#0e1c2e] dark:to-[#111f33] border border-[#dce9ff] dark:border-slate-800 shadow-xs p-8 lg:p-12">
+    <section class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#eff4ff] via-[#f8f9ff] to-[#e5eeff] dark:from-[#0b1624] dark:via-[#0e1c2e] dark:to-[#111f33] border border-[#dce9ff] dark:border-slate-800 shadow-xs p-4 sm:p-8 lg:p-12">
         <div class="absolute -right-16 -top-16 w-80 h-80 rounded-full bg-[#0051d5]/10 dark:bg-blue-500/10 blur-3xl pointer-events-none"></div>
 
-        <div class="relative z-10 max-w-4xl space-y-5">
+        <div class="relative z-10 max-w-4xl space-y-4 sm:space-y-5">
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white dark:bg-[#111f33] text-[#0051d5] dark:text-blue-300 text-xs font-semibold shadow-xs border border-blue-100 dark:border-blue-900/60">
                 <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                 <span>Ventanilla Única Digital Ciudadana</span>
             </div>
 
             <div class="space-y-2">
-                <h1 class="text-3xl lg:text-4xl font-extrabold text-[#001229] dark:text-white tracking-tight" style="font-family: var(--font-display);">
+                <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#001229] dark:text-white tracking-tight leading-tight" style="font-family: var(--font-display);">
                     @auth
                         Bienvenido, {{ auth()->user()->Nombre ?? auth()->user()->name }}.
                     @else
                         Bienvenido al Sistema de Expedientes de Trámites y Citas (SETC).
                     @endauth
-                    <span class="text-[#0051d5] dark:text-blue-400 block font-semibold text-2xl lg:text-3xl mt-1">
+                    <span class="text-[#0051d5] dark:text-blue-400 block font-semibold text-xl sm:text-2xl lg:text-3xl mt-1">
                         ¿Qué gestión o trámite deseas realizar hoy?
                     </span>
                 </h1>

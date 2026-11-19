@@ -2,7 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="csrf-token" content="{{ csrf_token() }}" />
 
     {{-- Dark mode script inicial para evitar parpadeo --}}
@@ -274,14 +274,14 @@
     {{-- ═══════════════════════════════════════════════════════ HEADER PÚBLICO ══ --}}
     <header id="main-header" class="fixed top-0 left-0 right-0 z-50 bg-white/92 dark:bg-[#0a1626]/92 border-b border-slate-200/80 dark:border-slate-800 transition-colors"
             style="backdrop-filter: blur(16px); box-shadow: var(--shadow-header);">
-        <div class="h-20 max-w-screen-xl mx-auto px-6 lg:px-12 flex items-center justify-between gap-4">
+        <div class="h-16 sm:h-20 max-w-screen-xl mx-auto px-3.5 sm:px-6 lg:px-12 flex items-center justify-between gap-2 sm:gap-4">
 
             {{-- Logo + Nombre --}}
-            <a href="{{ route('home') }}" class="flex items-center gap-3 shrink-0" aria-label="Ir al inicio SETC">
-                <img src="{{ asset('images/logo.png') }}" alt="Logo SETC" class="h-11 w-auto object-contain">
+            <a href="{{ route('home') }}" class="flex items-center gap-2 sm:gap-3 shrink-0" aria-label="Ir al inicio SETC">
+                <img src="{{ asset('images/logo.png') }}" alt="Logo SETC" class="h-8 sm:h-11 w-auto object-contain shrink-0">
                 <div class="flex flex-col leading-tight">
-                    <span class="text-headline-sm font-bold tracking-tight text-[#001229] dark:text-white" style="font-family: var(--font-display);">SETC</span>
-                    <span class="text-[11px] font-medium text-slate-500 dark:text-slate-400">Sistema de Expedientes de Trámites y Citas</span>
+                    <span class="text-base sm:text-headline-sm font-bold tracking-tight text-[#001229] dark:text-white" style="font-family: var(--font-display);">SETC</span>
+                    <span class="text-[11px] font-medium text-slate-500 dark:text-slate-400 hidden md:block">Sistema de Expedientes de Trámites y Citas</span>
                 </div>
             </a>
 
@@ -339,12 +339,12 @@
             </nav>
 
             {{-- Acciones de usuario --}}
-            <div class="flex items-center gap-2 shrink-0">
+            <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
 
                 {{-- Botón Modo Oscuro --}}
                 <button type="button"
                         onclick="toggleDarkMode()"
-                        class="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                        class="p-1.5 sm:p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
                         title="Cambiar modo oscuro / claro"
                         aria-label="Alternar tema de color">
                     <span class="material-symbols-outlined block dark:hidden text-amber-500 text-xl">dark_mode</span>
@@ -510,35 +510,48 @@
                         </div>
                     </div>
                 @else
-                    <a href="{{ route('login') }}" class="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors hidden sm:inline-flex items-center gap-1.5">
+                    <a href="{{ route('login') }}" class="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold transition-colors flex items-center gap-1 shrink-0">
                         <span class="material-symbols-outlined text-base">login</span>
-                        <span>Ingresar</span>
+                        <span class="hidden sm:inline">Ingresar</span>
                     </a>
-                    <a href="{{ route('register') }}" class="px-4 py-2 rounded-lg bg-[#001229] hover:bg-[#0f2744] text-white text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-xs">
+                    <a href="{{ route('register') }}" class="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-[#001229] hover:bg-[#0f2744] dark:bg-blue-600 dark:hover:bg-blue-700 text-white text-xs font-semibold transition-colors flex items-center gap-1 shadow-xs shrink-0">
                         <span class="material-symbols-outlined text-base">person_add</span>
-                        <span>Registrarse</span>
+                        <span class="hidden sm:inline">Registrarse</span>
                     </a>
                 @endauth
 
                 {{-- Hamburguesa mobile --}}
-                <button class="btn-ghost lg:hidden" id="btn-mobile-menu" aria-label="Menú" aria-expanded="false" aria-controls="mobile-menu">
-                    <span class="material-symbols-outlined">menu</span>
+                <button class="p-1.5 sm:p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 lg:hidden flex items-center justify-center shrink-0 cursor-pointer" id="btn-mobile-menu" aria-label="Menú" aria-expanded="false" aria-controls="mobile-menu">
+                    <span class="material-symbols-outlined text-2xl">menu</span>
                 </button>
             </div>
         </div>
 
         {{-- ── Menú mobile ── --}}
-        <div id="mobile-menu" class="hidden lg:hidden border-t" style="border-color: var(--color-outline-variant); background-color: var(--color-surface-container-lowest);">
+        <div id="mobile-menu" class="hidden lg:hidden border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0e1c2e] shadow-xl transition-colors">
+            @guest
+                <div class="p-3 border-b border-slate-100 dark:border-slate-800 flex items-center gap-2">
+                    <a href="{{ route('login') }}" class="flex-1 py-2 text-center rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold transition-colors flex items-center justify-center gap-1">
+                        <span class="material-symbols-outlined text-base">login</span>
+                        <span>Iniciar Sesión</span>
+                    </a>
+                    <a href="{{ route('register') }}" class="flex-1 py-2 text-center rounded-lg bg-[#001229] hover:bg-[#0f2744] dark:bg-blue-600 text-white text-xs font-semibold transition-colors flex items-center justify-center gap-1">
+                        <span class="material-symbols-outlined text-base">person_add</span>
+                        <span>Crear Cuenta</span>
+                    </a>
+                </div>
+            @endguest
             {{-- Buscador mobile --}}
             <div class="px-4 py-3">
-                <div class="relative">
-                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-sm pointer-events-none"
-                          style="color: var(--color-on-surface-variant);">search</span>
+                <form action="{{ route('tramites.index') }}" method="GET" class="relative">
+                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400 pointer-events-none">search</span>
                     <input type="text"
+                           name="buscar"
+                           value="{{ request('buscar') }}"
                            class="w-full h-10 pl-9 pr-3 rounded-xl bg-slate-100 dark:bg-[#0b1624] text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-xs focus:outline-none focus:ring-2 focus:ring-[#0051d5] transition-colors"
                            placeholder="Buscar trámites..."
                            aria-label="Buscador mobile">
-                </div>
+                </form>
             </div>
             <nav class="px-4 pb-4 flex flex-col gap-1" aria-label="Menú mobile">
                 @foreach([
@@ -548,9 +561,8 @@
                     ['label'=>'Agendar Cita',        'url'=>'/citas',       'icon'=>'calendar_month'],
                     ['label'=>'Mesa de Ayuda',       'url'=>'/ayuda',       'icon'=>'support_agent'],
                 ] as $item)
-                    <a href="{{ $item['url'] }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-label-md transition-colors"
-                       style="color: var(--color-on-surface);">
-                        <span class="material-symbols-outlined text-base" style="color: var(--color-secondary);">{{ $item['icon'] }}</span>
+                    <a href="{{ $item['url'] }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                        <span class="material-symbols-outlined text-base text-[#0051d5] dark:text-blue-400">{{ $item['icon'] }}</span>
                         {{ $item['label'] }}
                     </a>
                 @endforeach
@@ -560,15 +572,15 @@
 
     {{-- ═══════════════════════════════════════════════════════ BREADCRUMB ══════ --}}
     @hasSection('breadcrumb')
-        <div class="pt-20">
-            <div class="max-w-screen-xl mx-auto px-6 lg:px-12 py-3">
-                <nav class="breadcrumb" aria-label="Ruta de navegación">
+        <div class="pt-16 sm:pt-20">
+            <div class="max-w-screen-xl mx-auto px-3.5 sm:px-6 lg:px-12 py-2.5 sm:py-3">
+                <nav class="breadcrumb flex flex-wrap items-center gap-1 sm:gap-1.5 text-xs text-slate-500 dark:text-slate-400 overflow-hidden" aria-label="Ruta de navegación">
                     @yield('breadcrumb')
                 </nav>
             </div>
         </div>
     @else
-        <div class="pt-20"></div>
+        <div class="pt-16 sm:pt-20"></div>
     @endif
 
     {{-- ═══════════════════════════════════════════════════════ FLASH MESSAGES ══ --}}
@@ -681,6 +693,9 @@
             </div>
         </div>
     </footer>
+
+    {{-- ═══════════════════════════════════════════════════════ ASISTENTE VIRTUAL IA ══ --}}
+    @include('public.partials.chatbot')
 
     {{-- ═══════════════════════════════════════════════════════ SCRIPTS ═════════ --}}
     <script>

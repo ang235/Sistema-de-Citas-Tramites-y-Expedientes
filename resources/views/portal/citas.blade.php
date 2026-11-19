@@ -13,24 +13,24 @@
 <div class="space-y-6">
 
     {{-- ══ CABECERA DE LA VENTANA ══ --}}
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-[#111f33] p-5 rounded-xl border border-slate-200/90 dark:border-slate-800 shadow-xs">
-        <div>
-            <div class="flex items-center gap-2">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-[#111f33] p-4 sm:p-5 rounded-xl border border-slate-200/90 dark:border-slate-800 shadow-xs">
+        <div class="min-w-0 flex-1">
+            <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
                 <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#eff4ff] dark:bg-blue-950/60 text-[#0051d5] dark:text-blue-300">
                     {{ !empty($esSoloRevisor) ? 'Mesa Técnica Revisor' : 'Control Operativo' }}
                 </span>
                 <span class="text-xs text-slate-400 dark:text-slate-500">•</span>
-                <span class="text-xs text-slate-500 dark:text-slate-400">Atención Presencial y Virtual ITSE</span>
+                <span class="text-xs text-slate-500 dark:text-slate-400 break-words">Atención Presencial y Virtual ITSE</span>
             </div>
-            <h1 class="font-headline-sm text-xl font-bold text-slate-900 dark:text-white mt-1">
+            <h1 class="font-headline-sm text-lg sm:text-xl font-bold text-slate-900 dark:text-white mt-1 leading-snug break-words">
                 {{ !empty($esSoloRevisor) ? 'Mis Citas Asignadas en Ventanilla' : 'Agenda de Citas y Turnos de Ventanilla' }}
             </h1>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
                 {{ !empty($esSoloRevisor) ? 'Turnos y comparecencias de ciudadanos cuyos expedientes técnicos fueron revisados y calificados por usted.' : 'Supervisa el calendario de atención ciudadana, confirma comparecencias y valida pases digitales.' }}
             </p>
         </div>
 
-        <div class="flex items-center gap-2.5 shrink-0">
+        <div class="flex flex-wrap items-center gap-2 sm:gap-2.5 shrink-0">
             <a href="{{ route('portal.citas', ['fecha' => today()->toDateString()]) }}"
                class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 transition-colors">
                 <span class="material-symbols-outlined text-sm text-[#0051d5] dark:text-blue-400">today</span>

@@ -1,8 +1,8 @@
-<!DOCTYPE html>
+**<!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full scroll-smooth">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="csrf-token" content="{{ csrf_token() }}" />
 
     {{-- SEO — portal interno (no indexable) --}}
@@ -268,26 +268,35 @@
 
     @stack('head')
 </head>
-<body class="h-full flex overflow-hidden bg-slate-50 dark:bg-[#070e17] text-slate-900 dark:text-slate-100 antialiased">
+<body class="h-full h-[100dvh] flex overflow-hidden bg-slate-50 dark:bg-[#070e17] text-slate-900 dark:text-slate-100 antialiased">
+
+    {{-- Overlay móvil --}}
+    <div id="sidebar-overlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-40 hidden lg:hidden transition-opacity"></div>
 
     {{-- ════════════════════════════════════════════════════════ SIDEBAR ═════════ --}}
     <aside id="sidebar"
-           class="flex-shrink-0 flex flex-col h-full z-40 transition-all duration-300 w-64 bg-[#0a1626] border-r border-slate-800 text-slate-200"
+           class="fixed inset-y-0 left-0 z-50 flex flex-col h-full w-64 bg-[#0a1626] border-r border-slate-800 text-slate-200 transition-transform duration-300 -translate-x-full lg:translate-x-0 lg:static lg:flex-shrink-0"
            aria-label="Panel de navegación">
 
         {{-- Logo & Contexto operativo --}}
         <div class="px-4 py-4 shrink-0 border-b border-slate-800/80 bg-[#08121f]">
-            <div class="flex items-center gap-3 mb-3">
-                <div class="w-10 h-10 rounded-xl bg-white/10 p-1 flex items-center justify-center shrink-0 border border-white/20">
-                    <img src="{{ asset('images/logo.png') }}" alt="Logo SETC" class="h-8 w-auto object-contain">
-                </div>
-                <div class="flex flex-col leading-tight min-w-0">
-                    <div class="flex items-center gap-1.5">
-                        <span class="text-white font-bold text-base tracking-tight" style="font-family: var(--font-display);">S.E.T.C.</span>
-                        <span class="px-1.5 py-0.5 rounded text-white font-bold text-[9px] bg-[#0051d5] tracking-wider">ENTERPRISE</span>
+            <div class="flex items-center justify-between gap-2 mb-3">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-white/10 p-1 flex items-center justify-center shrink-0 border border-white/20">
+                        <img src="{{ asset('images/logo.png') }}" alt="Logo SETC" class="h-8 w-auto object-contain">
                     </div>
-                    <span class="text-[11px] truncate text-slate-400 font-medium">Expedientes, Trámites y Citas</span>
+                    <div class="flex flex-col leading-tight min-w-0">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-white font-bold text-base tracking-tight" style="font-family: var(--font-display);">S.E.T.C.</span>
+                            <span class="px-1.5 py-0.5 rounded text-white font-bold text-[9px] bg-[#0051d5] tracking-wider">ENTERPRISE</span>
+                        </div>
+                        <span class="text-[11px] truncate text-slate-400 font-medium">Expedientes, Trámites y Citas</span>
+                    </div>
                 </div>
+                {{-- Botón cerrar sidebar en móvil --}}
+                <button type="button" onclick="toggleSidebar()" class="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors shrink-0" aria-label="Cerrar menú">
+                    <span class="material-symbols-outlined text-xl">close</span>
+                </button>
             </div>
 
             {{-- Identidad Institucional --}}
@@ -543,13 +552,20 @@
     <div class="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
 
         {{-- ── Topbar ── --}}
-        <header class="shrink-0 flex items-center justify-between gap-4 px-6 h-16 z-30 bg-white dark:bg-[#0a1626] border-b border-slate-200/90 dark:border-slate-800 shadow-xs">
+        <header class="shrink-0 flex items-center justify-between gap-2 sm:gap-4 px-3 sm:px-6 min-h-[3.5rem] sm:min-h-[4rem] z-30 bg-white dark:bg-[#0a1626] border-b border-slate-200/90 dark:border-slate-800 shadow-xs"
+                style="padding-top: max(0.5rem, env(safe-area-inset-top)); padding-left: max(0.75rem, env(safe-area-inset-left)); padding-right: max(0.75rem, env(safe-area-inset-right));">
 
-            {{-- Toggle sidebar (mobile) + Buscador --}}
-            <div class="flex items-center gap-3 flex-1 min-w-0">
-                <button id="btn-sidebar-toggle" class="p-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 lg:hidden" aria-label="Toggle sidebar">
-                    <span class="material-symbols-outlined">menu</span>
+            {{-- Toggle sidebar (mobile) + Marca móvil + Buscador --}}
+            <div class="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                <button id="btn-sidebar-toggle" class="p-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 lg:hidden shrink-0" aria-label="Toggle sidebar">
+                    <span class="material-symbols-outlined text-2xl">menu</span>
                 </button>
+
+                {{-- Marca móvil visible cuando el sidebar está oculto --}}
+                <div class="flex items-center gap-1.5 lg:hidden min-w-0">
+                    <img src="{{ asset('images/logo.png') }}" alt="Logo SETC" class="h-6 w-auto object-contain shrink-0">
+                    <span class="text-slate-900 dark:text-white font-bold text-xs sm:text-sm tracking-tight truncate">S.E.T.C.</span>
+                </div>
 
                 {{-- Global search context-aware --}}
                 @php
@@ -574,7 +590,7 @@
             </div>
 
             {{-- Indicadores de estado del sistema & Controles --}}
-            <div class="flex items-center gap-2.5 shrink-0">
+            <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
 
                 {{-- Red segura --}}
                 <div class="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
@@ -591,7 +607,7 @@
                 {{-- BOTÓN MODO OSCURO / CLARO --}}
                 <button type="button"
                         onclick="toggleDarkMode()"
-                        class="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                        class="p-1.5 sm:p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shrink-0"
                         title="Alternar Modo Oscuro / Claro"
                         aria-label="Alternar Modo Oscuro">
                     <span class="material-symbols-outlined block dark:hidden text-amber-500 text-xl">dark_mode</span>
@@ -599,13 +615,13 @@
                 </button>
 
                 {{-- Notificaciones con Dropdown --}}
-                <div class="relative" x-data="{ openNotif: false }">
-                    <button @click="openNotif = !openNotif" class="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 relative transition-colors" aria-label="Notificaciones" id="btn-topbar-notifications">
+                <div class="relative shrink-0" x-data="{ openNotif: false }">
+                    <button @click="openNotif = !openNotif" class="p-1.5 sm:p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 relative transition-colors" aria-label="Notificaciones" id="btn-topbar-notifications">
                         <span class="material-symbols-outlined text-xl">notifications</span>
                     </button>
                     <div x-show="openNotif" @click.outside="openNotif = false"
                          x-transition
-                         class="dropdown-menu absolute right-0 top-full mt-2 w-80 z-50 bg-white dark:bg-[#111f33] rounded-xl shadow-lg border border-slate-200 dark:border-slate-800" role="dialog" aria-label="Panel de notificaciones" style="display: none;">
+                         class="dropdown-menu absolute right-0 top-full mt-2 w-72 sm:w-80 max-w-[calc(100vw-2rem)] z-50 bg-white dark:bg-[#111f33] rounded-xl shadow-lg border border-slate-200 dark:border-slate-800" role="dialog" aria-label="Panel de notificaciones" style="display: none;">
                         <div class="px-4 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
                             <span class="text-sm font-bold text-[#0b1c30] dark:text-white">Notificaciones</span>
                             <span class="text-xs text-slate-400 font-mono">{{ now()->format('d/m/Y') }}</span>
@@ -695,14 +711,14 @@
                     </div>
                 </div>
 
-                {{-- Ayuda con Dropdown --}}
-                <div class="relative" x-data="{ openAyuda: false }">
-                    <button @click="openAyuda = !openAyuda" class="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" aria-label="Ayuda">
+                {{-- Ayuda con Dropdown (visible en sm en adelante para optimizar el header móvil) --}}
+                <div class="relative hidden sm:block shrink-0" x-data="{ openAyuda: false }">
+                    <button @click="openAyuda = !openAyuda" class="p-1.5 sm:p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" aria-label="Ayuda">
                         <span class="material-symbols-outlined text-xl">help_outline</span>
                     </button>
                     <div x-show="openAyuda" @click.outside="openAyuda = false"
                          x-transition
-                         class="dropdown-menu absolute right-0 top-full mt-2 w-72 z-50 bg-white dark:bg-[#111f33] rounded-xl shadow-lg border border-slate-200 dark:border-slate-800 p-3" role="dialog" style="display: none;">
+                         class="dropdown-menu absolute right-0 top-full mt-2 w-72 max-w-[calc(100vw-2rem)] z-50 bg-white dark:bg-[#111f33] rounded-xl shadow-lg border border-slate-200 dark:border-slate-800 p-3" role="dialog" style="display: none;">
                         <span class="text-xs font-bold text-slate-800 dark:text-white block border-b border-slate-100 dark:border-slate-800 pb-2 mb-2">Mesa de Ayuda SETC</span>
                         <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                             Para soporte técnico o asistencia normativa, contacte a soporte@setc.gob.pe o llame a la extensión interna 401.
@@ -710,9 +726,9 @@
                     </div>
                 </div>
 
-                {{-- Tarjeta de Usuario en Topbar: Exclusiva para visualización del rol institucional (Solo Vista) --}}
-                <div class="flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-slate-100/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/60 select-none shadow-2xs">
-                    <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-xs bg-gradient-to-br from-[#0051d5] to-[#1e40af] shrink-0 shadow-xs">
+                {{-- Tarjeta de Usuario en Topbar: compacta en móvil --}}
+                <div class="flex items-center gap-2 p-1 sm:px-3 sm:py-1.5 rounded-xl bg-slate-100/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/60 select-none shadow-2xs shrink-0">
+                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center text-white font-bold text-xs bg-gradient-to-br from-[#0051d5] to-[#1e40af] shrink-0 shadow-xs">
                         {{ strtoupper(substr(auth()->user()->Nombre ?? auth()->user()->name ?? 'U', 0, 1)) }}
                     </div>
                     <div class="hidden sm:flex flex-col text-left leading-tight">
@@ -731,13 +747,13 @@
         </header>
 
         {{-- ── ÁREA DE CONTENIDO SCROLLABLE (SOLUCIÓN DEFINITIVA DE SCROLL) ── --}}
-        <div class="flex-1 min-h-0 overflow-y-auto custom-scroll bg-slate-50 dark:bg-[#070e17]" id="portal-content-scroll">
+        <div class="flex-1 min-h-0 overflow-y-auto overflow-x-hidden custom-scroll bg-slate-50 dark:bg-[#070e17]" id="portal-content-scroll">
 
             {{-- Breadcrumb interno --}}
             @hasSection('breadcrumb')
-                <div class="px-6 lg:px-8 pt-4">
-                    <nav class="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-medium" aria-label="Ruta de navegación">
-                        <a href="{{ route('portal.dashboard') }}" class="hover:text-slate-800 dark:hover:text-slate-200">Inicio</a>
+                <div class="px-3.5 sm:px-6 lg:px-8 pt-3 sm:pt-4">
+                    <nav class="flex flex-wrap items-center gap-1 sm:gap-1.5 text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium overflow-hidden" aria-label="Ruta de navegación">
+                        <a href="{{ route('portal.dashboard') }}" class="hover:text-slate-800 dark:hover:text-slate-200 shrink-0">Inicio</a>
                         @yield('breadcrumb')
                     </nav>
                 </div>
@@ -745,7 +761,7 @@
 
             {{-- Flash messages --}}
             @if(session('success') || session('error') || session('warning') || session('info'))
-                <div class="px-6 lg:px-8 pt-3" id="flash-messages">
+                <div class="px-3.5 sm:px-6 lg:px-8 pt-3" id="flash-messages">
                     @if(session('success'))
                         <div class="p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 text-xs flex items-center gap-2">
                             <span class="material-symbols-outlined text-base text-emerald-600">check_circle</span>
@@ -769,7 +785,7 @@
 
             {{-- Errores de validación --}}
             @if($errors->any())
-                <div class="px-6 lg:px-8 pt-3">
+                <div class="px-3.5 sm:px-6 lg:px-8 pt-3">
                     <div class="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200 text-xs flex items-start gap-2">
                         <span class="material-symbols-outlined text-base text-rose-600 mt-0.5">error</span>
                         <ul class="list-disc list-inside space-y-0.5">
@@ -782,7 +798,7 @@
             @endif
 
             {{-- CONTENIDO PRINCIPAL --}}
-            <main id="main-content" role="main" class="px-6 lg:px-8 py-6 pb-16">
+            <main id="main-content" role="main" class="px-3.5 sm:px-6 lg:px-8 py-4 sm:py-6 pb-16">
                 @yield('content')
             </main>
         </div>
@@ -804,13 +820,25 @@
         // ── Toggle sidebar mobile ──────────────────────────────────────────────
         const btnSidebar = document.getElementById('btn-sidebar-toggle');
         const sidebar    = document.getElementById('sidebar');
-        if (btnSidebar && sidebar) {
-            btnSidebar.addEventListener('click', () => {
-                sidebar.classList.toggle('-translate-x-full');
-                sidebar.classList.toggle('fixed');
-                sidebar.classList.toggle('inset-y-0');
-                sidebar.classList.toggle('left-0');
-            });
+        const overlay    = document.getElementById('sidebar-overlay');
+
+        function toggleSidebar() {
+            if (!sidebar) return;
+            const isClosed = sidebar.classList.contains('-translate-x-full');
+            if (isClosed) {
+                sidebar.classList.remove('-translate-x-full');
+                if (overlay) overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                if (overlay) overlay.classList.add('hidden');
+            }
+        }
+
+        if (btnSidebar) {
+            btnSidebar.addEventListener('click', toggleSidebar);
+        }
+        if (overlay) {
+            overlay.addEventListener('click', toggleSidebar);
         }
 
         // ── Auto-ocultar flash messages ────────────────────────────────────────

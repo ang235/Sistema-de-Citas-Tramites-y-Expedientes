@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\VersionTramiteController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Auth\ProfileController;
+use App\Http\Controllers\Ciudadano\ChatbotController;
 use App\Http\Controllers\Ciudadano\CitaCiudadanoController;
 use App\Http\Controllers\Ciudadano\ExpedienteCiudadanoController;
 use App\Http\Controllers\Ciudadano\SolicitudCiudadanoController;
@@ -25,6 +26,7 @@ use Illuminate\Support\Facades\Route;
 // Rutas Públicas & Portal Ciudadano
 Route::get('/', [TramiteCiudadanoController::class, 'home'])->name('home');
 Route::get('/ayuda', fn () => view('public.ayuda.index'))->name('ayuda.index');
+Route::post('/asistente/chat', [ChatbotController::class, 'chat'])->name('asistente.chat');
 
 // Catálogo de trámites
 Route::get('/tramites', [TramiteCiudadanoController::class, 'index'])->name('tramites.index');
