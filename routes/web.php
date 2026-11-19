@@ -49,12 +49,17 @@ Route::middleware(['auth', 'role:ciudadano'])->group(function (): void {
     Route::get('/citas', [CitaCiudadanoController::class, 'index'])->name('citas.index');
     Route::get('/citas/agendar', [CitaCiudadanoController::class, 'create'])->name('citas.create');
     Route::post('/citas', [CitaCiudadanoController::class, 'store'])->name('citas.store');
-    Route::get('/citas/{idCita}/pase', [CitaCiudadanoController::class, 'paseDigital'])->name('citas.pase');
     Route::post('/citas/{idCita}/cancelar', [CitaCiudadanoController::class, 'cancelar'])->name('citas.cancelar');
 
     // Perfil personal del ciudadano
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+});
+
+// Pase digital y descarga PDF de cita (disponible para el ciudadano y autoridades operativas)
+Route::middleware('auth')->group(function (): void {
+    Route::get('/citas/{idCita}/pase', [CitaCiudadanoController::class, 'paseDigital'])->name('citas.pase');
+    Route::get('/citas/{idCita}/pase/pdf', [CitaCiudadanoController::class, 'pasePdf'])->name('citas.pase.pdf');
 });
 
 /*
@@ -105,6 +110,7 @@ Route::prefix('portal')->name('portal.')->middleware('auth')->group(function ():
 
     // Resoluciones
     Route::post('/expedientes/{idSolicitud}/resolucion', [ResolucionController::class, 'store'])->name('resoluciones.store');
+    Route::get('/expedientes/{idSolicitud}/resolucion/pdf', [ResolucionController::class, 'descargarPdf'])->name('resoluciones.pdf');
 
     // Citas Operativas
     Route::get('/citas', [CitaOperativaController::class, 'index'])->name('citas');

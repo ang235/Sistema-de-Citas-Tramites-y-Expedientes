@@ -12,6 +12,8 @@ use App\Models\Solicitud;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Spatie\LaravelPdf\Facades\Pdf;
+use Spatie\LaravelPdf\PdfBuilder;
 
 class ResolucionController extends Controller
 {
@@ -53,5 +55,32 @@ class ResolucionController extends Controller
         });
 
         return back()->with('success', 'Resolución formal emitida y registrada en el expediente.');
+    }
+
+    public function descargarPdf(int $idSolicitud): PdfBuilder
+    {
+        /** @var Solicitud $solicitud */
+        $solicitud = Solicitud::with([
+            'solicitante',
+            'versionTramite.tipoTramite',
+            'folio',
+            'resoluciones.supervisor',
+            'asignaciones.revisor',
+        ])->findOrFail($idSolicitud);
+
+        abort_if($solicitud->resoluciones->isEmpty(), 404, 'Este expediente no cuenta con resolución emitida aún.');
+
+        $resolucion = $solicitud->resoluciones->last();
+        $folio = $solicitud->folio?->Codigo_Folio ?? "EXP-{$idSolicitud}";
+        $qrUrl = route('expedientes.show', ['codigoFolio' => $folio]);
+
+        return Pdf::view('pdf.resolucion', [
+            'solicitud' => $solicitud,
+            'resolucion' => $resolucion,
+            'folio' => $folio,
+            'qrUrl' => $qrUrl,
+        ])
+            ->format('a4')
+            ->name("SETC-Resolucion-{$folio}.pdf");
     }
 }

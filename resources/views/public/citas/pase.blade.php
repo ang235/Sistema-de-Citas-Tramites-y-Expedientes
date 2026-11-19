@@ -19,10 +19,19 @@
             <span class="material-symbols-outlined text-emerald-600 dark:text-emerald-400 text-xl">check_circle</span>
             <span class="font-semibold">¡Cita confirmada exitosamente! Tu turno ha sido reservado.</span>
         </div>
-        <button onclick="window.print();" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold transition-colors flex items-center gap-1 shrink-0 cursor-pointer">
-            <span class="material-symbols-outlined text-sm">print</span>
-            <span>Imprimir Pase</span>
-        </button>
+        <div class="flex items-center gap-2 shrink-0">
+            <a href="{{ route('citas.pase.pdf', $cita->ID_Citas) }}?descargar=1"
+               class="px-3.5 py-1.5 bg-[#0051d5] hover:bg-[#1d4ed8] text-white rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs">
+                <span class="material-symbols-outlined text-sm">download</span>
+                <span>Descargar PDF</span>
+            </a>
+            <a href="{{ route('citas.pase.pdf', $cita->ID_Citas) }}"
+               target="_blank"
+               class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs">
+                <span class="material-symbols-outlined text-sm">print</span>
+                <span>Imprimir Pase</span>
+            </a>
+        </div>
     </div>
 
     {{-- Ticket / Pase Digital --}}
@@ -30,9 +39,7 @@
         {{-- Cabecera Institucional del Pase --}}
         <div class="bg-[#001229] dark:bg-[#070e17] text-white p-6 sm:p-8 flex items-center justify-between gap-4 border-b border-slate-800">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-[#0051d5] flex items-center justify-center text-white">
-                    <span class="material-symbols-outlined text-2xl">account_balance</span>
-                </div>
+                <img src="{{ asset('images/logo.png') }}" alt="Logo SETC" class="h-10 w-auto object-contain bg-white/10 rounded-xl p-1 shrink-0">
                 <div>
                     <h1 class="text-xl font-bold tracking-tight" style="font-family: var(--font-display);">SETC • Pase Digital Oficial</h1>
                     <span class="text-xs text-slate-300">Gobierno Digital e Innovación Telemática</span>
@@ -53,7 +60,7 @@
                 {{-- QR --}}
                 <div class="flex flex-col items-center justify-center p-6 bg-[#eff4ff]/60 dark:bg-slate-800/60 border border-[#dce9ff] dark:border-slate-700 rounded-2xl text-center space-y-3">
                     <div class="p-4 bg-white dark:bg-slate-900 rounded-xl shadow-xs border border-slate-200 dark:border-slate-700 inline-block">
-                        <span class="material-symbols-outlined text-7xl text-[#001229] dark:text-white">qr_code_2</span>
+                        {!! \SimpleSoftwareIO\QrCode\Facades\QrCode::size(160)->generate(route('citas.pase', ['idCita' => $cita->ID_Citas])) !!}
                     </div>
                     <div class="space-y-0.5">
                         <span class="text-[11px] text-slate-400 font-mono block">CÓDIGO DE VALIDACIÓN</span>
@@ -141,4 +148,24 @@
         </div>
     </div>
 </div>
+
+<style>
+    @media print {
+        header, nav, footer, .breadcrumb-item, .breadcrumb-separator, #asistente-setc, a, button, .shadow-xs, .shadow-md {
+            display: none !important;
+        }
+        body {
+            background: #ffffff !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        #pase-imprimible {
+            border: none !important;
+            box-shadow: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+        }
+    }
+</style>
 @endsection

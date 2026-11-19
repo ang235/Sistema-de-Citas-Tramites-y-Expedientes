@@ -16,6 +16,9 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use Spatie\LaravelPdf\Facades\Pdf;
+use Spatie\LaravelPdf\PdfBuilder;
+use Symfony\Component\HttpFoundation\Response;
 
 class CitaCiudadanoController extends Controller
 {
@@ -260,14 +263,48 @@ class CitaCiudadanoController extends Controller
 
     public function paseDigital(int $idCita): View
     {
+        /** @var Usuario $usuario */
+        $usuario = Auth::user();
+
+        $query = Cita::with(['usuario', 'solicitud.folio', 'solicitud.versionTramite.tipoTramite', 'revisor']);
+
+        if ($usuario->esCiudadano()) {
+            $query->where('ID_Usuarios', $usuario->ID_Usuarios);
+        }
+
         /** @var Cita $cita */
-        $cita = Cita::with(['usuario', 'solicitud.folio', 'solicitud.versionTramite.tipoTramite', 'revisor'])
-            ->where('ID_Usuarios', Auth::id())
-            ->findOrFail($idCita);
+        $cita = $query->findOrFail($idCita);
 
         return view('public.citas.pase', [
             'cita' => $cita,
         ]);
+    }
+
+    public function pasePdf(Request $request, int $idCita): Response|PdfBuilder
+    {
+        /** @var Usuario $usuario */
+        $usuario = Auth::user();
+
+        $query = Cita::with(['usuario', 'solicitud.folio', 'solicitud.versionTramite.tipoTramite', 'revisor']);
+
+        if ($usuario->esCiudadano()) {
+            $query->where('ID_Usuarios', $usuario->ID_Usuarios);
+        }
+
+        /** @var Cita $cita */
+        $cita = $query->findOrFail($idCita);
+
+        $qrUrl = route('citas.pase', ['idCita' => $cita->ID_Citas]);
+        $turno = str_pad((string) $cita->ID_Citas, 5, '0', STR_PAD_LEFT);
+
+        $pdf = Pdf::view('pdf.pase-cita', [
+            'cita' => $cita,
+            'qrUrl' => $qrUrl,
+        ])
+            ->format('a4')
+            ->name("SETC-Pase-Turno-{$turno}.pdf");
+
+        return $request->boolean('descargar') ? $pdf->download() : $pdf;
     }
 
     public function cancelar(int $idCita): RedirectResponse

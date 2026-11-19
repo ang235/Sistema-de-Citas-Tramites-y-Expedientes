@@ -316,6 +316,11 @@
                                             <span class="material-symbols-outlined text-sm">qr_code_2</span>
                                             <span>Pase</span>
                                         </a>
+
+                                        <a href="{{ route('citas.pase.pdf', $cita->ID_Citas) }}" target="_blank" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 dark:hover:bg-rose-900/60 transition-colors" title="Descargar Pase en PDF oficial con QR">
+                                            <span class="material-symbols-outlined text-sm">picture_as_pdf</span>
+                                            <span>PDF</span>
+                                        </a>
                                     </div>
                                 </td>
                             @endif

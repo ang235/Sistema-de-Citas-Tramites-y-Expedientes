@@ -32,13 +32,15 @@ RUN composer install \
     --no-interaction \
     --no-scripts \
     --prefer-dist \
-    --optimize-autoloader
+    --optimize-autoloader \
+    --ignore-platform-req=ext-gd
 
 # Copiar el resto del código fuente
 COPY . .
 
 # Ejecutar scripts post-install manualmente (sin root)
-RUN composer dump-autoload --optimize --no-dev
+RUN mkdir -p storage/framework/views storage/framework/cache storage/framework/sessions \
+    && composer dump-autoload --optimize --no-dev --no-scripts
 
 
 # ============================================================

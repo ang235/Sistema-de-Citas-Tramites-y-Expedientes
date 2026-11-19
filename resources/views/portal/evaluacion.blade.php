@@ -56,6 +56,14 @@
                 <span class="material-symbols-outlined text-base">arrow_back</span>
                 <span>Cola de Expedientes</span>
             </a>
+            @if($solicitud->resoluciones->isNotEmpty() && (auth()->user()?->esAdministrador() || auth()->user()?->esSupervisor()))
+                <a href="{{ route('portal.resoluciones.pdf', $solicitud->ID_Solicitud) }}"
+                   target="_blank"
+                   class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#001229] hover:bg-[#00224d] text-white text-xs font-semibold transition-colors shadow-xs">
+                    <span class="material-symbols-outlined text-base">picture_as_pdf</span>
+                    <span>Resolución PDF</span>
+                </a>
+            @endif
             @if(auth()->user()?->esAdministrador() || auth()->user()?->esSupervisor())
                 <a href="{{ route('portal.auditoria') }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white dark:bg-[#0a1626] border border-slate-200 dark:border-slate-700 hover:bg-slate-50 text-slate-700 dark:text-slate-200 text-xs font-semibold shadow-xs transition-colors">
                     <span class="material-symbols-outlined text-base text-purple-600">policy</span>

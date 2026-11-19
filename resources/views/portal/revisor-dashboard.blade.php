@@ -281,6 +281,13 @@
                                        title="Ver Pase Digital con QR">
                                         <span class="material-symbols-outlined text-sm">qr_code_2</span>
                                     </a>
+
+                                    <a href="{{ route('citas.pase.pdf', $cita->ID_Citas) }}"
+                                       target="_blank"
+                                       class="inline-flex items-center justify-center p-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 text-rose-600 dark:text-rose-400 transition-colors"
+                                       title="Descargar Pase en PDF oficial Spatie">
+                                        <span class="material-symbols-outlined text-sm">picture_as_pdf</span>
+                                    </a>
                                 </div>
                             </td>
                         </tr>

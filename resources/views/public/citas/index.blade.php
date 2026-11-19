@@ -81,9 +81,14 @@
                 {{-- Acciones --}}
                 <div class="flex items-center gap-3 shrink-0">
                     @if (! $esCancelada)
-                        <a href="{{ route('citas.pase', $cita->ID_Citas) }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#eff4ff] hover:bg-[#dce9ff] dark:bg-blue-950/60 dark:hover:bg-blue-900/60 text-[#0051d5] dark:text-blue-300 text-xs font-semibold transition-colors">
+                        <a href="{{ route('citas.pase', $cita->ID_Citas) }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#eff4ff] hover:bg-[#dce9ff] dark:bg-blue-950/60 dark:hover:bg-blue-900/60 text-[#0051d5] dark:text-blue-300 text-xs font-semibold transition-colors">
                             <span class="material-symbols-outlined text-base">qr_code</span>
-                            <span>Ver Pase Digital</span>
+                            <span>Ver Pase</span>
+                        </a>
+
+                        <a href="{{ route('citas.pase.pdf', $cita->ID_Citas) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#001229] hover:bg-[#00224d] text-white text-xs font-semibold transition-colors shadow-xs" title="Descargar Pase en PDF oficial con QR">
+                            <span class="material-symbols-outlined text-base text-rose-400">picture_as_pdf</span>
+                            <span>PDF</span>
                         </a>
 
                         <form action="{{ route('citas.cancelar', $cita->ID_Citas) }}" method="POST" onsubmit="return confirm('¿Confirmas que deseas cancelar esta cita?');">
