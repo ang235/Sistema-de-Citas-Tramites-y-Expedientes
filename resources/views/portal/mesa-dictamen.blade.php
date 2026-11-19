@@ -140,7 +140,7 @@
                         <div class="flex flex-col min-w-0">
                             <span class="font-mono text-xs font-bold text-[#0051d5] dark:text-blue-400">{{ $folio }}</span>
                             <h3 class="text-xs font-bold text-[#0b1c30] dark:text-white truncate">{{ $sol->solicitante?->Nombre ?? 'Administrado' }}</h3>
-                            <span class="text-[11px] text-slate-500 dark:text-slate-400 truncate">{{ $sol->versionTramite?->tipoTramite?->Nombre ?? 'Trámite TUPA' }}</span>
+                            <span class="text-[11px] text-slate-500 dark:text-slate-400 truncate">{{ $sol->versionTramite?->tipoTramite?->Nombre ?? 'Trámite Institucional' }}</span>
                         </div>
                         <span class="px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 {{ $sol->Estado_Solicitud === 'Aprobado' ? 'bg-emerald-50 text-emerald-700' : ($sol->Estado_Solicitud === 'Observado' ? 'bg-amber-50 text-amber-800' : 'bg-blue-50 text-blue-700') }}">
                             {{ str_replace('_', ' ', $sol->Estado_Solicitud) }}
@@ -180,7 +180,7 @@
                             {{ $solicitudSeleccionada->folio?->Codigo_Folio ?? 'EXP-' . $solicitudSeleccionada->ID_Solicitud }}
                         </span>
                         <span class="text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-                            {{ $solicitudSeleccionada->versionTramite?->tipoTramite?->Nombre ?? 'Trámite TUPA' }}
+                            {{ $solicitudSeleccionada->versionTramite?->tipoTramite?->Nombre ?? 'Trámite Institucional' }}
                         </span>
                         <span class="text-xs px-2 py-0.5 rounded font-semibold {{ $solicitudSeleccionada->Estado_Solicitud === 'Aprobado' ? 'bg-emerald-50 text-emerald-700' : ($solicitudSeleccionada->Estado_Solicitud === 'Observado' ? 'bg-amber-50 text-amber-800' : 'bg-blue-50 text-blue-700') }}">
                             {{ str_replace('_', ' ', $solicitudSeleccionada->Estado_Solicitud) }}
@@ -435,7 +435,7 @@
                         <div class="flex items-center justify-between pt-2">
                             <span class="text-xs text-slate-400 flex items-center gap-1">
                                 <span class="material-symbols-outlined text-sm text-emerald-500">lock</span>
-                                Firma PKI Digital del Revisor Habilitada
+                                Firma Digital del Revisor Habilitada
                             </span>
                             <button type="submit" class="px-5 py-2.5 rounded-xl bg-[#001229] hover:bg-[#0f2744] text-white text-xs font-bold transition-all shadow-sm flex items-center gap-2">
                                 <span class="material-symbols-outlined text-base">verified</span>

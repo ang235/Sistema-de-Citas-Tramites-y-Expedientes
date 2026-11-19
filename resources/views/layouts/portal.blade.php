@@ -579,7 +579,7 @@
                 {{-- Red segura --}}
                 <div class="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
                     <span class="material-symbols-outlined text-sm">lock</span>
-                    Red Segura PKI
+                    Conexión Segura
                 </div>
 
                 {{-- Sede actual --}}

@@ -68,7 +68,7 @@
             <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Trámites Catalogados</span>
             <div class="flex items-baseline gap-2 mt-1">
                 <span class="text-2xl font-bold text-slate-900">{{ $kpis['total_tramites'] ?? 47 }}</span>
-                <span class="text-xs text-slate-400">/ 50 límite TUPA</span>
+                <span class="text-xs text-slate-400">/ 50 límite institucional</span>
             </div>
         </div>
         <div class="w-9 h-9 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center shrink-0">
@@ -115,7 +115,7 @@
     </div>
 </div>
 
-{{-- ═══════════════════════════════════ TABLA CATÁLOGO TUPA ══ --}}
+{{-- ═══════════════════════════════════ TABLA CATÁLOGO DE TRÁMITES ══ --}}
 <div class="bg-white rounded-xl border border-slate-200/80 shadow-xs overflow-hidden">
     {{-- Pestañas de estado: Activos vs Inactivos --}}
     <div class="px-6 pt-4 border-b border-slate-100 flex items-center justify-between gap-4 flex-wrap">
@@ -155,7 +155,7 @@
         <table class="w-full text-left text-xs">
             <thead>
                 <tr class="border-b border-slate-100 bg-slate-50 text-slate-400 uppercase tracking-wider font-semibold text-[11px]">
-                    <th class="py-3 px-6">Código TUPA</th>
+                    <th class="py-3 px-6">Código de Trámite</th>
                     <th class="py-3 px-4">Nombre del Procedimiento</th>
                     <th class="py-3 px-4">Versión Activa</th>
                     <th class="py-3 px-4">Requisitos</th>
@@ -177,7 +177,7 @@
                             <div class="flex items-center gap-1.5">
                                 <span class="material-symbols-outlined text-base text-blue-600 transition-transform duration-200"
                                       :class="expandedTramiteId === {{ $tipo->ID_Tipo_Tramite }} ? 'rotate-90' : ''">chevron_right</span>
-                                <span class="font-mono font-bold text-blue-700 text-[11px]">TUPA-{{ str_pad($tipo->ID_Tipo_Tramite, 3, '0', STR_PAD_LEFT) }}</span>
+                                <span class="font-mono font-bold text-blue-700 text-[11px]">TRM-{{ str_pad($tipo->ID_Tipo_Tramite, 3, '0', STR_PAD_LEFT) }}</span>
                             </div>
                         </td>
                         <td class="py-3.5 px-4 cursor-pointer group"
@@ -373,7 +373,7 @@
         <div class="flex items-center justify-between border-b border-slate-100 pb-3">
             <div class="flex items-center gap-2">
                 <span class="material-symbols-outlined text-[#0051d5]">post_add</span>
-                <h3 class="font-bold text-base text-[#0b1c30]">Nuevo Procedimiento TUPA</h3>
+                <h3 class="font-bold text-base text-[#0b1c30]">Nuevo Procedimiento Institucional</h3>
             </div>
             <button @click="showNewTramiteModal = false" class="text-slate-400 hover:text-slate-600">
                 <span class="material-symbols-outlined">close</span>

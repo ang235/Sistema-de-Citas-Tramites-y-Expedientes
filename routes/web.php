@@ -110,7 +110,7 @@ Route::prefix('portal')->name('portal.')->middleware('auth')->group(function ():
 
     // Módulos Exclusivos de Administración y Configuración Normativa
     Route::middleware('role:admin')->group(function (): void {
-        // Configuración Normativa TUPA & Catálogos
+        // Configuración Normativa & Catálogos
         Route::get('/parametros', [TipoTramiteController::class, 'index'])->name('parametros');
         Route::post('/tipo-tramites', [TipoTramiteController::class, 'store'])->name('tipo-tramites.store');
         Route::put('/tipo-tramites/{id}', [TipoTramiteController::class, 'update'])->name('tipo-tramites.update');

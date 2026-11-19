@@ -36,7 +36,7 @@
                 <span class="material-symbols-outlined text-sm text-[#0051d5] dark:text-blue-400">today</span>
                 <span>Hoy: {{ today()->translatedFormat('d \d\e M') }}</span>
             </a>
-            @if(! (auth()->user()->esSupervisor() && ! auth()->user()->esAdministrador()))
+            @if(! (auth()->user()->esSupervisor() || auth()->user()->esAdministrador()))
                 <a href="{{ route('citas.create') }}"
                    target="_blank"
                    class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-primary-container hover:bg-[#1a3860] dark:bg-blue-600 dark:hover:bg-blue-700 text-white text-xs font-semibold transition-colors shadow-2xs">
@@ -47,8 +47,8 @@
         </div>
     </div>
 
-    {{-- Aviso exclusivo para el rol de Supervisor (Solo Lectura) --}}
-    @if(auth()->user()->esSupervisor() && ! auth()->user()->esAdministrador())
+    {{-- Aviso exclusivo para el rol de Supervisor y Administrador (Solo Lectura) --}}
+    @if(auth()->user()->esSupervisor() || auth()->user()->esAdministrador())
         <div class="p-4 rounded-xl bg-slate-100 dark:bg-slate-800/70 border border-slate-200/90 dark:border-slate-700 text-slate-700 dark:text-slate-300 flex items-center justify-between gap-3 text-xs shadow-xs">
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 flex items-center justify-center shrink-0">
@@ -56,7 +56,7 @@
                 </div>
                 <div>
                     <span class="font-bold text-slate-900 dark:text-white block">Supervisión Institucional de Citas (Solo Lectura)</span>
-                    <span class="text-slate-500 dark:text-slate-400">Como supervisor, puede auditar el calendario de comparecencias y pases digitales. La gestión y marcado de comparecencia es exclusiva del Revisor Técnico asignado.</span>
+                    <span class="text-slate-500 dark:text-slate-400">Como supervisor o administrador, puede auditar el calendario de comparecencias y pases digitales. La gestión y marcado de comparecencia en ventanilla es exclusiva del Revisor Técnico asignado.</span>
                 </div>
             </div>
             <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 shrink-0">
@@ -213,7 +213,7 @@
                         <th class="py-3 px-4">Expediente / Trámite</th>
                         <th class="py-3 px-4">Revisor Especialista</th>
                         <th class="py-3 px-4 text-center">Estado del Turno</th>
-                        @if(! (auth()->user()->esSupervisor() && ! auth()->user()->esAdministrador()))
+                        @if(! (auth()->user()->esSupervisor() || auth()->user()->esAdministrador()))
                             <th class="py-3 px-4 text-right">Acciones Operativas</th>
                         @endif
                     </tr>
@@ -285,11 +285,11 @@
                             </td>
 
                             @php
-                                $esSupervisorSolo = auth()->user()->esSupervisor() && ! auth()->user()->esAdministrador();
+                                $esSoloLecturaCitas = auth()->user()->esSupervisor() || auth()->user()->esAdministrador();
                                 $esRevisorAsignado = $cita->ID_Revisor === auth()->id() || ($cita->ID_Revisor === null && $cita->solicitud?->asignaciones()->where('ID_Revisor', auth()->id())->exists());
-                                $puedeModificar = ! $esSupervisorSolo && (auth()->user()->esAdministrador() || (auth()->user()->esRevisor() && $esRevisorAsignado));
+                                $puedeModificar = ! $esSoloLecturaCitas && (auth()->user()->esRevisor() && $esRevisorAsignado);
                             @endphp
-                            @if(! $esSupervisorSolo)
+                            @if(! $esSoloLecturaCitas)
                                 <td class="py-3.5 px-4 text-right">
                                     <div class="inline-flex items-center gap-1.5">
                                         @if($cita->Estado_Citas === 'Programada' && $puedeModificar)
@@ -322,7 +322,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="{{ (auth()->user()->esSupervisor() && ! auth()->user()->esAdministrador()) ? 5 : 6 }}" class="py-12 text-center text-slate-400 dark:text-slate-500">
+                            <td colspan="{{ (auth()->user()->esSupervisor() || auth()->user()->esAdministrador()) ? 5 : 6 }}" class="py-12 text-center text-slate-400 dark:text-slate-500">
                                 <span class="material-symbols-outlined text-3xl mb-1 block text-slate-300 dark:text-slate-600">event_busy</span>
                                 No hay citas registradas para la consulta realizada.
                             </td>

@@ -1,360 +1,500 @@
 @extends('layouts.portal')
 
-@section('title', 'Auditoría y Bitácora Normativa')
+@section('title', 'Bitácora de Expedientes')
 
 @section('breadcrumb')
     <span class="material-symbols-outlined text-xs">chevron_right</span>
     <a href="{{ route('portal.dashboard') }}">Administración Central</a>
     <span class="material-symbols-outlined text-xs">chevron_right</span>
-    <span>Gobernanza y Cumplimiento</span>
-    <span class="material-symbols-outlined text-xs">chevron_right</span>
-    <span class="current">Auditoría y Bitácora</span>
+    <span class="current">Bitácora de Expedientes</span>
 @endsection
 
 @section('content')
-@php
-    $primerLog = isset($bitacoras) && $bitacoras->isNotEmpty() ? $bitacoras->first() : null;
-    $initialLogData = $primerLog ? [
-        'id' => $primerLog->ID_Bitacora,
-        'fecha' => $primerLog->Fecha_Creacion ? $primerLog->Fecha_Creacion->format('d/m/Y H:i:s') : 'N/A',
-        'usuario' => $primerLog->usuario?->Nombre ?? 'Sistema Central',
-        'email' => $primerLog->usuario?->Email ?? 'sistema@setc.gob.pe',
-        'accion' => $primerLog->Accion ?? 'Evento Registrado',
-        'descripcion' => $primerLog->Descripcion ?? 'Sin descripción adicional.',
-        'modulo' => 'SEGURIDAD / AUDITORÍA',
-        'hash' => hash('sha256', (string) $primerLog->ID_Bitacora . ($primerLog->Fecha_Creacion ?? now())),
-    ] : null;
-@endphp
+<div
+    class="space-y-6"
+    x-data="{
+        abierto: null,
+        toggle(id) {
+            this.abierto = this.abierto === id ? null : id;
+        }
+    }"
+>
 
-<div class="flex flex-col w-full gap-space-lg" x-data="{
-    selectedLog: {{ json_encode($initialLogData) }},
-    selectLog(id, fecha, usuario, email, accion, descripcion, modulo, hash) {
-        this.selectedLog = { id, fecha, usuario, email, accion, descripcion, modulo, hash };
-    }
-}">
-
-    {{-- ══ HEADER + BADGES ══ --}}
-    <div class="flex flex-col xl:flex-row xl:items-start justify-between gap-space-md pt-1">
-        <div class="flex flex-col max-w-4xl">
-            <div class="flex flex-wrap items-center gap-2 mb-2">
-                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-[#001229] dark:text-blue-200 text-[12px] font-semibold shadow-xs">
-                    <span class="material-symbols-outlined text-[#0051d5] text-[16px]">token</span>
-                    <span>Trazabilidad Institucional</span>
-                    <span class="text-slate-300">•</span>
-                    <span class="inline-flex items-center gap-1 text-emerald-700 dark:text-emerald-400 font-semibold">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                        Modo Inmutable Activo
-                    </span>
-                </div>
-                <span class="text-[12px] text-slate-500 font-mono">Consenso SHA-256 / Auditoría Integral</span>
+    {{-- ══ CABECERA ══ --}}
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-[#111f33] p-5 rounded-xl border border-slate-200/90 dark:border-slate-800 shadow-xs">
+        <div>
+            <div class="flex items-center gap-2 mb-1">
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#eff4ff] dark:bg-blue-950/60 text-[#0051d5] dark:text-blue-300">Trazabilidad</span>
+                <span class="text-xs text-slate-400 dark:text-slate-500">•</span>
+                <span class="text-xs text-slate-500 dark:text-slate-400">Registro Histórico Institucional SETC</span>
             </div>
-            <h1 class="font-headline-xl text-[28px] lg:text-[32px] text-[#001229] dark:text-white font-extrabold tracking-tight leading-tight" style="font-family: var(--font-display);">
-                Bitácora Oficial de Auditoría y Trazabilidad
-            </h1>
-            <p class="font-body-md text-slate-600 dark:text-slate-400 mt-1.5 text-[14px] leading-relaxed">
-                Registro inmutable de accesos, modificaciones de usuarios, cambios normativos en trámites y emisión de dictámenes y resoluciones administrativas.
+            <h1 class="text-xl font-bold text-slate-900 dark:text-white">Bitácora de Expedientes Tramitados</h1>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Haz clic en cualquier fila o en el botón de documentos para desplegar los recaudos adjuntos al trámite.
             </p>
         </div>
-        {{-- Botones de Acción Funcionales --}}
-        <div class="flex flex-wrap items-center gap-2.5 shrink-0 pt-1">
+        <div class="shrink-0">
             <a href="{{ route('portal.auditoria', array_merge(request()->query(), ['export' => 'csv'])) }}"
-               class="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-white dark:bg-[#111f33] border border-slate-200 dark:border-slate-800 hover:bg-slate-50 text-slate-700 dark:text-slate-200 text-[13px] font-semibold shadow-xs transition-colors">
-                <span class="material-symbols-outlined text-[17px] text-emerald-600">sim_card_download</span>
-                Exportar Bitácora (CSV)
+               class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-white dark:bg-[#111f33] border border-slate-200 dark:border-slate-800 hover:bg-slate-50 text-slate-700 dark:text-slate-200 text-xs font-semibold shadow-xs transition-colors">
+                <span class="material-symbols-outlined text-base text-emerald-600">sim_card_download</span>
+                Exportar CSV
             </a>
-            <button type="button" @click="alert('Verificación PKI: Todos los hashes SHA-256 del bloque actual coinciden con la firma institucional.')"
-                    class="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-white dark:bg-[#111f33] border border-slate-200 dark:border-slate-800 hover:bg-slate-50 text-slate-700 dark:text-slate-200 text-[13px] font-semibold shadow-xs transition-colors">
-                <span class="material-symbols-outlined text-[17px] text-blue-600">verified_user</span>
-                Verificar Integridad
-            </button>
         </div>
     </div>
 
-    {{-- ══ KPI CARDS REALES ══ --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {{-- Card 1: Total Eventos --}}
-        <div class="p-4 rounded-xl bg-white dark:bg-[#111f33] border border-slate-200/90 dark:border-slate-800 shadow-xs flex flex-col justify-between">
+    {{-- ══ KPIs ══ --}}
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white dark:bg-[#111f33] p-4 rounded-xl border border-slate-200/90 dark:border-slate-800 shadow-xs flex flex-col justify-between">
             <div class="flex items-start justify-between">
-                <div>
-                    <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Total Registros</span>
-                    <div class="font-headline-lg text-[28px] font-bold text-slate-900 dark:text-white mt-1">
-                        {{ number_format($kpis['total_eventos'] ?? 0) }}
-                    </div>
-                </div>
-                <div class="w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-950/60 flex items-center justify-center text-[#0051d5]">
-                    <span class="material-symbols-outlined text-[22px]">database</span>
+                <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Expedientes</span>
+                <div class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-[#0051d5] dark:text-blue-300 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-base">folder_open</span>
                 </div>
             </div>
-            <div class="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[12px]">
-                <span class="flex items-center gap-1 text-emerald-700 dark:text-emerald-400 font-semibold">
-                    <span class="material-symbols-outlined text-[15px]">lock</span>
-                    100% Inmutable
-                </span>
-                <span class="text-slate-400 font-mono text-[11px]">Audit ID #{{ $kpis['total_eventos'] ?? 0 }}</span>
+            <div class="mt-2">
+                <span class="text-2xl font-bold text-slate-900 dark:text-white">{{ number_format($kpis['total_expedientes']) }}</span>
+                <span class="text-[11px] text-slate-400 dark:text-slate-500 block mt-0.5">Registros en sistema</span>
             </div>
         </div>
 
-        {{-- Card 2: Eventos Hoy --}}
-        <div class="p-4 rounded-xl bg-white dark:bg-[#111f33] border border-slate-200/90 dark:border-slate-800 shadow-xs flex flex-col justify-between">
+        <div class="bg-white dark:bg-[#111f33] p-4 rounded-xl border border-slate-200/90 dark:border-slate-800 shadow-xs flex flex-col justify-between">
             <div class="flex items-start justify-between">
-                <div>
-                    <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Eventos de Hoy</span>
-                    <div class="font-headline-lg text-[28px] font-bold text-slate-900 dark:text-white mt-1">
-                        {{ number_format($kpis['eventos_hoy'] ?? 0) }}
-                    </div>
-                </div>
-                <div class="w-10 h-10 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 flex items-center justify-center text-emerald-700">
-                    <span class="material-symbols-outlined text-[22px]">today</span>
+                <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Ingresados Hoy</span>
+                <div class="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-base">today</span>
                 </div>
             </div>
-            <div class="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[12px]">
-                <span class="text-slate-500 text-[11px]">Jornada en curso</span>
-                <span class="text-emerald-700 font-semibold text-[11px]">En tiempo real</span>
+            <div class="mt-2">
+                <span class="text-2xl font-bold text-amber-700 dark:text-amber-400">{{ $kpis['expedientes_hoy'] }}</span>
+                <span class="text-[11px] text-slate-400 dark:text-slate-500 block mt-0.5">Jornada actual</span>
             </div>
         </div>
 
-        {{-- Card 3: Usuarios Activos en Bitácora --}}
-        <div class="p-4 rounded-xl bg-white dark:bg-[#111f33] border border-slate-200/90 dark:border-slate-800 shadow-xs flex flex-col justify-between">
+        <div class="bg-white dark:bg-[#111f33] p-4 rounded-xl border border-slate-200/90 dark:border-slate-800 shadow-xs flex flex-col justify-between">
             <div class="flex items-start justify-between">
-                <div>
-                    <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Funcionarios Auditados</span>
-                    <div class="font-headline-lg text-[28px] font-bold text-slate-900 dark:text-white mt-1">
-                        {{ $kpis['usuarios_activos'] ?? 0 }}
-                    </div>
-                </div>
-                <div class="w-10 h-10 rounded-lg bg-purple-50 dark:bg-purple-950/60 flex items-center justify-center text-purple-700">
-                    <span class="material-symbols-outlined text-[22px]">badge</span>
+                <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Con Cita Asignada</span>
+                <div class="w-8 h-8 rounded-lg bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-base">event_available</span>
                 </div>
             </div>
-            <div class="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[12px]">
-                <span class="text-slate-500 text-[11px]">Con actividad registrada</span>
-                <span class="text-purple-700 font-semibold text-[11px]">Trazados</span>
+            <div class="mt-2">
+                <span class="text-2xl font-bold text-teal-700 dark:text-teal-400">{{ $kpis['con_cita'] }}</span>
+                <span class="text-[11px] text-slate-400 dark:text-slate-500 block mt-0.5">Comparecencia agendada</span>
             </div>
         </div>
 
-        {{-- Card 4: Cambios Normativos --}}
-        <div class="p-4 rounded-xl bg-white dark:bg-[#111f33] border border-slate-200/90 dark:border-slate-800 shadow-xs flex flex-col justify-between">
+        <div class="bg-white dark:bg-[#111f33] p-4 rounded-xl border border-slate-200/90 dark:border-slate-800 shadow-xs flex flex-col justify-between">
             <div class="flex items-start justify-between">
-                <div>
-                    <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Acciones Normativas</span>
-                    <div class="font-headline-lg text-[28px] font-bold text-slate-900 dark:text-white mt-1">
-                        {{ $kpis['cambios_normativos'] ?? 0 }}
-                    </div>
-                </div>
-                <div class="w-10 h-10 rounded-lg bg-amber-50 dark:bg-amber-950/60 flex items-center justify-center text-amber-700">
-                    <span class="material-symbols-outlined text-[22px]">tune</span>
+                <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Concluidos / Aprobados</span>
+                <div class="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-base">check_circle</span>
                 </div>
             </div>
-            <div class="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[12px]">
-                <span class="text-slate-500 text-[11px]">Trámites / Requisitos</span>
-                <span class="text-amber-700 font-semibold text-[11px]">Control TUPA</span>
+            <div class="mt-2">
+                <span class="text-2xl font-bold text-emerald-700 dark:text-emerald-400">{{ $kpis['concluidos'] }}</span>
+                <span class="text-[11px] text-slate-400 dark:text-slate-500 block mt-0.5">Trámites finalizados</span>
             </div>
         </div>
     </div>
 
-    {{-- ══ SEARCH + FORENSIC FILTERS BAR ══ --}}
-    <div class="p-4 bg-white dark:bg-[#111f33] rounded-xl border border-slate-200/90 dark:border-slate-800 shadow-xs flex flex-col gap-3">
-        <form action="{{ route('portal.auditoria') }}" method="GET" class="flex flex-col sm:flex-row items-center gap-2.5 flex-wrap">
-            <div class="relative flex-1 min-w-[240px]">
-                <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-[19px] pointer-events-none">saved_search</span>
-                <input
-                    class="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 rounded-lg text-xs text-slate-800 dark:text-slate-200 placeholder:text-slate-400 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-[#0051d5]/20 focus:bg-white transition-all"
-                    id="audit-search"
-                    name="accion"
-                    placeholder="Buscar por acción o palabra clave..."
-                    type="text"
-                    value="{{ request('accion') }}"
-                />
+    {{-- ══ FILTROS ══ --}}
+    <div class="p-4 bg-white dark:bg-[#111f33] rounded-xl border border-slate-200/90 dark:border-slate-800 shadow-xs">
+        <form action="{{ route('portal.auditoria') }}" method="GET" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
+            <div class="space-y-1">
+                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300">Ciudadano Solicitante</label>
+                <select name="id_usuario" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 rounded-lg text-xs text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-secondary/20 cursor-pointer">
+                    <option value="">Todos los ciudadanos</option>
+                    @foreach($ciudadanos as $ciudadano)
+                        <option value="{{ $ciudadano->ID_Usuarios }}" @selected((string) $idUsuarioFiltro === (string) $ciudadano->ID_Usuarios)>
+                            {{ $ciudadano->Nombre }}
+                        </option>
+                    @endforeach
+                </select>
             </div>
-            <select name="id_usuario" class="px-3 py-2 bg-white dark:bg-slate-800 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-[#0051d5]/20 cursor-pointer">
-                <option value="">Todos los Funcionarios</option>
-                @foreach($usuarios ?? [] as $usr)
-                    <option value="{{ $usr->ID_Usuarios }}" @selected((string) request('id_usuario') === (string) $usr->ID_Usuarios)>
-                        {{ $usr->Nombre }} ({{ $usr->Email }})
-                    </option>
-                @endforeach
-            </select>
-            <input type="date" name="fecha" value="{{ request('fecha') }}"
-                   class="px-3 py-2 bg-white dark:bg-slate-800 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-[#0051d5]/20 cursor-pointer">
 
-            <button type="submit" class="px-4 py-2 rounded-lg bg-[#001229] hover:bg-[#0f2744] text-white text-xs font-semibold shadow-xs transition-colors">
-                Filtrar Bitácora
-            </button>
-            @if(request('accion') || request('id_usuario') || request('fecha'))
-                <a href="{{ route('portal.auditoria') }}" class="px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-600 dark:text-slate-300 text-xs font-semibold transition-colors">
-                    Limpiar Filtros
-                </a>
-            @endif
+            <div class="space-y-1">
+                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300">Tipo de Trámite</label>
+                <input type="text" name="accion" value="{{ $accionFiltro }}" placeholder="Ej. Licencia..."
+                       class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 rounded-lg text-xs text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-secondary/20">
+            </div>
+
+            <div class="space-y-1">
+                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300">Estado del Expediente</label>
+                <select name="estado" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 rounded-lg text-xs text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-secondary/20 cursor-pointer">
+                    <option value="">Todos los estados</option>
+                    <option value="Pendiente"   @selected($estadoFiltro === 'Pendiente')>Pendiente</option>
+                    <option value="En Revisión" @selected($estadoFiltro === 'En Revisión')>En Revisión</option>
+                    <option value="Aprobado"    @selected($estadoFiltro === 'Aprobado')>Aprobado</option>
+                    <option value="Rechazado"   @selected($estadoFiltro === 'Rechazado')>Rechazado</option>
+                    <option value="Concluido"   @selected($estadoFiltro === 'Concluido')>Concluido</option>
+                </select>
+            </div>
+
+            <div class="space-y-1">
+                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300">Fecha de Solicitud</label>
+                <input type="date" name="fecha" value="{{ $fechaFiltro }}"
+                       class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 rounded-lg text-xs text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-secondary/20">
+            </div>
+
+            <div class="flex items-center gap-2">
+                <button type="submit" class="flex-1 py-2 px-4 bg-primary-container hover:bg-[#1a3860] dark:bg-blue-600 dark:hover:bg-blue-700 text-white rounded-lg text-xs font-semibold transition-colors cursor-pointer">
+                    Filtrar
+                </button>
+                @if($idUsuarioFiltro || $accionFiltro || $fechaFiltro || $estadoFiltro)
+                    <a href="{{ route('portal.auditoria') }}" class="py-2 px-3 text-xs font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 rounded-lg border border-slate-200 dark:border-slate-700 transition-colors">
+                        Limpiar
+                    </a>
+                @endif
+            </div>
         </form>
     </div>
 
-    {{-- ══ DUAL-PANEL WORKSPACE ══ --}}
-    <div class="grid grid-cols-1 xl:grid-cols-12 gap-space-lg items-start">
-
-        {{-- ── LEFT: AUDIT TABLE (7 COLS) ── --}}
-        <div class="xl:col-span-7 flex flex-col gap-space-md">
-            <div class="bg-white dark:bg-[#111f33] rounded-xl border border-slate-200/90 dark:border-slate-800 shadow-xs overflow-hidden flex flex-col">
-                {{-- Table Toolbar --}}
-                <div class="px-4 py-3 bg-slate-50/80 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <span class="material-symbols-outlined text-[#0051d5] text-[19px]">format_list_bulleted</span>
-                        <span class="font-headline-sm text-[14px] font-bold text-slate-900 dark:text-white">Registros de Actividad</span>
-                    </div>
-                    <span class="text-[12px] text-slate-500 font-medium">
-                        {{ $bitacoras->total() }} registros en total
-                    </span>
-                </div>
-
-                {{-- Table --}}
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-[13px] text-slate-700 dark:text-slate-300">
-                        <thead class="bg-slate-50 dark:bg-slate-800/80 text-[11px] font-semibold text-slate-500 uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
-                            <tr>
-                                <th class="py-3 px-3.5">ID / Evento</th>
-                                <th class="py-3 px-3.5">Fecha y Hora</th>
-                                <th class="py-3 px-3.5">Funcionario</th>
-                                <th class="py-3 px-3.5">Acción</th>
-                                <th class="py-3 px-3.5 text-center">Estado</th>
-                                <th class="py-3 px-3.5 text-right">Ver</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
-                            @forelse($bitacoras as $log)
-                                @php
-                                    $hash = hash('sha256', (string) $log->ID_Bitacora . ($log->Fecha_Creacion ?? now()));
-                                @endphp
-                                <tr @click="selectLog(
-                                        {{ $log->ID_Bitacora }},
-                                        '{{ $log->Fecha_Creacion ? $log->Fecha_Creacion->format('d/m/Y H:i:s') : 'N/A' }}',
-                                        '{{ addslashes($log->usuario?->Nombre ?? 'Sistema Central') }}',
-                                        '{{ addslashes($log->usuario?->Email ?? 'sistema@setc.gob.pe') }}',
-                                        '{{ addslashes($log->Accion ?? 'Evento') }}',
-                                        '{{ addslashes($log->Descripcion ?? 'Sin detalles') }}',
-                                        'AUDITORÍA',
-                                        '{{ $hash }}'
-                                    )"
-                                    :class="selectedLog && selectedLog.id === {{ $log->ID_Bitacora }} ? 'bg-blue-50/70 dark:bg-blue-950/40 border-l-4 border-l-[#0051d5]' : 'border-l-4 border-l-transparent hover:bg-slate-50 dark:hover:bg-slate-800/40'"
-                                    class="cursor-pointer transition-colors">
-                                    <td class="py-3 px-3.5 font-mono text-xs font-bold text-[#001229] dark:text-slate-200">
-                                        #{{ $log->ID_Bitacora }}
-                                    </td>
-                                    <td class="py-3 px-3.5 text-xs text-slate-600 dark:text-slate-400 whitespace-nowrap">
-                                        {{ $log->Fecha_Creacion ? $log->Fecha_Creacion->format('d/m/Y H:i') : '--' }}
-                                    </td>
-                                    <td class="py-3 px-3.5">
-                                        <div class="font-semibold text-slate-900 dark:text-white text-xs truncate max-w-[130px]">
-                                            {{ $log->usuario?->Nombre ?? 'Sistema' }}
-                                        </div>
-                                        <div class="text-[10px] text-slate-400 truncate max-w-[130px]">
-                                            {{ $log->usuario?->Email }}
-                                        </div>
-                                    </td>
-                                    <td class="py-3 px-3.5 max-w-[190px]">
-                                        <span class="font-semibold text-slate-800 dark:text-slate-200 text-xs block truncate" title="{{ $log->Accion }}">
-                                            {{ $log->Accion }}
-                                        </span>
-                                        <span class="text-[11px] text-slate-400 block truncate" title="{{ $log->Descripcion }}">
-                                            {{ Str::limit($log->Descripcion, 35) }}
-                                        </span>
-                                    </td>
-                                    <td class="py-3 px-3.5 text-center">
-                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 text-[10px] font-semibold">
-                                            <span class="material-symbols-outlined text-[12px]">verified</span>
-                                            OK
-                                        </span>
-                                    </td>
-                                    <td class="py-3 px-3.5 text-right">
-                                        <button type="button" class="p-1 rounded bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-600 dark:text-slate-300">
-                                            <span class="material-symbols-outlined text-sm">visibility</span>
-                                        </button>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="6" class="py-12 text-center text-slate-400">
-                                        <span class="material-symbols-outlined text-4xl block mb-2 text-slate-300">policy</span>
-                                        No se encontraron registros de auditoría bajo estos criterios.
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-
-                {{-- Pagination Footer --}}
-                <div class="px-4 py-3 bg-slate-50/60 dark:bg-slate-800/40 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-600 dark:text-slate-400">
-                    <span>
-                        Mostrando página {{ $bitacoras->currentPage() }} de {{ $bitacoras->lastPage() }}
-                    </span>
-                    <div>
-                        {{ $bitacoras->links() }}
-                    </div>
-                </div>
+    {{-- ══ TABLA DE EXPEDIENTES ══ --}}
+    <div class="bg-white dark:bg-[#111f33] rounded-xl border border-slate-200/90 dark:border-slate-800 shadow-xs overflow-hidden">
+        <div class="px-5 py-3.5 bg-slate-50/80 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary-container dark:text-blue-400 text-lg">history_edu</span>
+                <span class="text-sm font-bold text-slate-900 dark:text-white">Historial de Expedientes</span>
+                <span class="text-[11px] text-slate-400 dark:text-slate-500 ml-1">— Haz clic en una fila para ver sus documentos</span>
             </div>
+            <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                {{ $solicitudes->total() }} registros encontrados
+            </span>
         </div>
 
-        {{-- ── RIGHT: FORENSIC INSPECTOR PANEL REAL (5 COLS) ── --}}
-        <div class="xl:col-span-5 flex flex-col gap-space-md sticky top-20">
-            <template x-if="selectedLog">
-                <div class="bg-white dark:bg-[#111f33] rounded-xl border border-slate-200/90 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col">
-                    {{-- Inspector Header --}}
-                    <div class="px-4 py-3.5 bg-[#001229] text-white flex items-center justify-between border-b border-slate-800">
-                        <div class="flex items-center gap-2.5">
-                            <div class="w-7 h-7 rounded bg-blue-900/60 border border-blue-400/20 flex items-center justify-center text-blue-200">
-                                <span class="material-symbols-outlined text-[18px]">rule</span>
-                            </div>
-                            <div>
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-blue-300 block">Detalle de Auditoría</span>
-                                <span class="font-headline-sm text-[15px] font-bold text-white block" x-text="'Evento #' + selectedLog.id"></span>
-                            </div>
-                        </div>
-                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[11px] font-semibold">
-                            <span class="material-symbols-outlined text-[13px]">verified</span>
-                            Inmutable
-                        </span>
-                    </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-700 dark:text-slate-300">
+                <thead class="bg-slate-50 dark:bg-slate-800/80 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
+                    <tr>
+                        <th class="py-3 px-4">Folio / Expediente</th>
+                        <th class="py-3 px-4">Ciudadano Solicitante</th>
+                        <th class="py-3 px-4">Trámite</th>
+                        <th class="py-3 px-4 text-center">Estado</th>
+                        <th class="py-3 px-4">Fecha Solicitud</th>
+                        <th class="py-3 px-4">Fecha y Hora de Cita</th>
+                        <th class="py-3 px-4">Revisor Técnico</th>
+                        <th class="py-3 px-4 text-center">Documentos</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                    @forelse($solicitudes as $sol)
+                        @php
+                            $cita    = $sol->citas->first();
+                            $revisor = $sol->asignaciones->first()?->revisor ?? $cita?->revisor ?? null;
+                            $solId   = $sol->ID_Solicitud;
+                        @endphp
 
-                    {{-- Metadata Dossier --}}
-                    <div class="p-4 bg-slate-50/80 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 space-y-2.5 text-xs">
-                        <div class="flex justify-between">
-                            <span class="text-slate-400">Acción:</span>
-                            <span class="font-bold text-slate-900 dark:text-white text-right" x-text="selectedLog.accion"></span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-slate-400">Funcionario:</span>
-                            <span class="font-semibold text-slate-800 dark:text-slate-200" x-text="selectedLog.usuario"></span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-slate-400">Correo institucional:</span>
-                            <span class="font-mono text-slate-600 dark:text-slate-300" x-text="selectedLog.email"></span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-slate-400">Fecha y Hora de Registro:</span>
-                            <span class="font-mono text-slate-700 dark:text-slate-300" x-text="selectedLog.fecha"></span>
-                        </div>
-                    </div>
+                        {{-- Fila Principal del Expediente --}}
+                        <tr
+                            data-toggle-exp="{{ $solId }}"
+                            @click="toggle({{ $solId }})"
+                            class="hover:bg-blue-50/50 dark:hover:bg-blue-950/30 cursor-pointer transition-colors group select-none"
+                            :class="abierto === {{ $solId }} ? 'bg-blue-50/70 dark:bg-blue-950/40 border-l-4 border-l-[#0051d5]' : 'border-l-4 border-l-transparent'"
+                            title="Haz clic para desplegar los documentos de este expediente"
+                        >
+                            {{-- Folio --}}
+                            <td class="py-3.5 px-4">
+                                <div class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-xs text-slate-400 group-hover:text-[#0051d5] transition-transform duration-200"
+                                          :class="abierto === {{ $solId }} ? 'rotate-90 text-[#0051d5]' : ''">
+                                        chevron_right
+                                    </span>
+                                    <div>
+                                        <span class="font-mono font-bold text-[#0051d5] dark:text-blue-400 group-hover:underline block">
+                                            {{ $sol->folio?->Codigo_Folio ?? 'Sin folio' }}
+                                        </span>
+                                        <span class="text-[10px] text-slate-400 dark:text-slate-500 block">
+                                            #EXP-{{ $solId }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </td>
 
-                    {{-- Descripción / Payload del Evento --}}
-                    <div class="p-4 flex flex-col gap-2">
-                        <span class="text-xs font-bold text-slate-700 dark:text-slate-300">Descripción Completa del Evento:</span>
-                        <div class="p-3 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-300 leading-relaxed break-words" x-text="selectedLog.descripcion"></div>
-                    </div>
+                            {{-- Ciudadano --}}
+                            <td class="py-3.5 px-4">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-7 h-7 rounded-full bg-blue-50 dark:bg-blue-950/60 text-[#0051d5] dark:text-blue-300 flex items-center justify-center font-bold text-[10px] shrink-0">
+                                        {{ strtoupper(substr($sol->solicitante?->Nombre ?? 'C', 0, 1)) }}
+                                    </div>
+                                    <div>
+                                        <span class="font-semibold text-slate-900 dark:text-white block">
+                                            {{ $sol->solicitante?->Nombre ?? 'Ciudadano' }}
+                                        </span>
+                                        <span class="text-[10px] text-slate-400 dark:text-slate-500">
+                                            {{ $sol->solicitante?->Email }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </td>
 
-                    {{-- Cadena Criptográfica --}}
-                    <div class="px-4 pb-4 flex flex-col gap-2">
-                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Hash SHA-256 de Autenticidad:</span>
-                        <div class="p-3 rounded-lg bg-slate-900 text-slate-300 font-mono text-[11px] break-all select-all leading-tight" x-text="selectedLog.hash"></div>
-                    </div>
-                </div>
-            </template>
+                            {{-- Trámite --}}
+                            <td class="py-3.5 px-4 max-w-[180px]">
+                                <span class="font-semibold text-slate-900 dark:text-white block truncate" title="{{ $sol->versionTramite?->tipoTramite?->Nombre }}">
+                                    {{ $sol->versionTramite?->tipoTramite?->Nombre ?? 'Sin trámite' }}
+                                </span>
+                                @if($sol->versionTramite)
+                                    <span class="text-[10px] text-slate-400 dark:text-slate-500">v{{ $sol->versionTramite->No_Version }}</span>
+                                @endif
+                            </td>
 
-            <template x-if="!selectedLog">
-                <div class="p-8 text-center bg-white dark:bg-[#111f33] rounded-xl border border-slate-200 dark:border-slate-800 text-slate-400 text-xs">
-                    Seleccione un evento de la bitácora para inspeccionar su registro.
-                </div>
-            </template>
+                            {{-- Estado --}}
+                            <td class="py-3.5 px-4 text-center">
+                                @php
+                                    $estadoClass = match($sol->Estado_Solicitud) {
+                                        'Aprobado', 'Concluido' => 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
+                                        'En Revisión'           => 'bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800',
+                                        'Rechazado'             => 'bg-rose-50 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800',
+                                        default                 => 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800',
+                                    };
+                                @endphp
+                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold border {{ $estadoClass }}">
+                                    {{ $sol->Estado_Solicitud }}
+                                </span>
+                            </td>
+
+                            {{-- Fecha Solicitud --}}
+                            <td class="py-3.5 px-4 whitespace-nowrap">
+                                <div class="font-semibold text-slate-700 dark:text-slate-300">
+                                    {{ $sol->Fecha_Creacion_Solicitud?->translatedFormat('d \d\e M, Y') ?? '--' }}
+                                </div>
+                                <div class="text-[10px] text-slate-400 dark:text-slate-500">
+                                    {{ $sol->Fecha_Creacion_Solicitud?->format('H:i') ?? '' }}
+                                </div>
+                            </td>
+
+                            {{-- Fecha/Hora Cita --}}
+                            <td class="py-3.5 px-4 whitespace-nowrap">
+                                @if($cita)
+                                    <div class="font-semibold text-slate-700 dark:text-slate-300">
+                                        {{ \Carbon\Carbon::parse($cita->Fecha)->translatedFormat('d \d\e M, Y') }}
+                                    </div>
+                                    <div class="flex items-center gap-1.5 mt-0.5">
+                                        <span class="font-mono text-[11px] font-bold text-primary-container dark:text-blue-300">
+                                            {{ substr((string) $cita->Hora, 0, 5) }} hrs
+                                        </span>
+                                        @php
+                                            $citaClass = match($cita->Estado_Citas) {
+                                                'Atendida'   => 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800',
+                                                'No asistió' => 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-800',
+                                                default      => 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800',
+                                            };
+                                        @endphp
+                                        <span class="px-1.5 py-0.5 rounded text-[9px] font-bold border {{ $citaClass }}">
+                                            {{ $cita->Estado_Citas }}
+                                        </span>
+                                    </div>
+                                @else
+                                    <span class="text-[11px] text-slate-400 dark:text-slate-500 italic">Sin cita agendada</span>
+                                @endif
+                            </td>
+
+                            {{-- Revisor --}}
+                            <td class="py-3.5 px-4">
+                                @if($revisor)
+                                    <div class="flex items-center gap-1.5">
+                                        <div class="w-6 h-6 rounded-full bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 flex items-center justify-center font-bold text-[10px] shrink-0">
+                                            {{ strtoupper(substr($revisor->Nombre, 0, 1)) }}
+                                        </div>
+                                        <div>
+                                            <span class="font-semibold text-slate-900 dark:text-white block text-xs">{{ $revisor->Nombre }}</span>
+                                            <span class="text-[10px] text-teal-600 dark:text-teal-400">Revisor Técnico</span>
+                                        </div>
+                                    </div>
+                                @else
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                                        Sin asignar
+                                    </span>
+                                @endif
+                            </td>
+
+                            {{-- Botón Desplegable con Contador --}}
+                            <td class="py-3.5 px-4 text-center">
+                                <button
+                                    type="button"
+                                    data-toggle-exp="{{ $solId }}"
+                                    @click.stop="toggle({{ $solId }})"
+                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all shadow-2xs cursor-pointer"
+                                    :class="abierto === {{ $solId }}
+                                        ? 'bg-[#0051d5] text-white shadow-blue-500/20'
+                                        : 'bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/60 dark:hover:bg-blue-900/60 text-[#0051d5] dark:text-blue-300 border border-blue-200 dark:border-blue-800'"
+                                    title="Desplegar documentos de este expediente"
+                                >
+                                    <span class="material-symbols-outlined text-sm">folder_open</span>
+                                    <span>{{ $sol->documentos->count() }} docs</span>
+                                    <span class="material-symbols-outlined text-xs transition-transform duration-200"
+                                          :class="abierto === {{ $solId }} ? 'rotate-180' : ''">
+                                        expand_more
+                                    </span>
+                                </button>
+                            </td>
+                        </tr>
+
+                        {{-- ══ FILA DESPLEGABLE CON LOS DOCUMENTOS ══ --}}
+                        <tr
+                            id="desplegable-{{ $solId }}"
+                            x-show="abierto === {{ $solId }}"
+                            x-cloak
+                            class="bg-slate-50/90 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800"
+                        >
+                            <td colspan="8" class="p-4 sm:p-6">
+                                <div class="bg-white dark:bg-[#0e1c2e] rounded-xl border border-blue-200 dark:border-slate-700 shadow-md p-4 sm:p-5 space-y-4">
+
+                                    {{-- Cabecera del Desplegable --}}
+                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+                                        <div class="flex items-center gap-2.5">
+                                            <div class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-[#0051d5] dark:text-blue-300 flex items-center justify-center shrink-0">
+                                                <span class="material-symbols-outlined text-lg">folder_open</span>
+                                            </div>
+                                            <div>
+                                                <div class="flex items-center gap-2">
+                                                    <span class="font-bold text-slate-900 dark:text-white text-sm">
+                                                        Documentos del Expediente {{ $sol->folio?->Codigo_Folio ?? '#EXP-'.$solId }}
+                                                    </span>
+                                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 dark:bg-blue-950/60 text-[#0051d5] dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                                                        {{ $sol->documentos->count() }} adjunto(s)
+                                                    </span>
+                                                </div>
+                                                <span class="text-xs text-slate-500 dark:text-slate-400">
+                                                    {{ $sol->solicitante?->Nombre }} • {{ $sol->versionTramite?->tipoTramite?->Nombre }}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <button
+                                            type="button"
+                                            @click="abierto = null"
+                                            class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-semibold transition-colors cursor-pointer self-start sm:self-auto"
+                                        >
+                                            <span class="material-symbols-outlined text-sm">expand_less</span>
+                                            <span>Ocultar</span>
+                                        </button>
+                                    </div>
+
+                                    {{-- Tarjetas de Documentos --}}
+                                    @if($sol->documentos->isNotEmpty())
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                            @foreach($sol->documentos as $doc)
+                                                @php
+                                                    $ultVersion = $doc->versionesDoc->last();
+                                                    $docEstado = $doc->Estado_Doc;
+                                                    $docClass = match($docEstado) {
+                                                        'Aprobado'  => 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
+                                                        'Rechazado' => 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800',
+                                                        'Observado' => 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800',
+                                                        default     => 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-600',
+                                                    };
+                                                    $iconName = match($docEstado) {
+                                                        'Aprobado'  => 'verified',
+                                                        'Rechazado' => 'cancel',
+                                                        'Observado' => 'warning',
+                                                        default     => 'description',
+                                                    };
+                                                @endphp
+                                                <div class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-slate-50/50 dark:bg-slate-800/40 hover:border-blue-300 dark:hover:border-slate-600 transition-colors">
+                                                    {{-- Icono Estado --}}
+                                                    <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5 {{ $docClass }}">
+                                                        <span class="material-symbols-outlined text-base">{{ $iconName }}</span>
+                                                    </div>
+
+                                                    {{-- Info Documento --}}
+                                                    <div class="flex-1 min-w-0">
+                                                        <div class="flex items-start justify-between gap-2">
+                                                            <span class="font-semibold text-slate-900 dark:text-white text-xs block leading-tight">
+                                                                {{ $doc->requisito?->Nombre ?? 'Documento #'.$doc->ID_Documento }}
+                                                            </span>
+                                                            <span class="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold border {{ $docClass }}">
+                                                                {{ $docEstado }}
+                                                            </span>
+                                                        </div>
+
+                                                        <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-[10px] text-slate-500 dark:text-slate-400">
+                                                            <span class="flex items-center gap-1 truncate max-w-[200px]" title="{{ $ultVersion?->Nombre_Original ?? 'Sin archivo digital' }}">
+                                                                <span class="material-symbols-outlined text-xs text-slate-400">attach_file</span>
+                                                                <span>{{ $ultVersion?->Nombre_Original ?? 'Sin archivo digital' }}</span>
+                                                            </span>
+
+                                                            <span class="flex items-center gap-1">
+                                                                <span class="material-symbols-outlined text-xs text-slate-400">history</span>
+                                                                <span>{{ $doc->versionesDoc->count() }} ver.</span>
+                                                            </span>
+
+                                                            @if($ultVersion?->Fecha_Carga)
+                                                                <span class="flex items-center gap-1">
+                                                                    <span class="material-symbols-outlined text-xs text-slate-400">schedule</span>
+                                                                    <span>{{ \Carbon\Carbon::parse($ultVersion->Fecha_Carga)->format('d/m/Y H:i') }}</span>
+                                                                </span>
+                                                            @endif
+
+                                                            @if($doc->requisito?->Prioridad === 'Obligatorio')
+                                                                <span class="px-1.5 py-0.2 rounded bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 font-semibold border border-rose-200/60 dark:border-rose-800">
+                                                                    Obligatorio
+                                                                </span>
+                                                            @endif
+                                                        </div>
+
+                                                        {{-- Botón para ver archivo original --}}
+                                                        <div class="mt-2.5 pt-2 border-t border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between">
+                                                            <span class="text-[10px] text-slate-400 font-mono">
+                                                                Formato: {{ $doc->requisito?->Formato ?? 'PDF' }}
+                                                            </span>
+                                                            <a href="{{ route('portal.documentos.archivo', $doc->ID_Documento) }}"
+                                                               target="_blank"
+                                                               class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/60 dark:hover:bg-blue-900/60 text-[#0051d5] dark:text-blue-300 border border-blue-200/80 dark:border-blue-800 transition-colors"
+                                                               title="Abrir archivo original en nueva pestaña"
+                                                            >
+                                                                <span class="material-symbols-outlined text-xs">visibility</span>
+                                                                <span>Ver Archivo</span>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @else
+                                        <div class="py-8 text-center text-slate-400 dark:text-slate-500">
+                                            <span class="material-symbols-outlined text-3xl block mb-1 text-slate-300 dark:text-slate-600">folder_off</span>
+                                            <span class="text-xs">Este expediente no tiene documentos registrados en el sistema.</span>
+                                        </div>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="8" class="py-12 text-center text-slate-400 dark:text-slate-500">
+                                <span class="material-symbols-outlined text-3xl mb-1 block text-slate-300 dark:text-slate-600">manage_search</span>
+                                No se encontraron expedientes con los filtros aplicados.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
+
+        @if($solicitudes instanceof \Illuminate\Pagination\LengthAwarePaginator)
+            <div class="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40">
+                {{ $solicitudes->links() }}
+            </div>
+        @endif
     </div>
 
 </div>
+
+{{-- Script de respaldo directo en caso de que Alpine tarde en hidratar --}}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('tr[data-toggle-exp]').forEach(function (row) {
+            row.addEventListener('click', function (e) {
+                // Si el clic fue en un enlace o botón de acción específico, ignorar
+                if (e.target.closest('a')) return;
+
+                const expId = row.getAttribute('data-toggle-exp');
+                const targetRow = document.getElementById('desplegable-' + expId);
+                if (targetRow && (!window.Alpine || !targetRow._x_dataStack)) {
+                    targetRow.classList.toggle('hidden');
+                }
+            });
+        });
+    });
+</script>
 @endsection

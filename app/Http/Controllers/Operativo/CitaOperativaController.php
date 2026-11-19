@@ -103,9 +103,9 @@ class CitaOperativaController extends Controller
             abort(401);
         }
 
-        // El supervisor no tiene autorización para modificar citas (función exclusiva del Revisor o Administrador)
-        if ($currentUser->esSupervisor() && ! $currentUser->esAdministrador()) {
-            abort(403, 'Los supervisores no tienen permisos para modificar citas. Esta acción es de solo lectura para supervisión.');
+        // Ni el supervisor ni el administrador modifican citas operativas directamente (función exclusiva del Revisor Técnico asignado)
+        if ($currentUser->esSupervisor() || $currentUser->esAdministrador()) {
+            abort(403, 'Los supervisores y administradores no tienen permisos para modificar citas en ventanilla. Esta acción es de solo lectura y exclusiva del Revisor Técnico asignado.');
         }
 
         if (! ($currentUser->esAdministrador() || $currentUser->esRevisor())) {

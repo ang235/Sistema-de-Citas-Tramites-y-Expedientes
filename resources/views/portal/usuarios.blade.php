@@ -38,7 +38,7 @@
                 Gestión de Usuarios y Control de Accesos
             </h1>
             <p class="text-sm text-slate-500 mt-1 max-w-3xl leading-relaxed">
-                Supervise el padrón de identidades institucionales, delegación jerárquica de roles (Ciudadano, Revisor L1/L2, Supervisor y Administrador) y auditoría de firmas digitales con estándar PKI.
+                Supervise el padrón de identidades institucionales, delegación jerárquica de roles (Ciudadano, Revisor L1/L2, Supervisor y Administrador) y auditoría de firmas digitales institucionales.
             </p>
         </div>
         <div class="flex flex-wrap items-center gap-2.5">
@@ -83,7 +83,7 @@
             <div class="font-bold text-2xl text-slate-900">{{ $kpis['revisores'] ?? 48 }}</div>
             <div class="flex items-center gap-1.5 mt-1 text-xs text-emerald-700">
                 <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                <span class="font-medium">100% firma PKI activa</span>
+                <span class="font-medium">100% firma activa</span>
             </div>
         </div>
     </div>
@@ -115,7 +115,7 @@
             <div class="font-bold text-2xl text-slate-900">{{ $kpis['administradores'] ?? 3 }}</div>
             <div class="flex items-center gap-1.5 mt-1 text-xs text-amber-600 font-medium">
                 <span class="material-symbols-outlined text-xs">shield</span>
-                <span>2FA obligatorio</span>
+                <span>Acceso protegido</span>
             </div>
         </div>
     </div>
@@ -175,7 +175,7 @@
                     <th class="py-3 px-6">Usuario / Identidad</th>
                     <th class="py-3 px-4">Rol Institucional (Único)</th>
                     <th class="py-3 px-4">Sede Operativa</th>
-                    <th class="py-3 px-4">PKI / Firma Digital</th>
+                    <th class="py-3 px-4">Firma Digital</th>
                     <th class="py-3 px-4">Última Modificación</th>
                     <th class="py-3 px-4">Estado de Cuenta</th>
                     <th class="py-3 px-4 text-right">Acciones</th>
@@ -217,7 +217,7 @@
                         <td class="py-3.5 px-4">
                             @if ($usuario->esRevisor() || $usuario->esSupervisor() || $usuario->esAdministrador())
                                 <span class="inline-flex items-center gap-1 text-[11px] text-emerald-600 font-semibold">
-                                    <span class="material-symbols-outlined text-xs">verified</span> PKI Activo
+                                    <span class="material-symbols-outlined text-xs">verified</span> Firma Activa
                                 </span>
                             @else
                                 <span class="inline-flex items-center gap-1 text-[11px] text-slate-400">

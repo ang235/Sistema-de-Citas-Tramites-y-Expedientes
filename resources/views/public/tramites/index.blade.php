@@ -13,7 +13,7 @@
 <div class="max-w-7xl mx-auto px-6 lg:px-12 py-8 w-full space-y-8">
     {{-- Cabecera de Página --}}
     <div class="space-y-3">
-        <span class="px-3 py-1 rounded-full bg-[#eff4ff] dark:bg-blue-950/60 text-[#0051d5] dark:text-blue-300 text-xs font-semibold">Catálogo Normativo TUPA</span>
+        <span class="px-3 py-1 rounded-full bg-[#eff4ff] dark:bg-blue-950/60 text-[#0051d5] dark:text-blue-300 text-xs font-semibold">Catálogo Normativo Institucional</span>
         <h1 class="text-3xl font-bold tracking-tight text-[#001229] dark:text-white" style="font-family: var(--font-display);">
             Trámites y Servicios al Ciudadano
         </h1>

@@ -529,7 +529,7 @@
                                     <span class="material-symbols-outlined text-rose-600 text-xl mt-0.5">cancel</span>
                                     <div>
                                         <span class="text-xs font-bold text-slate-900 dark:text-white block">Dictamen Desfavorable (Rechazado)</span>
-                                        <span class="text-[11px] text-slate-500">Incumplimiento insubsanable de la normativa TUPA vigente.</span>
+                                        <span class="text-[11px] text-slate-500">Incumplimiento insubsanable de la normativa aplicable vigente.</span>
                                     </div>
                                 </button>
                             </div>
@@ -550,7 +550,7 @@
                         <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-between text-[11px]">
                             <span class="flex items-center gap-1.5 text-slate-600 dark:text-slate-300 font-medium">
                                 <span class="material-symbols-outlined text-secondary text-base">verified_user</span>
-                                Firma PKI L2 Activa
+                                Firma Digital Activa
                             </span>
                             <span class="font-mono text-emerald-700 font-semibold">Certificado #8941-OK</span>
                         </div>
