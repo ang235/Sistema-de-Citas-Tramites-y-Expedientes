@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreRequisitoRequest;
 use App\Models\Bitacora;
 use App\Models\Requisito;
+use App\Models\VersionTramite;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 
@@ -15,6 +16,11 @@ class RequisitoController extends Controller
 {
     public function store(StoreRequisitoRequest $request): RedirectResponse
     {
+        $version = VersionTramite::findOrFail($request->validated('id_version_tramite'));
+        if ($version->Estado_Ver_Tr === 'Histórica') {
+            return back()->with('error', 'El historial normativo no es modificable. No se pueden agregar requisitos a versiones históricas.');
+        }
+
         $requisito = Requisito::create([
             'ID_Version_Tramite' => $request->validated('id_version_tramite'),
             'Nombre' => $request->validated('nombre'),
@@ -35,7 +41,12 @@ class RequisitoController extends Controller
     public function destroy(int $id): RedirectResponse
     {
         /** @var Requisito $requisito */
-        $requisito = Requisito::findOrFail($id);
+        $requisito = Requisito::with('versionTramite')->findOrFail($id);
+
+        if ($requisito->versionTramite?->Estado_Ver_Tr === 'Histórica') {
+            return back()->with('error', 'El historial normativo no es modificable. No se pueden eliminar requisitos de versiones históricas.');
+        }
+
         $nombre = $requisito->Nombre;
         $requisito->delete();
 

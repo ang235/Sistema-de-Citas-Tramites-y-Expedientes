@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -42,5 +43,10 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('manage-users', fn ($user) => $user->esAdministrador());
         Gate::define('mesa-dictamen', fn ($user) => $user->esRevisor());
         Gate::define('supervisar', fn ($user) => $user->esSupervisor());
+
+        // Enlazar dinámicamente URLs a la IP/Host por el que se accede
+        if (! $this->app->runningInConsole() && request()->getHttpHost()) {
+            URL::forceRootUrl(request()->getSchemeAndHttpHost());
+        }
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Operativo;
 
 use App\Http\Controllers\Controller;
+use App\Http\Middleware\RedirigirLocalhostAIp;
 use App\Http\Requests\Operativo\EmitirResolucionRequest;
 use App\Models\Bitacora;
 use App\Models\Resolucion;
@@ -72,7 +73,11 @@ class ResolucionController extends Controller
 
         $resolucion = $solicitud->resoluciones->last();
         $folio = $solicitud->folio?->Codigo_Folio ?? "EXP-{$idSolicitud}";
+        $qrHost = request()->getHost();
         $qrUrl = route('expedientes.show', ['codigoFolio' => $folio]);
+        if (($qrHost === 'localhost' || $qrHost === '127.0.0.1') && $lanIp = RedirigirLocalhostAIp::obtenerIpRedActiva()) {
+            $qrUrl = preg_replace('#^https?://(localhost|127\.0\.0\.1)#', 'http://'.$lanIp, $qrUrl);
+        }
 
         return Pdf::view('pdf.resolucion', [
             'solicitud' => $solicitud,

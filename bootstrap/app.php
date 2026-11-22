@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\CheckRole;
+use App\Http\Middleware\RedirigirLocalhostAIp;
 use App\Http\Middleware\RegistrarBitacora;
 use App\Http\Middleware\VerificarAccesoSolicitud;
 use Illuminate\Foundation\Application;
@@ -15,6 +16,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->trustProxies(at: '*');
+
+        $middleware->web(append: [
+            RedirigirLocalhostAIp::class,
+        ]);
+
         $middleware->validateCsrfTokens(except: [
             'asistente/chat',
         ]);

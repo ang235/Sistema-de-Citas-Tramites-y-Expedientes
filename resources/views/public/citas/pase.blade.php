@@ -60,7 +60,7 @@
                 {{-- QR --}}
                 <div class="flex flex-col items-center justify-center p-6 bg-[#eff4ff]/60 dark:bg-slate-800/60 border border-[#dce9ff] dark:border-slate-700 rounded-2xl text-center space-y-3">
                     <div class="p-4 bg-white dark:bg-slate-900 rounded-xl shadow-xs border border-slate-200 dark:border-slate-700 inline-block">
-                        {!! \SimpleSoftwareIO\QrCode\Facades\QrCode::size(160)->generate(route('citas.pase', ['idCita' => $cita->ID_Citas])) !!}
+                        {!! \SimpleSoftwareIO\QrCode\Facades\QrCode::size(160)->generate($qrUrl ?? route('citas.pase', ['idCita' => $cita->ID_Citas])) !!}
                     </div>
                     <div class="space-y-0.5">
                         <span class="text-[11px] text-slate-400 font-mono block">CÓDIGO DE VALIDACIÓN</span>

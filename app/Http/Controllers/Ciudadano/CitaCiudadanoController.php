@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Ciudadano;
 
 use App\Http\Controllers\Controller;
+use App\Http\Middleware\RedirigirLocalhostAIp;
 use App\Http\Requests\Ciudadano\StoreCitaRequest;
 use App\Models\Bitacora;
 use App\Models\Cita;
@@ -275,8 +276,15 @@ class CitaCiudadanoController extends Controller
         /** @var Cita $cita */
         $cita = $query->findOrFail($idCita);
 
+        $qrHost = request()->getHost();
+        $qrUrl = route('citas.pase', ['idCita' => $cita->ID_Citas]);
+        if (($qrHost === 'localhost' || $qrHost === '127.0.0.1') && $lanIp = RedirigirLocalhostAIp::obtenerIpRedActiva()) {
+            $qrUrl = preg_replace('#^https?://(localhost|127\.0\.0\.1)#', 'http://'.$lanIp, $qrUrl);
+        }
+
         return view('public.citas.pase', [
             'cita' => $cita,
+            'qrUrl' => $qrUrl,
         ]);
     }
 
@@ -287,14 +295,19 @@ class CitaCiudadanoController extends Controller
 
         $query = Cita::with(['usuario', 'solicitud.folio', 'solicitud.versionTramite.tipoTramite', 'revisor']);
 
-        if ($usuario->esCiudadano()) {
+        if ($usuario?->esCiudadano()) {
             $query->where('ID_Usuarios', $usuario->ID_Usuarios);
         }
 
         /** @var Cita $cita */
         $cita = $query->findOrFail($idCita);
 
+        $qrHost = request()->getHost();
         $qrUrl = route('citas.pase', ['idCita' => $cita->ID_Citas]);
+        if (($qrHost === 'localhost' || $qrHost === '127.0.0.1') && $lanIp = RedirigirLocalhostAIp::obtenerIpRedActiva()) {
+            $qrUrl = preg_replace('#^https?://(localhost|127\.0\.0\.1)#', 'http://'.$lanIp, $qrUrl);
+        }
+
         $turno = str_pad((string) $cita->ID_Citas, 5, '0', STR_PAD_LEFT);
 
         $pdf = Pdf::view('pdf.pase-cita', [

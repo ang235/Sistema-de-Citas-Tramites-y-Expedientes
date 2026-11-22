@@ -130,6 +130,11 @@
                 <span class="material-symbols-outlined text-sm">block</span>
                 <span>Trámites Inactivos / Deshabilitados ({{ $totalInactivos ?? 0 }})</span>
             </a>
+            <a href="{{ route('portal.parametros', ['tab' => 'versiones']) }}"
+               class="pb-3 px-3 text-xs font-bold border-b-2 transition-colors flex items-center gap-1.5 {{ ($tab ?? 'activos') === 'versiones' ? 'border-purple-600 text-purple-700' : 'border-transparent text-slate-500 hover:text-slate-800' }}">
+                <span class="material-symbols-outlined text-sm">history_edu</span>
+                <span>Historial de Versiones ({{ $totalVersiones ?? 0 }})</span>
+            </a>
         </div>
 
         <form method="GET" action="{{ route('portal.parametros') }}" class="flex items-center gap-2 pb-3">
@@ -152,6 +157,218 @@
     </div>
 
     <div class="overflow-x-auto">
+        @if(($tab ?? 'activos') === 'versiones')
+        {{-- ═══ TABLA HISTORIAL DE VERSIONES POR TRÁMITE ══ --}}
+        <table class="w-full text-left text-xs">
+            <thead>
+                <tr class="border-b border-slate-100 bg-slate-50 text-slate-400 uppercase tracking-wider font-semibold text-[11px]">
+                    <th class="py-3 px-6">Código</th>
+                    <th class="py-3 px-4">Nombre del Trámite</th>
+                    <th class="py-3 px-4">Versión Vigente</th>
+                    <th class="py-3 px-4">Total Versiones</th>
+                    <th class="py-3 px-4">Estado Catálogo</th>
+                    <th class="py-3 px-4 text-right">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-slate-700">
+                @forelse ($tramitesVersiones ?? [] as $tramiteVer)
+                    @php
+                        $verVigente = $tramiteVer->versionesTramite->where('Estado_Ver_Tr', 'Vigente')->first();
+                        $noVerVigente = $verVigente ? (Str::startsWith($verVigente->No_Version, 'v') ? $verVigente->No_Version : 'v'.$verVigente->No_Version) : 'Sin versión vigente';
+                        $cantVersiones = $tramiteVer->versionesTramite->count();
+                        $esInactivo = ($tramiteVer->Estado_Tipo_Tr === 'Inactivo');
+                    @endphp
+                    <tr class="hover:bg-slate-50 transition-colors {{ $esInactivo ? 'bg-slate-50/70 opacity-80' : '' }}"
+                        :class="expandedTramiteId === {{ $tramiteVer->ID_Tipo_Tramite }} ? 'bg-purple-50/30' : ''">
+                        <td class="py-3.5 px-6 cursor-pointer"
+                            @click="expandedTramiteId = (expandedTramiteId === {{ $tramiteVer->ID_Tipo_Tramite }} ? null : {{ $tramiteVer->ID_Tipo_Tramite }})">
+                            <div class="flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-base text-purple-600 transition-transform duration-200"
+                                      :class="expandedTramiteId === {{ $tramiteVer->ID_Tipo_Tramite }} ? 'rotate-90' : ''">chevron_right</span>
+                                <span class="font-mono font-bold text-purple-700 text-[11px]">TRM-{{ str_pad($tramiteVer->ID_Tipo_Tramite, 3, '0', STR_PAD_LEFT) }}</span>
+                            </div>
+                        </td>
+                        <td class="py-3.5 px-4 cursor-pointer group"
+                            @click="expandedTramiteId = (expandedTramiteId === {{ $tramiteVer->ID_Tipo_Tramite }} ? null : {{ $tramiteVer->ID_Tipo_Tramite }})">
+                            <div class="flex items-center gap-1">
+                                <span class="font-semibold text-[#0b1c30] group-hover:text-purple-700 transition-colors">{{ $tramiteVer->Nombre }}</span>
+                                <span class="text-[10px] text-purple-600 font-medium px-1.5 py-0.2 rounded bg-purple-50 opacity-0 group-hover:opacity-100 transition-opacity">Ver versiones</span>
+                            </div>
+                            <p class="text-[11px] text-slate-400 mt-0.5 line-clamp-1">{{ $tramiteVer->Descripcion ?? '' }}</p>
+                        </td>
+                        <td class="py-3.5 px-4">
+                            @if ($verVigente)
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>{{ $noVerVigente }}
+                                </span>
+                            @else
+                                <span class="text-slate-400 italic">Sin vigente</span>
+                            @endif
+                        </td>
+                        <td class="py-3.5 px-4 cursor-pointer"
+                            @click="expandedTramiteId = (expandedTramiteId === {{ $tramiteVer->ID_Tipo_Tramite }} ? null : {{ $tramiteVer->ID_Tipo_Tramite }})">
+                            <button type="button" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-purple-50 hover:bg-purple-100 text-purple-700 transition-colors cursor-pointer">
+                                <span class="material-symbols-outlined text-xs">history_edu</span>
+                                <span>{{ $cantVersiones }} {{ Str::plural('versión', $cantVersiones) }}</span>
+                            </button>
+                        </td>
+                        <td class="py-3.5 px-4">
+                            @if ($esInactivo)
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>Inactivo
+                                </span>
+                            @else
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>{{ $tramiteVer->Estado_Tipo_Tr ?? 'Activo' }}
+                                </span>
+                            @endif
+                        </td>
+                        <td class="py-3.5 px-4 text-right">
+                            <div class="flex items-center justify-end gap-1.5 flex-wrap">
+                                <button type="button"
+                                        @click="expandedTramiteId = (expandedTramiteId === {{ $tramiteVer->ID_Tipo_Tramite }} ? null : {{ $tramiteVer->ID_Tipo_Tramite }})"
+                                        class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-700 text-[11px] font-semibold transition-colors cursor-pointer"
+                                        title="Ver historial de versiones de este trámite">
+                                    <span class="material-symbols-outlined text-xs">visibility</span>
+                                    <span>Ver Historial</span>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    {{-- DETALLE DESPLEGABLE: HISTORIAL DE VERSIONES (SOLO LECTURA) --}}
+                    <tr x-show="expandedTramiteId === {{ $tramiteVer->ID_Tipo_Tramite }}" x-cloak class="bg-purple-50/40 border-b border-purple-100">
+                        <td colspan="6" class="p-5">
+                            <div class="bg-white rounded-xl border border-purple-200/80 p-5 shadow-xs space-y-4"
+                                 x-data="{ expandedVerId: {{ $verVigente?->ID_Version_Tramite ?? 'null' }} }">
+
+                                {{-- Cabecera --}}
+                                <div class="flex items-center justify-between border-b border-slate-100 pb-3 flex-wrap gap-2">
+                                    <div class="flex items-center gap-2.5">
+                                        <div class="w-8 h-8 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center shrink-0">
+                                            <span class="material-symbols-outlined text-lg">history_edu</span>
+                                        </div>
+                                        <div>
+                                            <h4 class="text-sm font-bold text-[#0b1c30]">Historial de Versiones: {{ $tramiteVer->Nombre }}</h4>
+                                            <p class="text-xs text-slate-500">
+                                                {{ $cantVersiones }} versión(es) archivada(s)
+                                                &bull; Versión vigente:
+                                                <span class="font-semibold text-emerald-700">{{ $noVerVigente }}</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+                                            <span class="material-symbols-outlined text-xs">lock</span>
+                                            <span>Historial no modificable (Solo lectura)</span>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {{-- Lista de versiones del trámite (Solo Lectura) --}}
+                                @if($tramiteVer->versionesTramite->isEmpty())
+                                    <div class="p-6 text-center rounded-xl bg-slate-50 border border-dashed border-slate-200">
+                                        <span class="material-symbols-outlined text-3xl text-slate-300">history_edu</span>
+                                        <p class="text-xs text-slate-500 mt-1">Este trámite no tiene versiones registradas.</p>
+                                    </div>
+                                @else
+                                    <div class="space-y-2.5">
+                                        @foreach($tramiteVer->versionesTramite as $ver)
+                                            @php
+                                                $noVer = Str::startsWith($ver->No_Version,'v') ? $ver->No_Version : 'v'.$ver->No_Version;
+                                                $esVerVigente  = $ver->Estado_Ver_Tr === 'Vigente';
+                                                $esVerBorrador = $ver->Estado_Ver_Tr === 'Borrador';
+                                            @endphp
+                                            <div class="rounded-xl border transition-all"
+                                                 :class="expandedVerId === {{ $ver->ID_Version_Tramite }} ? 'border-purple-300 bg-purple-50/20 shadow-xs' : 'border-slate-200 bg-slate-50/50'">
+
+                                                {{-- Fila de la versión --}}
+                                                <div class="flex items-center justify-between gap-3 p-3.5 cursor-pointer"
+                                                     @click="expandedVerId = (expandedVerId === {{ $ver->ID_Version_Tramite }} ? null : {{ $ver->ID_Version_Tramite }})">
+                                                    <div class="flex items-center gap-2.5 min-w-0 flex-wrap">
+                                                        <span class="material-symbols-outlined text-sm text-purple-600 transition-transform duration-200"
+                                                              :class="expandedVerId === {{ $ver->ID_Version_Tramite }} ? 'rotate-90' : ''">chevron_right</span>
+                                                        <span class="font-mono font-bold text-[13px] text-[#0b1c30]">{{ $noVer }}</span>
+
+                                                        @if($esVerVigente)
+                                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Vigente (Activa)
+                                                            </span>
+                                                        @elseif($esVerBorrador)
+                                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                                                                <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>Borrador
+                                                            </span>
+                                                        @else
+                                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-500 border border-slate-200">
+                                                                <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>Histórica (Archivada)
+                                                            </span>
+                                                        @endif
+
+                                                        <span class="text-xs text-slate-500">
+                                                            &bull; {{ $ver->requisitos->count() }} requisito(s)
+                                                            @if($ver->Fecha_Inicio_Vig)
+                                                                &bull; Vigencia desde {{ $ver->Fecha_Inicio_Vig->format('d/m/Y') }}
+                                                            @endif
+                                                        </span>
+                                                    </div>
+
+                                                    <div class="flex items-center gap-2 shrink-0">
+                                                        <span class="text-[11px] text-purple-700 font-medium flex items-center gap-1">
+                                                            <span class="material-symbols-outlined text-xs">visibility</span>
+                                                            <span x-text="expandedVerId === {{ $ver->ID_Version_Tramite }} ? 'Ocultar requisitos' : 'Ver requisitos'"></span>
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                {{-- Requisitos desplegables de esta versión (Solo Lectura) --}}
+                                                <div x-show="expandedVerId === {{ $ver->ID_Version_Tramite }}" x-cloak class="px-4 pb-4 border-t border-slate-100 pt-3">
+                                                    <div class="flex items-center justify-between mb-2">
+                                                        <span class="text-xs font-semibold text-slate-700">Requisitos normativos registrados en {{ $noVer }}:</span>
+                                                        <span class="text-[10px] text-slate-400 italic">Registro histórico inmutable</span>
+                                                    </div>
+
+                                                    @if($ver->requisitos->isNotEmpty())
+                                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-1">
+                                                            @foreach($ver->requisitos as $ri => $req)
+                                                                <div class="flex items-start justify-between gap-2 p-2.5 rounded-lg bg-white border border-slate-200">
+                                                                    <div class="flex items-start gap-2 min-w-0">
+                                                                        <span class="w-5 h-5 rounded-full {{ $esVerVigente ? 'bg-purple-700' : 'bg-slate-400' }} text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">{{ $ri + 1 }}</span>
+                                                                        <div class="min-w-0">
+                                                                            <p class="text-[11px] font-bold text-slate-900 leading-snug truncate">{{ $req->Nombre }}</p>
+                                                                            <div class="flex items-center gap-1.5 mt-0.5">
+                                                                                <span class="font-mono uppercase text-[9px] px-1 py-0.5 rounded bg-slate-100 border border-slate-200">{{ $req->Formato ?? 'PDF' }}</span>
+                                                                                <span class="text-[10px] font-medium {{ $req->Prioridad === 'Obligatorio' ? 'text-amber-700' : 'text-slate-500' }}">{{ $req->Prioridad }}</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
+                                                    @else
+                                                        <div class="p-4 text-center rounded-lg bg-slate-50 border border-dashed border-slate-200">
+                                                            <p class="text-[11px] text-slate-500">Sin requisitos registrados en esta versión.</p>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="6" class="py-12 text-center text-slate-400">
+                            <span class="material-symbols-outlined text-4xl block mb-2 text-slate-300">history_edu</span>
+                            No hay trámites registrados.
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+        @else
+        {{-- ═══ TABLA DE TRÁMITES ACTIVOS / INACTIVOS ══ --}}
         <table class="w-full text-left text-xs">
             <thead>
                 <tr class="border-b border-slate-100 bg-slate-50 text-slate-400 uppercase tracking-wider font-semibold text-[11px]">
@@ -167,7 +384,7 @@
             <tbody class="divide-y divide-slate-100 text-slate-700">
                 @forelse ($tiposTramite ?? [] as $tipo)
                     @php
-                        $version = $tipo->versionesTramite->where('Vigente', true)->first() ?? $tipo->versionesTramite->last();
+                        $version = $tipo->versionesTramite->where('Estado_Ver_Tr', 'Vigente')->first() ?? $tipo->versionesTramite->last();
                         $esInactivo = ($tipo->Estado_Tipo_Tr === 'Inactivo');
                     @endphp
                     <tr class="hover:bg-slate-50 transition-colors {{ $esInactivo ? 'bg-slate-50/70 opacity-80' : '' }}"
@@ -190,7 +407,7 @@
                         </td>
                         <td class="py-3.5 px-4">
                             @if ($version)
-                                <span class="font-mono text-slate-600">v{{ $version->No_Version }}</span>
+                                <span class="font-mono text-slate-600">{{ Str::startsWith($version->No_Version, 'v') ? $version->No_Version : 'v'.$version->No_Version }}</span>
                             @else
                                 <span class="text-slate-400">—</span>
                             @endif
@@ -260,7 +477,7 @@
                         </td>
                     </tr>
 
-                    {{-- DETALLE DESPLEGABLE DE REQUISITOS DEL TRÁMITE --}}
+                    {{-- DETALLE DESPLEGABLE: REQUISITOS DE LA VERSIÓN VIGENTE --}}
                     <tr x-show="expandedTramiteId === {{ $tipo->ID_Tipo_Tramite }}" x-cloak class="bg-blue-50/40 border-b border-blue-100">
                         <td colspan="7" class="p-5">
                             <div class="bg-white rounded-xl border border-blue-200/80 p-5 shadow-xs space-y-4">
@@ -274,7 +491,7 @@
                                                 Requisitos Normativos de: {{ $tipo->Nombre }}
                                             </h4>
                                             <p class="text-xs text-slate-500">
-                                                Versión vigente: <span class="font-semibold text-slate-700">{{ $version ? 'v' . $version->No_Version : 'Sin versión activa' }}</span>
+                                                Versión vigente: <span class="font-semibold text-slate-700">{{ $version ? (Str::startsWith($version->No_Version, 'v') ? $version->No_Version : 'v'.$version->No_Version) : 'Sin versión activa' }}</span>
                                                 &bull; Total de requisitos: {{ $version?->requisitos->count() ?? 0 }}
                                             </p>
                                         </div>
@@ -282,7 +499,7 @@
 
                                     @if($version)
                                         <button type="button"
-                                                @click="showNewReqModal = true; currentVersionId = {{ $version->ID_Version_Tramite }}; currentTramiteName = '{{ addslashes($tipo->Nombre) }} (v{{ $version->No_Version }})';"
+                                                @click="showNewReqModal = true; currentVersionId = {{ $version->ID_Version_Tramite }}; currentTramiteName = '{{ addslashes($tipo->Nombre) }} ({{ Str::startsWith($version->No_Version, 'v') ? $version->No_Version : 'v'.$version->No_Version }})';"
                                                 class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer shrink-0">
                                             <span class="material-symbols-outlined text-sm">add_task</span>
                                             <span>+ Agregar Requisito</span>
@@ -290,7 +507,7 @@
                                     @endif
                                 </div>
 
-                                {{-- Listado de requisitos de la versión --}}
+                                {{-- Listado de requisitos de la versión vigente --}}
                                 @if($version && $version->requisitos->isNotEmpty())
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                         @foreach($version->requisitos as $reqIndex => $req)
@@ -329,7 +546,7 @@
                                         <p class="text-xs font-semibold text-slate-700">Este trámite no tiene requisitos registrados en su versión activa.</p>
                                         @if($version)
                                             <button type="button"
-                                                    @click="showNewReqModal = true; currentVersionId = {{ $version->ID_Version_Tramite }}; currentTramiteName = '{{ addslashes($tipo->Nombre) }} (v{{ $version->No_Version }})';"
+                                                    @click="showNewReqModal = true; currentVersionId = {{ $version->ID_Version_Tramite }}; currentTramiteName = '{{ addslashes($tipo->Nombre) }} ({{ Str::startsWith($version->No_Version, 'v') ? $version->No_Version : 'v'.$version->No_Version }})';"
                                                     class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#001229] text-white text-xs font-semibold hover:bg-[#0f2744] transition-colors cursor-pointer mt-1">
                                                 <span class="material-symbols-outlined text-sm">add</span>
                                                 <span>Crear el primer requisito</span>
@@ -350,15 +567,22 @@
                 @endforelse
             </tbody>
         </table>
+        @endif
     </div>
 
     <div class="px-6 py-4 border-t border-slate-100 flex items-center justify-between">
-        @php
-            $tramitesCol = $tiposTramite ?? $tramites ?? null;
-        @endphp
-        <span class="text-xs text-slate-500">{{ $tramitesCol ? (method_exists($tramitesCol, 'total') ? $tramitesCol->total() : $tramitesCol->count()) : 0 }} procedimientos administrativos</span>
-        @if(isset($tramitesCol) && $tramitesCol instanceof \Illuminate\Pagination\LengthAwarePaginator)
-            {{ $tramitesCol->links() }}
+        @if(($tab ?? 'activos') === 'versiones')
+            @php $col = $tramitesVersiones ?? null; @endphp
+            <span class="text-xs text-slate-500">{{ $col ? (method_exists($col, 'total') ? $col->total() : $col->count()) : 0 }} trámites con historial de versiones</span>
+            @if(isset($col) && $col instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                {{ $col->links() }}
+            @endif
+        @else
+            @php $tramitesCol = $tiposTramite ?? $tramites ?? null; @endphp
+            <span class="text-xs text-slate-500">{{ $tramitesCol ? (method_exists($tramitesCol, 'total') ? $tramitesCol->total() : $tramitesCol->count()) : 0 }} procedimientos administrativos</span>
+            @if(isset($tramitesCol) && $tramitesCol instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                {{ $tramitesCol->links() }}
+            @endif
         @endif
     </div>
 </div>

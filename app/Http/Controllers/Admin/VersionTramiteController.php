@@ -71,6 +71,11 @@ class VersionTramiteController extends Controller
     {
         /** @var VersionTramite $version */
         $version = VersionTramite::findOrFail($id);
+
+        if ($version->Estado_Ver_Tr === 'Histórica') {
+            return back()->with('error', 'El historial normativo no es modificable. Las versiones históricas están protegidas para auditoría.');
+        }
+
         $version->delete();
 
         Bitacora::create([

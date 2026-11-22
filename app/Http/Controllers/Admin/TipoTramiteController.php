@@ -21,8 +21,55 @@ class TipoTramiteController extends Controller
         $tab = $request->query('tab', 'activos');
         $buscar = $request->query('buscar');
 
+        // Para la pestaña de versiones, listamos los trámites para desplegar sus versiones por trámite
+        if ($tab === 'versiones') {
+            $tramitesVersiones = TipoTramite::withCount('versiones')
+                ->with(['versionesTramite' => function ($q): void {
+                    $q->orderByRaw("CASE WHEN Estado_Ver_Tr = 'Vigente' THEN 0 WHEN Estado_Ver_Tr = 'Borrador' THEN 1 ELSE 2 END")
+                        ->orderByDesc('ID_Version_Tramite')
+                        ->with('requisitos');
+                }])
+                ->when($buscar, function ($q, $term): void {
+                    $q->where('Nombre', 'like', "%{$term}%")
+                        ->orWhere('Descripcion', 'like', "%{$term}%")
+                        ->orWhereHas('versionesTramite', fn ($v) => $v->where('No_Version', 'like', "%{$term}%"));
+                })
+                ->orderBy('Nombre')
+                ->paginate(15)
+                ->appends($request->query());
+
+            $totalActivos = TipoTramite::where('Estado_Tipo_Tr', '!=', 'Inactivo')->count();
+            $totalInactivos = TipoTramite::where('Estado_Tipo_Tr', 'Inactivo')->count();
+            $totalVersiones = VersionTramite::count();
+
+            $kpis = [
+                'total_tramites' => TipoTramite::count(),
+                'versiones_activas' => VersionTramite::where('Estado_Ver_Tr', 'Vigente')->count(),
+                'total_activos' => $totalActivos,
+                'total_inactivos' => $totalInactivos,
+                'pendientes_revision' => TipoTramite::where('Estado_Tipo_Tr', '!=', 'Activo')->where('Estado_Tipo_Tr', '!=', 'Inactivo')->count(),
+            ];
+
+            return view('portal.parametros', [
+                'tiposTramite' => collect(),
+                'tramitesVersiones' => $tramitesVersiones,
+                'todasVersiones' => collect(),
+                'tab' => $tab,
+                'buscar' => $buscar,
+                'totalActivos' => $totalActivos,
+                'totalInactivos' => $totalInactivos,
+                'totalVersiones' => $totalVersiones,
+                'kpis' => $kpis,
+            ]);
+        }
+
         $query = TipoTramite::withCount('versiones')
-            ->with(['versionesTramite.requisitos'])
+            ->with(['versionesTramite' => function ($q): void {
+                // Vigente primero, luego las demás por ID descendente
+                $q->orderByRaw("CASE WHEN Estado_Ver_Tr = 'Vigente' THEN 0 ELSE 1 END")
+                    ->orderByDesc('ID_Version_Tramite')
+                    ->with('requisitos');
+            }])
             ->when($tab === 'inactivos', function ($q): void {
                 $q->where('Estado_Tipo_Tr', 'Inactivo');
             }, function ($q): void {
@@ -41,7 +88,7 @@ class TipoTramiteController extends Controller
 
         $kpis = [
             'total_tramites' => TipoTramite::count(),
-            'versiones_activas' => VersionTramite::where('Vigente', true)->count(),
+            'versiones_activas' => VersionTramite::where('Estado_Ver_Tr', 'Vigente')->count(),
             'total_activos' => $totalActivos,
             'total_inactivos' => $totalInactivos,
             'pendientes_revision' => TipoTramite::where('Estado_Tipo_Tr', '!=', 'Activo')->where('Estado_Tipo_Tr', '!=', 'Inactivo')->count(),
@@ -50,10 +97,13 @@ class TipoTramiteController extends Controller
         return view('portal.parametros', [
             'tramites' => $tiposTramite,
             'tiposTramite' => $tiposTramite,
+            'tramitesVersiones' => collect(),
+            'todasVersiones' => collect(),
             'tab' => $tab,
             'buscar' => $buscar,
             'totalActivos' => $totalActivos,
             'totalInactivos' => $totalInactivos,
+            'totalVersiones' => VersionTramite::count(),
             'kpis' => $kpis,
         ]);
     }
