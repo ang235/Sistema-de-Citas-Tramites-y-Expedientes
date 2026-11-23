@@ -134,6 +134,16 @@
                 $tieneArchivo = !empty($archivosDir);
             }
 
+            $versiones = $d->versionesDoc->map(function($ver, $vIdx) use ($d) {
+                return [
+                    'id' => $ver->ID_Version_Doc,
+                    'numero' => $vIdx + 1,
+                    'nombre' => $ver->Nombre_Original ?? ('Version_' . ($vIdx + 1) . '.pdf'),
+                    'fecha' => $ver->Fecha_Carga ? $ver->Fecha_Carga->format('d/m/Y H:i') : null,
+                    'url' => route('portal.documentos.archivo', $d->ID_Documento) . '?version_id=' . $ver->ID_Version_Doc,
+                ];
+            })->values();
+
             return [
                 'id' => $d->ID_Documento,
                 'nombre' => $d->requisito?->Nombre ?? ('Documento #' . $d->ID_Documento),
@@ -144,6 +154,7 @@
                 'archivo_url' => route('portal.documentos.archivo', $d->ID_Documento),
                 'archivo_nombre' => $v?->Nombre_Original ?? (($d->requisito?->Nombre ?? 'Documento') . '.pdf'),
                 'fecha_carga' => $v?->Fecha_Carga ? $v->Fecha_Carga->format('d/m/Y H:i') : null,
+                'versiones' => $versiones,
                 'versiones_count' => $d->versionesDoc->count(),
             ];
         })->values();
@@ -153,8 +164,18 @@
          x-data="{
              docs: {{ json_encode($docsData) }},
              activeIndex: 0,
+             currentIframeUrl: '',
              get activeDoc() { return this.docs[this.activeIndex] || null; },
-             selectDoc(idx) { this.activeIndex = idx; }
+             selectDoc(idx) {
+                 this.activeIndex = idx;
+                 this.currentIframeUrl = this.activeDoc?.archivo_url || '';
+             },
+             init() {
+                 this.currentIframeUrl = this.activeDoc?.archivo_url || '';
+             },
+             setVersion(url) {
+                 this.currentIframeUrl = url;
+             }
          }">
 
         {{-- COLUMNA IZQUIERDA: VISOR DE DOCUMENTOS Y RECAUDOS --}}
@@ -209,11 +230,30 @@
                         <span class="font-semibold"
                               :class="{
                                   'text-emerald-700 dark:text-emerald-400': activeDoc?.estado === 'Aprobado',
+                                  'text-blue-700 dark:text-blue-400': activeDoc?.estado === 'Subsanado',
                                   'text-amber-700 dark:text-amber-400': activeDoc?.estado === 'Observado',
                                   'text-rose-700 dark:text-rose-400': activeDoc?.estado === 'Rechazado',
-                                  'text-slate-600 dark:text-slate-400': activeDoc?.estado !== 'Aprobado' && activeDoc?.estado !== 'Observado' && activeDoc?.estado !== 'Rechazado'
+                                  'text-slate-600 dark:text-slate-400': activeDoc?.estado !== 'Aprobado' && activeDoc?.estado !== 'Subsanado' && activeDoc?.estado !== 'Observado' && activeDoc?.estado !== 'Rechazado'
                               }"
                               x-text="'Estado: ' + (activeDoc?.estado || 'Pendiente')"></span>
+                    </div>
+                </div>
+
+                {{-- Selector de Versiones (si el ciudadano subsanó y cargó una nueva versión) --}}
+                <div x-show="activeDoc?.versiones?.length > 1" class="flex flex-wrap items-center gap-2 px-3 py-2 rounded-xl bg-blue-50/70 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900 text-xs">
+                    <span class="font-bold text-blue-900 dark:text-blue-200 flex items-center gap-1.5 text-[11px]">
+                        <span class="material-symbols-outlined text-sm text-[#0051d5]">history</span>
+                        Historial de Versiones del Documento:
+                    </span>
+                    <div class="flex items-center gap-1.5">
+                        <template x-for="ver in activeDoc?.versiones" :key="ver.id">
+                            <button type="button"
+                                    @click="setVersion(ver.url)"
+                                    :class="(currentIframeUrl === ver.url || (!currentIframeUrl && ver.numero === activeDoc?.versiones?.length)) ? 'bg-[#0051d5] text-white shadow-xs font-bold' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'"
+                                    class="px-2.5 py-1 rounded-md text-[11px] transition-all cursor-pointer">
+                                <span x-text="ver.numero === 1 ? 'v1 (Original)' : 'v' + ver.numero + ' (Subsanación)'"></span>
+                            </button>
+                        </template>
                     </div>
                 </div>
 
@@ -221,7 +261,7 @@
                 <div class="relative w-full rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-900 shadow-inner">
                     {{-- Caso 1: Archivo disponible --}}
                     <div x-show="activeDoc?.tiene_archivo" class="w-full h-[620px]">
-                        <iframe :src="activeDoc?.archivo_url"
+                        <iframe :src="currentIframeUrl || activeDoc?.archivo_url"
                                 class="w-full h-full border-0 bg-white"
                                 title="Visualizador oficial del documento adjunto"></iframe>
                     </div>
@@ -288,8 +328,11 @@
                                         @endif
                                     </div>
                                 </div>
-                                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold border {{ $doc->Estado_Doc === 'Aprobado' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : ($doc->Estado_Doc === 'Observado' ? 'bg-amber-50 text-amber-800 border-amber-200' : ($doc->Estado_Doc === 'Rechazado' ? 'bg-rose-50 text-rose-800 border-rose-200' : 'bg-slate-100 text-slate-700 border-slate-200')) }}">
-                                    {{ $doc->Estado_Doc }}
+                                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold border {{ $doc->Estado_Doc === 'Aprobado' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : ($doc->Estado_Doc === 'Subsanado' ? 'bg-blue-50 text-blue-700 border-blue-200 ring-2 ring-blue-400/20' : ($doc->Estado_Doc === 'Observado' ? 'bg-amber-50 text-amber-800 border-amber-200' : ($doc->Estado_Doc === 'Rechazado' ? 'bg-rose-50 text-rose-800 border-rose-200' : 'bg-slate-100 text-slate-700 border-slate-200'))) }}">
+                                    @if($doc->Estado_Doc === 'Subsanado')
+                                        <span class="material-symbols-outlined text-[13px] inline-block align-middle mr-0.5">published_with_changes</span>
+                                    @endif
+                                    {{ $doc->Estado_Doc }} ({{ $doc->versionesDoc->count() }} {{ Str::plural('versión', $doc->versionesDoc->count()) }})
                                 </span>
                             </div>
 
@@ -340,6 +383,76 @@
                 </div>
             </div>
 
+            {{-- HISTORIAL DE OBSERVACIONES Y SUBSANACIONES CIUDADANAS --}}
+            @php
+                $todasObservaciones = $solicitud->asignaciones->flatMap->revisiones->flatMap->observaciones;
+            @endphp
+            @if($todasObservaciones->isNotEmpty())
+                <div class="bg-white dark:bg-[#111f33] p-5 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                        <div class="flex items-center gap-2">
+                            <div class="w-7 h-7 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-amber-600 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-base">published_with_changes</span>
+                            </div>
+                            <div>
+                                <h2 class="text-base font-bold text-[#001229] dark:text-white">Historial de Observaciones y Subsanaciones</h2>
+                                <p class="text-xs text-slate-500 mt-0.5">Requerimientos técnicos formulados y respuestas ingresadas por el ciudadano.</p>
+                            </div>
+                        </div>
+                        <span class="px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold">
+                            {{ $todasObservaciones->count() }} {{ Str::plural('observación', $todasObservaciones->count()) }}
+                        </span>
+                    </div>
+
+                    <div class="space-y-3">
+                        @foreach($todasObservaciones as $obs)
+                            <div class="p-4 rounded-xl border {{ $obs->estaAbierta() ? 'border-amber-200 bg-amber-50/40 dark:bg-amber-950/20' : 'border-emerald-200 bg-emerald-50/30 dark:bg-emerald-950/20' }} space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold text-slate-800 dark:text-slate-200">
+                                        Observación #{{ $obs->ID_Observacion }}
+                                    </span>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase {{ $obs->estaAbierta() ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800' }}">
+                                        {{ $obs->Estado_Obs }}
+                                    </span>
+                                </div>
+                                <div class="p-2.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-300">
+                                    <span class="font-semibold block text-[11px] text-slate-400 mb-0.5">Requerimiento del revisor:</span>
+                                    {{ $obs->Detalles }}
+                                </div>
+
+                                @if($obs->respuestas->isNotEmpty())
+                                    <div class="pl-3 border-l-2 border-emerald-500 space-y-2">
+                                        @foreach($obs->respuestas as $resp)
+                                            <div class="text-xs text-slate-800 dark:text-slate-200 space-y-1">
+                                                <div class="flex items-center justify-between text-[11px] text-slate-500">
+                                                    <span class="font-semibold text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
+                                                        <span class="material-symbols-outlined text-sm">reply</span>
+                                                        Subsanación del Ciudadano:
+                                                    </span>
+                                                    <span>{{ $resp->Fecha_Respuesta ? \Carbon\Carbon::parse($resp->Fecha_Respuesta)->format('d/m/Y H:i') : '' }}</span>
+                                                </div>
+                                                <p class="p-2.5 rounded-lg bg-emerald-50/80 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-900 text-emerald-950 dark:text-emerald-200 font-medium">
+                                                    {{ $resp->Mensaje_Respuesta }}
+                                                </p>
+                                                @if($resp->versionDoc)
+                                                    <div class="flex items-center gap-2 pt-1 text-[11px]">
+                                                        <span class="material-symbols-outlined text-sm text-[#0051d5]">attach_file</span>
+                                                        <span class="text-slate-600 dark:text-slate-400">Archivo subsanado adjunto:</span>
+                                                        <span class="font-semibold text-[#0051d5] dark:text-blue-400">{{ $resp->versionDoc->Nombre_Original }}</span>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <span class="text-xs text-amber-700 dark:text-amber-400 italic block">Pendiente de respuesta por el administrado.</span>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+
         </div>
 
         {{-- COLUMNA DERECHA: CONSOLA DE DICTAMEN OFICIAL --}}
@@ -351,7 +464,7 @@
                     <div class="flex items-center gap-2.5">
                         <span class="material-symbols-outlined text-amber-600 text-xl">schedule</span>
                         <div>
-                            <span class="text-xs font-bold text-amber-900 dark:text-amber-200 block">Plazo Normativo SLA</span>
+                            <span class="text-xs font-bold text-amber-900 dark:text-amber-200 block">Emisión de dictamen</span>
                             <span class="text-[11px] text-amber-700 dark:text-amber-400">Revise los documentos y emita su dictamen.</span>
                         </div>
                     </div>
@@ -362,7 +475,11 @@
             @endif
 
             {{-- CONSOLA DE DICTAMEN / RESOLUCION --}}
-            <div class="bg-white dark:bg-[#111f33] p-5 lg:p-6 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col gap-5" x-data="{ decision: 'Aprobado' }">
+            <div class="bg-white dark:bg-[#111f33] p-5 lg:p-6 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col gap-5"
+                 x-data="{
+                     activeTab: '{{ in_array($solicitud->Estado_Solicitud, ['En_Revision', 'Observado']) || $solicitud->documentos->where('Estado_Doc', 'Subsanado')->isNotEmpty() || !($asignacionActiva && $asignacionActiva->revisiones->where('Resultado', 'Aprobado')->isNotEmpty()) ? 'dictamen' : 'resolucion' }}',
+                     decision: 'Aprobado'
+                 }">
                 <div class="border-b border-slate-100 dark:border-slate-800 pb-3">
                     <h2 class="text-base font-bold text-[#001229] dark:text-white">
                         @if ($esSoloLectura ?? false)
@@ -380,26 +497,34 @@
                     </p>
                 </div>
 
-                @if ($esSoloLectura ?? false)
-                    {{-- MODO SOLO LECTURA: mostrar resoluciones e historial de revisiones --}}
+                @if ($tieneResolucion ?? $solicitud->resoluciones->isNotEmpty())
+                    {{-- ══ RESOLUCIÓN FORMAL YA EMITIDA (EXPEDIENTE CONCLUIDO) ══ --}}
                     @php $ultimaResolucion = $solicitud->resoluciones->last(); @endphp
-                    @if ($ultimaResolucion)
-                        <div class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-xs text-emerald-900 dark:text-emerald-200 space-y-2">
+                    <div class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-xs text-emerald-900 dark:text-emerald-200 space-y-3">
+                        <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2">
                                 <span class="material-symbols-outlined text-emerald-600 text-lg">verified</span>
-                                <span class="font-bold">Resolucion Oficial Emitida</span>
+                                <span class="font-bold text-sm">Resolución Oficial Emitida</span>
                             </div>
-                            <p class="text-[11px] text-emerald-800 dark:text-emerald-300">
-                                <strong>Sentido:</strong> Resolucion {{ $ultimaResolucion->Tipo_Resolucion }}
-                            </p>
-                            <p class="text-[11px] text-emerald-700 dark:text-emerald-400">
-                                <strong>Fecha de Emision:</strong> {{ $ultimaResolucion->Fecha_Emision_Resolucion ? \Carbon\Carbon::parse($ultimaResolucion->Fecha_Emision_Resolucion)->format('d/m/Y H:i') : '' }}
-                            </p>
-                            <span class="inline-block px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200 text-[10px] font-mono font-bold">
-                                RES-{{ str_pad($ultimaResolucion->ID_Resolucion, 5, '0', STR_PAD_LEFT) }}-{{ date('Y') }}
+                            <span class="inline-block px-2.5 py-1 rounded bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200 text-xs font-mono font-bold">
+                                RES-{{ str_pad((string)$ultimaResolucion->ID_Resolucion, 5, '0', STR_PAD_LEFT) }}-{{ date('Y') }}
                             </span>
                         </div>
-                    @endif
+                        <p class="text-xs text-emerald-800 dark:text-emerald-300">
+                            <strong>Sentido:</strong> Resolución {{ $ultimaResolucion->Tipo_Resolucion }}
+                        </p>
+                        <p class="text-xs text-emerald-700 dark:text-emerald-400">
+                            <strong>Fecha de Emisión:</strong> {{ $ultimaResolucion->Fecha_Emision_Resolucion ? \Carbon\Carbon::parse($ultimaResolucion->Fecha_Emision_Resolucion)->format('d/m/Y H:i') : '' }}
+                        </p>
+                        <div class="pt-2 border-t border-emerald-200/60 dark:border-emerald-800/60">
+                            <a href="{{ route('portal.resoluciones.pdf', $solicitud->ID_Solicitud) }}"
+                               target="_blank"
+                               class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs transition-colors">
+                                <span class="material-symbols-outlined text-sm">picture_as_pdf</span>
+                                <span>Descargar Resolución Oficial (PDF)</span>
+                            </a>
+                        </div>
+                    </div>
 
                     {{-- Historial de revisiones --}}
                     @foreach($solicitud->asignaciones as $asig)
@@ -407,7 +532,7 @@
                             @if($rev->Resultado !== 'En Revision')
                                 <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs space-y-1">
                                     <div class="flex items-center justify-between">
-                                        <span class="font-bold text-slate-800 dark:text-slate-200">Revision #{{ $rev->ID_Revision }}</span>
+                                        <span class="font-bold text-slate-800 dark:text-slate-200">Revisión #{{ $rev->ID_Revision }}</span>
                                         <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold {{ $rev->Resultado === 'Aprobado' ? 'bg-emerald-50 text-emerald-700' : ($rev->Resultado === 'Rechazado' ? 'bg-rose-50 text-rose-700' : 'bg-amber-50 text-amber-700') }}">
                                             {{ $rev->Resultado }}
                                         </span>
@@ -423,155 +548,204 @@
 
                     <div class="p-3 rounded-xl bg-slate-900 text-slate-300 text-[11px] flex items-center gap-2 font-mono">
                         <span class="material-symbols-outlined text-blue-400 text-base">lock</span>
-                        Expediente en modo inmutable. Ninguna accion de modificacion esta disponible.
+                        Expediente formalmente concluido e inmutable.
                     </div>
 
-                @elseif (auth()->check() && auth()->user()->esSupervisor())
-                    {{-- CONSOLA DE SUPERVISOR: EMISION DE RESOLUCION FINAL --}}
-                    @php $ultimaResolucion = $solicitud->resoluciones->last(); @endphp
+                @else
+                    {{-- Historial de revisiones técnicas previas (si existen) --}}
+                    @foreach($solicitud->asignaciones as $asig)
+                        @foreach($asig->revisiones as $rev)
+                            @if($rev->Resultado !== 'En Revision')
+                                <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs space-y-1">
+                                    <div class="flex items-center justify-between">
+                                        <span class="font-bold text-slate-800 dark:text-slate-200">Dictamen Técnico #{{ $rev->ID_Revision }}</span>
+                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold {{ $rev->Resultado === 'Aprobado' ? 'bg-emerald-50 text-emerald-700' : ($rev->Resultado === 'Rechazado' ? 'bg-rose-50 text-rose-700' : 'bg-amber-50 text-amber-700') }}">
+                                            {{ $rev->Resultado }}
+                                        </span>
+                                    </div>
+                                    <p class="text-[11px] text-slate-500">
+                                        Revisor: {{ $asig->revisor?->Nombre ?? 'Especialista' }} &bull; {{ $rev->Fecha_Revision ? \Carbon\Carbon::parse($rev->Fecha_Revision)->format('d/m/Y H:i') : 'N/A' }}
+                                    </p>
+                                </div>
+                            @endif
+                        @endforeach
+                    @endforeach
 
-                    @if ($ultimaResolucion)
-                        <div class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-xs text-emerald-900 dark:text-emerald-200 space-y-2">
-                            <div class="flex items-center gap-2">
-                                <span class="material-symbols-outlined text-emerald-600 text-lg">verified</span>
-                                <span class="font-bold">Resolucion Oficial Emitida</span>
-                            </div>
-                            <p class="text-[11px] text-emerald-800 dark:text-emerald-300">
-                                <strong>Sentido:</strong> Resolucion {{ $ultimaResolucion->Tipo_Resolucion }}
-                            </p>
-                            <p class="text-[11px] text-emerald-700 dark:text-emerald-400">
-                                <strong>Fecha de Emision:</strong> {{ $ultimaResolucion->Fecha_Emision_Resolucion ? \Carbon\Carbon::parse($ultimaResolucion->Fecha_Emision_Resolucion)->format('d/m/Y H:i') : '' }}
-                            </p>
-                            <span class="inline-block px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200 text-[10px] font-mono font-bold">
-                                RES-{{ str_pad($ultimaResolucion->ID_Resolucion, 5, '0', STR_PAD_LEFT) }}-{{ date('Y') }}
-                            </span>
-                        </div>
-                    @else
-                        <form action="{{ route('portal.resoluciones.store', $solicitud->ID_Solicitud) }}" method="POST" class="space-y-4">
-                            @csrf
-                            <div class="p-3 bg-blue-50/70 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 rounded-xl space-y-1">
-                                <span class="font-bold text-xs text-[#001229] dark:text-white flex items-center gap-1.5">
-                                    <span class="material-symbols-outlined text-[#0051d5] text-base">gavel</span>
-                                    Emision de Resolucion de Supervision
-                                </span>
-                                <p class="text-[11px] text-slate-600 dark:text-slate-400">
-                                    Como Supervisor / Dictaminador, usted suscribe el acto administrativo que concluye el expediente.
-                                </p>
-                            </div>
-
-                            <div>
-                                <label for="tipo_resolucion" class="block text-xs font-semibold text-slate-800 dark:text-slate-200 mb-1">
-                                    Sentido de la Resolucion <span class="text-rose-500">*</span>
-                                </label>
-                                <select name="tipo_resolucion" id="tipo_resolucion" required
-                                        class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#0051d5]">
-                                    <option value="Favorable">Favorable (Aprobacion Definitiva del Tramite)</option>
-                                    <option value="Desfavorable">Desfavorable (Denegatoria)</option>
-                                    <option value="Inadmisible">Inadmisible / Archivo</option>
-                                    <option value="Cancelada">Cancelada por el Administrado</option>
-                                </select>
-                            </div>
-
-                            <div>
-                                <label for="comentarios" class="block text-xs font-semibold text-slate-800 dark:text-slate-200 mb-1">
-                                    Fundamentacion y Comentarios Resolutivos
-                                </label>
-                                <textarea name="comentarios" id="comentarios" rows="3"
-                                          placeholder="Indique los antecedentes tecnicos de la revision y la motivacion juridica de la resolucion..."
-                                          class="w-full p-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#0051d5]"></textarea>
-                            </div>
-
-                            <button type="submit" class="w-full h-11 bg-[#001229] hover:bg-[#0f2744] text-white rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer">
-                                <span class="material-symbols-outlined text-base">verified</span>
-                                <span>Emitir y Firmar Resolucion Formal</span>
+                    @if (auth()->check() && (auth()->user()->esSupervisor() || auth()->user()->esAdministrador()))
+                        {{-- Pestañas para Supervisor / Administrador --}}
+                        <div class="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg">
+                            <button type="button"
+                                    @click="activeTab = 'dictamen'"
+                                    :class="activeTab === 'dictamen' ? 'bg-white dark:bg-slate-700 text-[#0051d5] dark:text-blue-400 font-bold shadow-xs' : 'text-slate-600 dark:text-slate-400'"
+                                    class="flex-1 py-1.5 px-3 rounded-md text-xs transition-all cursor-pointer text-center">
+                                Dictamen Técnico
                             </button>
-                        </form>
+                            <button type="button"
+                                    @click="activeTab = 'resolucion'"
+                                    :class="activeTab === 'resolucion' ? 'bg-white dark:bg-slate-700 text-[#0051d5] dark:text-blue-400 font-bold shadow-xs' : 'text-slate-600 dark:text-slate-400'"
+                                    class="flex-1 py-1.5 px-3 rounded-md text-xs transition-all cursor-pointer text-center">
+                                Resolución Final
+                            </button>
+                        </div>
+
+                        {{-- Panel Resolución Final --}}
+                        <div x-show="activeTab === 'resolucion'" class="space-y-4" x-cloak>
+                            <form action="{{ route('portal.resoluciones.store', $solicitud->ID_Solicitud) }}" method="POST" class="space-y-4">
+                                @csrf
+                                <div class="p-3 bg-blue-50/70 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 rounded-xl space-y-1">
+                                    <span class="font-bold text-xs text-[#001229] dark:text-white flex items-center gap-1.5">
+                                        <span class="material-symbols-outlined text-[#0051d5] text-base">gavel</span>
+                                        Emisión de Resolución Oficial
+                                    </span>
+                                    <p class="text-[11px] text-slate-600 dark:text-slate-400">
+                                        Como autoridad resolutiva, usted suscribe el acto administrativo que concluye formalmente el expediente ciudadano.
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <label for="tipo_resolucion" class="block text-xs font-semibold text-slate-800 dark:text-slate-200 mb-1">
+                                        Sentido de la Resolución <span class="text-rose-500">*</span>
+                                    </label>
+                                    <select name="tipo_resolucion" id="tipo_resolucion" required
+                                            class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#0051d5]">
+                                        <option value="Favorable">Favorable (Aprobación Definitiva del Trámite)</option>
+                                        <option value="Desfavorable">Desfavorable (Denegatoria)</option>
+                                        <option value="Inadmisible">Inadmisible / Archivo</option>
+                                        <option value="Cancelada">Cancelada por el Administrado</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label for="comentarios" class="block text-xs font-semibold text-slate-800 dark:text-slate-200 mb-1">
+                                        Fundamentación y Motivación Jurídica
+                                    </label>
+                                    <textarea name="comentarios" id="comentarios" rows="3"
+                                              placeholder="Indique los antecedentes técnicos de la revisión y la motivación jurídica de la resolución..."
+                                              class="w-full p-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#0051d5]"></textarea>
+                                </div>
+
+                                <button type="submit" class="w-full h-11 bg-[#001229] hover:bg-[#0f2744] text-white rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer">
+                                    <span class="material-symbols-outlined text-base">verified</span>
+                                    <span>Emitir y Firmar Resolución Formal</span>
+                                </button>
+                            </form>
+                        </div>
                     @endif
 
-                @elseif (auth()->check() && auth()->user()->esAdministrador() && !auth()->user()->esRevisor())
-                    <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-300 space-y-1.5">
-                        <span class="font-bold flex items-center gap-1.5 text-slate-800 dark:text-slate-200">
-                            <span class="material-symbols-outlined text-base text-[#0051d5]">visibility</span>
-                            Modo Visualizacion / Auditoria
-                        </span>
-                        <p class="text-[11px] text-slate-500 leading-relaxed">
-                            Como Administrador, usted tiene acceso de solo lectura para auditar el expediente. La calificacion tecnica y emision de dictamen corresponde exclusivamente a los Revisores Tecnicos periciales asignados.
-                        </p>
-                    </div>
+                    {{-- Panel Dictamen Técnico (Visible para Revisor siempre, y para Supervisor/Admin bajo la pestaña 'dictamen') --}}
+                    <div x-show="activeTab === 'dictamen'" class="space-y-4">
+                        @if ($asignacionActiva)
+                            @php
+                                $estadoSolEval = $solicitud->Estado_Solicitud;
+                                $puedeDictaminarEval = in_array($estadoSolEval, ['Pendiente', 'En_Revision'], true);
+                            @endphp
 
-                @elseif ($asignacionActiva)
-                    <form action="{{ route('portal.revisiones.store', $asignacionActiva->ID_Asignacion) }}" method="POST" class="space-y-4">
-                        @csrf
+                            @if($puedeDictaminarEval)
+                                <form action="{{ route('portal.revisiones.store', $asignacionActiva->ID_Asignacion) }}" method="POST" class="space-y-4" x-data="{ enviandoEval: false }" @submit="enviandoEval = true">
+                                    @csrf
 
-                        <div class="space-y-2">
-                            <label class="block text-xs font-semibold text-slate-800 dark:text-slate-200">Resultado Oficial</label>
-                            <input type="hidden" name="resultado" :value="decision">
+                                    <div class="space-y-2">
+                                        <label class="block text-xs font-semibold text-slate-800 dark:text-slate-200">Resultado Oficial</label>
+                                        <input type="hidden" name="resultado" :value="decision">
 
-                            <div class="grid grid-cols-1 gap-2.5">
-                                <button type="button"
-                                        @click="decision = 'Aprobado'"
-                                        :class="decision === 'Aprobado' ? 'bg-emerald-50 border-2 border-emerald-600 shadow-xs' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'"
-                                        class="p-3 rounded-xl text-left flex items-start gap-3 transition-all">
-                                    <span class="material-symbols-outlined text-emerald-600 text-xl mt-0.5">check_circle</span>
-                                    <div>
-                                        <span class="text-xs font-bold text-slate-900 dark:text-white block">Dictamen Favorable (Aprobado)</span>
-                                        <span class="text-[11px] text-slate-500">Cumple integramente los requisitos de admisibilidad.</span>
+                                        <div class="grid grid-cols-1 gap-2.5">
+                                            <button type="button"
+                                                    @click="decision = 'Aprobado'"
+                                                    :class="decision === 'Aprobado' ? 'bg-emerald-50 border-2 border-emerald-600 shadow-xs' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'"
+                                                    class="p-3 rounded-xl text-left flex items-start gap-3 transition-all">
+                                                <span class="material-symbols-outlined text-emerald-600 text-xl mt-0.5">check_circle</span>
+                                                <div>
+                                                    <span class="text-xs font-bold text-slate-900 dark:text-white block">Dictamen Favorable (Aprobado)</span>
+                                                    <span class="text-[11px] text-slate-500">Cumple integramente los requisitos de admisibilidad.</span>
+                                                </div>
+                                            </button>
+
+                                            <button type="button"
+                                                    @click="decision = 'Observado'"
+                                                    :class="decision === 'Observado' ? 'bg-amber-50 border-2 border-amber-500 shadow-xs' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'"
+                                                    class="p-3 rounded-xl text-left flex items-start gap-3 transition-all">
+                                                <span class="material-symbols-outlined text-amber-600 text-xl mt-0.5">rule</span>
+                                                <div>
+                                                    <span class="text-xs font-bold text-slate-900 dark:text-white block">Observar y Requerir Subsanacion</span>
+                                                    <span class="text-[11px] text-slate-500">Notifica al solicitante plazo de 48h para corregir recaudos.</span>
+                                                </div>
+                                            </button>
+
+                                            <button type="button"
+                                                    @click="decision = 'Rechazado'"
+                                                    :class="decision === 'Rechazado' ? 'bg-rose-50 border-2 border-rose-600 shadow-xs' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'"
+                                                    class="p-3 rounded-xl text-left flex items-start gap-3 transition-all">
+                                                <span class="material-symbols-outlined text-rose-600 text-xl mt-0.5">cancel</span>
+                                                <div>
+                                                    <span class="text-xs font-bold text-slate-900 dark:text-white block">Dictamen Desfavorable (Rechazado)</span>
+                                                    <span class="text-[11px] text-slate-500">Incumplimiento insubsanable de la normativa aplicable vigente.</span>
+                                                </div>
+                                            </button>
+                                        </div>
                                     </div>
-                                </button>
 
-                                <button type="button"
-                                        @click="decision = 'Observado'"
-                                        :class="decision === 'Observado' ? 'bg-amber-50 border-2 border-amber-500 shadow-xs' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'"
-                                        class="p-3 rounded-xl text-left flex items-start gap-3 transition-all">
-                                    <span class="material-symbols-outlined text-amber-600 text-xl mt-0.5">rule</span>
-                                    <div>
-                                        <span class="text-xs font-bold text-slate-900 dark:text-white block">Observar y Requerir Subsanacion</span>
-                                        <span class="text-[11px] text-slate-500">Notifica al solicitante plazo de 48h para corregir recaudos.</span>
+                                    <div x-show="decision === 'Observado' || decision === 'Rechazado'" class="space-y-1.5 pt-2" x-cloak>
+                                        <label class="block text-xs font-semibold text-slate-800 dark:text-slate-200">
+                                            Fundamentacion Juridica / Observacion Tecnica <span class="text-rose-500">*</span>
+                                        </label>
+                                        <textarea name="observaciones[0][detalles]"
+                                                  :disabled="decision === 'Aprobado'"
+                                                  :required="decision === 'Observado' || decision === 'Rechazado'"
+                                                  rows="4"
+                                                  placeholder="Describa con precision los recaudos observados, articulos de la norma aplicable y el plazo conferido para subsanar..."
+                                                  class="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-secondary/20 focus:border-secondary"></textarea>
                                     </div>
-                                </button>
 
-                                <button type="button"
-                                        @click="decision = 'Rechazado'"
-                                        :class="decision === 'Rechazado' ? 'bg-rose-50 border-2 border-rose-600 shadow-xs' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'"
-                                        class="p-3 rounded-xl text-left flex items-start gap-3 transition-all">
-                                    <span class="material-symbols-outlined text-rose-600 text-xl mt-0.5">cancel</span>
-                                    <div>
-                                        <span class="text-xs font-bold text-slate-900 dark:text-white block">Dictamen Desfavorable (Rechazado)</span>
-                                        <span class="text-[11px] text-slate-500">Incumplimiento insubsanable de la normativa aplicable vigente.</span>
+                                    <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-between text-[11px]">
+                                        <span class="flex items-center gap-1.5 text-slate-600 dark:text-slate-300 font-medium">
+                                            <span class="material-symbols-outlined text-secondary text-base">verified_user</span>
+                                            Firma Digital Activa
+                                        </span>
+                                        <span class="font-mono text-emerald-700 font-semibold">Certificado #8941-OK</span>
                                     </div>
-                                </button>
+
+                                    <button type="submit" :disabled="enviandoEval" class="w-full h-11 bg-primary-container hover:bg-[#1a3860] disabled:opacity-50 text-white rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer">
+                                        <span class="material-symbols-outlined text-base">gavel</span>
+                                        <span x-text="enviandoEval ? 'Emitiendo dictamen...' : 'Emitir Dictamen y Sellar Expediente'">Emitir Dictamen y Sellar Expediente</span>
+                                    </button>
+                                </form>
+                            @elseif($estadoSolEval === 'Observado')
+                                <div class="p-4 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-xs text-amber-900 dark:text-amber-200 space-y-1.5">
+                                    <div class="flex items-center gap-2 font-bold">
+                                        <span class="material-symbols-outlined text-amber-600 text-lg">hourglass_top</span>
+                                        <span>Subsanación en curso — Esperando al administrado</span>
+                                    </div>
+                                    <p class="text-[11px] text-amber-800 dark:text-amber-300">
+                                        El expediente tiene observaciones técnicas notificadas y no se pueden emitir nuevos dictámenes hasta que el ciudadano envíe su respuesta o documentos corregidos.
+                                    </p>
+                                </div>
+                            @elseif($estadoSolEval === 'Aprobado')
+                                <div class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-xs text-emerald-900 dark:text-emerald-200 space-y-1.5">
+                                    <div class="flex items-center gap-2 font-bold">
+                                        <span class="material-symbols-outlined text-emerald-600 text-lg">check_circle</span>
+                                        <span>Dictamen Técnico Favorable Emitido</span>
+                                    </div>
+                                    <p class="text-[11px] text-emerald-800 dark:text-emerald-300">
+                                        Este expediente ya fue dictaminado favorablemente por el revisor técnico. Se encuentra a la espera de la firma de Resolución Oficial por el Supervisor.
+                                    </p>
+                                </div>
+                            @elseif($estadoSolEval === 'Rechazado')
+                                <div class="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-xs text-rose-900 dark:text-rose-200 space-y-1.5">
+                                    <div class="flex items-center gap-2 font-bold">
+                                        <span class="material-symbols-outlined text-rose-600 text-lg">cancel</span>
+                                        <span>Dictamen Técnico Desfavorable Emitido</span>
+                                    </div>
+                                    <p class="text-[11px] text-rose-800 dark:text-rose-300">
+                                        El expediente fue dictaminado como no procedente y no presenta subsanaciones pendientes de evaluar.
+                                    </p>
+                                </div>
+                            @endif
+                        @else
+                            <div class="p-4 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-xs text-amber-800 dark:text-amber-300 space-y-1">
+                                <span class="font-bold block">Sin Asignacion Activa</span>
+                                <p class="text-[11px]">Para emitir un dictamen formal, el expediente debe tener asignado al revisor en la Matriz de Cargas.</p>
                             </div>
-                        </div>
-
-                        <div x-show="decision === 'Observado' || decision === 'Rechazado'" class="space-y-1.5 pt-2" x-cloak>
-                            <label class="block text-xs font-semibold text-slate-800 dark:text-slate-200">
-                                Fundamentacion Juridica / Observacion Tecnica <span class="text-rose-500">*</span>
-                            </label>
-                            <textarea name="observaciones[0][detalles]"
-                                      :disabled="decision === 'Aprobado'"
-                                      :required="decision === 'Observado' || decision === 'Rechazado'"
-                                      rows="4"
-                                      placeholder="Describa con precision los recaudos observados, articulos de la norma aplicable y el plazo conferido para subsanar..."
-                                      class="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-secondary/20 focus:border-secondary"></textarea>
-                        </div>
-
-                        <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-between text-[11px]">
-                            <span class="flex items-center gap-1.5 text-slate-600 dark:text-slate-300 font-medium">
-                                <span class="material-symbols-outlined text-secondary text-base">verified_user</span>
-                                Firma Digital Activa
-                            </span>
-                            <span class="font-mono text-emerald-700 font-semibold">Certificado #8941-OK</span>
-                        </div>
-
-                        <button type="submit" class="w-full h-11 bg-primary-container hover:bg-[#1a3860] text-white rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-2 shadow-sm">
-                            <span class="material-symbols-outlined text-base">gavel</span>
-                            <span>Emitir Dictamen y Sellar Expediente</span>
-                        </button>
-                    </form>
-                @else
-                    <div class="p-4 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-xs text-amber-800 dark:text-amber-300 space-y-1">
-                        <span class="font-bold block">Sin Asignacion Activa</span>
-                        <p class="text-[11px]">Para emitir un dictamen formal, el expediente debe tener asignado al revisor en la Matriz de Cargas.</p>
+                        @endif
                     </div>
                 @endif
             </div>

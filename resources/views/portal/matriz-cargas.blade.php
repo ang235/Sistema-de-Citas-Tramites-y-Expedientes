@@ -55,93 +55,79 @@
 </div>
 
 {{-- ═══════════════════════════════════ BANNER CAPACIDAD ══ --}}
-<div class="mb-6 bg-white border border-slate-200/90 rounded-xl p-4 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="mb-6 bg-white dark:bg-[#111f33] border border-slate-200/90 dark:border-slate-800 rounded-xl p-4 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
     <div class="flex items-center gap-3.5">
-        <div class="w-10 h-10 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-700 shrink-0">
+        <div class="w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900 flex items-center justify-center text-blue-700 dark:text-blue-400 shrink-0">
             <span class="material-symbols-outlined text-2xl">speed</span>
         </div>
         <div>
             <div class="flex items-center gap-2">
-                <span class="font-semibold text-sm text-slate-900">Capacidad Global del Equipo al {{ $capacidad ?? 78 }}%</span>
-                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">Umbral Seguro</span>
+                <span class="font-semibold text-sm text-slate-900 dark:text-white">Capacidad Global del Equipo al {{ $capacidadPorcentaje ?? 0 }}%</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold {{ ($capacidadPorcentaje ?? 0) >= 90 ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 border border-rose-200 dark:border-rose-800' : (($capacidadPorcentaje ?? 0) >= 70 ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200 dark:border-amber-800' : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800') }}">
+                    {{ ($capacidadPorcentaje ?? 0) >= 90 ? 'Sobrecarga' : (($capacidadPorcentaje ?? 0) >= 70 ? 'Alerta Media' : 'Umbral Seguro') }}
+                </span>
             </div>
-            <p class="text-xs text-slate-500 mt-0.5">
-                Capacidad nominal: 85 expedientes • <strong class="text-slate-700">{{ $enCurso ?? 66 }} en curso</strong> • {{ 85 - ($enCurso ?? 66) }} cupos disponibles
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Capacidad nominal: {{ $capacidadNominal ?? 0 }} expedientes • <strong class="text-slate-700 dark:text-slate-300">{{ $enCurso ?? 0 }} en curso</strong> • {{ $cuposDisponibles ?? 0 }} cupos disponibles
             </p>
         </div>
     </div>
     <div class="flex items-center gap-3 min-w-[260px]">
-        <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
-            <div class="bg-blue-600 h-full rounded-full transition-all duration-500" style="width: {{ $capacidad ?? 78 }}%"></div>
+        <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2.5 overflow-hidden">
+            <div class="bg-blue-600 h-full rounded-full transition-all duration-500" style="width: {{ $capacidadPorcentaje ?? 0 }}%"></div>
         </div>
-        <span class="font-bold text-xs text-slate-700 shrink-0">{{ $enCurso ?? 66 }} / 85</span>
+        <span class="font-bold text-xs text-slate-700 dark:text-slate-300 shrink-0">{{ $enCurso ?? 0 }} / {{ $capacidadNominal ?? 0 }}</span>
     </div>
 </div>
 
 {{-- ═══════════════════════════════════ KPIs ══ --}}
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-    <div class="bg-white rounded-xl border border-slate-200/90 p-4 shadow-xs flex flex-col justify-between hover:border-slate-300 transition-all">
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+    <div class="bg-white dark:bg-[#111f33] rounded-xl border border-slate-200/90 dark:border-slate-800 p-4 shadow-xs flex flex-col justify-between hover:border-slate-300 transition-all">
         <div class="flex items-center justify-between">
-            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Revisores Activos</span>
-            <div class="w-8 h-8 rounded-lg bg-slate-100 text-blue-700 flex items-center justify-center">
+            <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Revisores Activos</span>
+            <div class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-blue-700 dark:text-blue-400 flex items-center justify-center">
                 <span class="material-symbols-outlined text-lg">badge</span>
             </div>
         </div>
         <div class="mt-3 flex items-baseline gap-2">
-            <span class="font-bold text-2xl text-slate-900">{{ $kpis['revisores_activos'] ?? 8 }}</span>
-            <span class="text-xs text-slate-500">/ 10 asignados</span>
+            <span class="font-bold text-2xl text-slate-900 dark:text-white">{{ $kpis['revisores_con_carga'] ?? 0 }}</span>
+            <span class="text-xs text-slate-500 dark:text-slate-400">/ {{ $kpis['revisores_totales'] ?? 0 }} registrados</span>
         </div>
-        <div class="flex items-center gap-2 text-[11px] text-emerald-600 mt-2">
+        <div class="flex items-center gap-2 text-[11px] text-emerald-600 dark:text-emerald-400 mt-2">
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-            <span>2 en modo supervisión</span>
+            <span>{{ $kpis['supervisores_totales'] ?? 0 }} en supervisión</span>
         </div>
     </div>
 
-    <div class="bg-white rounded-xl border border-slate-200/90 p-4 shadow-xs flex flex-col justify-between hover:border-slate-300 transition-all">
+    <div class="bg-white dark:bg-[#111f33] rounded-xl border border-slate-200/90 dark:border-slate-800 p-4 shadow-xs flex flex-col justify-between hover:border-slate-300 transition-all">
         <div class="flex items-center justify-between">
-            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Expedientes en Cola</span>
-            <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center">
+            <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Expedientes en Cola</span>
+            <div class="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 flex items-center justify-center">
                 <span class="material-symbols-outlined text-lg">inbox</span>
             </div>
         </div>
         <div class="mt-3 flex items-baseline gap-2">
-            <span class="font-bold text-2xl text-amber-700">{{ $kpis['en_cola'] ?? 24 }}</span>
+            <span class="font-bold text-2xl text-amber-700 dark:text-amber-400">{{ $kpis['en_cola'] ?? 0 }}</span>
         </div>
-        <div class="flex items-center gap-2 text-[11px] text-rose-600 mt-2">
-            <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-            <span>{{ $kpis['criticos'] ?? 3 }} críticos (&lt;4h SLA)</span>
+        <div class="flex items-center gap-2 text-[11px] {{ ($kpis['criticos'] ?? 0) > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-400' }} mt-2">
+            <span class="w-1.5 h-1.5 rounded-full {{ ($kpis['criticos'] ?? 0) > 0 ? 'bg-rose-500' : 'bg-slate-400' }}"></span>
+            <span>{{ $kpis['criticos'] ?? 0 }} críticos (&gt;3 días sin asignar)</span>
         </div>
     </div>
 
-    <div class="bg-white rounded-xl border border-slate-200/90 p-4 shadow-xs flex flex-col justify-between hover:border-slate-300 transition-all">
+    <div class="bg-white dark:bg-[#111f33] rounded-xl border border-slate-200/90 dark:border-slate-800 p-4 shadow-xs flex flex-col justify-between hover:border-slate-300 transition-all">
         <div class="flex items-center justify-between">
-            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Tiempo Promedio Dictamen</span>
-            <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center">
+            <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Tiempo Promedio Dictamen</span>
+            <div class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 flex items-center justify-center">
                 <span class="material-symbols-outlined text-lg">timer</span>
             </div>
         </div>
         <div class="mt-3 flex items-baseline gap-2">
-            <span class="font-bold text-2xl text-slate-900">{{ $kpis['tiempo_promedio'] ?? '5h 20m' }}</span>
+            <span class="font-bold text-2xl text-slate-900 dark:text-white">{{ $kpis['tiempo_promedio'] ?? 'Sin registros' }}</span>
         </div>
-        <div class="flex items-center gap-2 text-[11px] text-slate-500 mt-2">
-            <span class="material-symbols-outlined text-xs">trending_down</span>
-            <span>-18 min vs. ayer</span>
-        </div>
-    </div>
-
-    <div class="bg-white rounded-xl border border-slate-200/90 p-4 shadow-xs flex flex-col justify-between hover:border-slate-300 transition-all">
-        <div class="flex items-center justify-between">
-            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Cumplimiento SLA</span>
-            <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center">
-                <span class="material-symbols-outlined text-lg">verified</span>
-            </div>
-        </div>
-        <div class="mt-3 flex items-baseline gap-2">
-            <span class="font-bold text-2xl text-emerald-700">{{ $kpis['cumplimiento_sla'] ?? '94.2' }}%</span>
-        </div>
-        <div class="flex items-center gap-2 text-[11px] text-emerald-600 mt-2">
-            <span class="material-symbols-outlined text-xs">trending_up</span>
-            <span>+2.1% esta semana</span>
+        <div class="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 mt-2">
+            <span class="material-symbols-outlined text-xs">history_edu</span>
+            <span>{{ $kpis['total_dictaminados'] ?? 0 }} dictámenes formalizados</span>
         </div>
     </div>
 </div>
@@ -179,19 +165,16 @@
                     <th class="py-3 px-6">Revisor Técnico</th>
                     <th class="py-3 px-4">Nivel / Rol</th>
                     <th class="py-3 px-4">Expedientes Asignados</th>
-                    <th class="py-3 px-4">Capacidad Usada</th>
-                    <th class="py-3 px-4">SLA Promedio</th>
                     <th class="py-3 px-4">Estado</th>
-                    <th class="py-3 px-4 text-right">Acción</th>
+                    @if(auth()->check() && auth()->user()->esSupervisor())
+                        <th class="py-3 px-4 text-right">Acción</th>
+                    @endif
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 text-slate-700">
                 @forelse ($revisores ?? [] as $revisor)
                     @php
-                        $asignados = $revisor->asignaciones_count ?? 0;
-                        $capacidadMax = 10;
-                        $pct = min(100, round($asignados / $capacidadMax * 100));
-                        $barColor = $pct >= 90 ? 'bg-rose-500' : ($pct >= 70 ? 'bg-amber-500' : 'bg-blue-600');
+                        $asignados = $revisor->asignaciones_activas_count ?? $revisor->asignaciones_count ?? 0;
                     @endphp
                     <tr class="hover:bg-slate-50 transition-colors">
                         <td class="py-3.5 px-6">
@@ -207,80 +190,39 @@
                         </td>
                         <td class="py-3.5 px-4">
                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">
-                                {{ $revisor->Rol ?? 'Revisor L1' }}
+                                {{ $revisor->role_label }}
                             </span>
                         </td>
-                        <td class="py-3.5 px-4 font-bold text-[#0b1c30]">{{ $asignados }}</td>
-                        <td class="py-3.5 px-4">
-                            <div class="flex items-center gap-2 min-w-[100px]">
-                                <div class="w-20 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                                    <div class="{{ $barColor }} h-full rounded-full transition-all" style="width: {{ $pct }}%"></div>
-                                </div>
-                                <span class="text-[11px] text-slate-500 shrink-0">{{ $pct }}%</span>
-                            </div>
+                        <td class="py-3.5 px-4 font-bold text-slate-900 dark:text-white text-sm">
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold {{ $asignados > 0 ? 'bg-blue-50 dark:bg-blue-950/40 text-[#0051d5] dark:text-blue-400 border border-blue-200 dark:border-blue-800' : 'bg-slate-100 dark:bg-slate-800 text-slate-500' }}">
+                                {{ $asignados }}
+                            </span>
                         </td>
-                        <td class="py-3.5 px-4 text-slate-600">—</td>
                         <td class="py-3.5 px-4">
                             <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700">
                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                                 Activo
                             </span>
                         </td>
-                        <td class="py-3.5 px-4 text-right">
-                            <button type="button"
-                                    @click="showAssignModal = true; selectedRevisorId = {{ $revisor->ID_Usuarios }}; selectedRevisorName = '{{ addslashes($revisor->Nombre) }}';"
-                                    class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 text-[11px] font-semibold transition-colors cursor-pointer">
-                                <span class="material-symbols-outlined text-xs">add_task</span>
-                                Asignar
-                            </button>
-                        </td>
-                    </tr>
-                @empty
-                    {{-- Filas de demostración --}}
-                    @foreach([
-                        ['AR','Arturo Salas García','Revisor L2','8','80'],
-                        ['CG','Carmen González Ruiz','Revisor L1','6','60'],
-                        ['MH','Miguel Herrera Vega','Revisor L2','9','90'],
-                        ['LP','Lorena Parra Díaz','Supervisor L2','4','40'],
-                    ] as $r)
-                        @php
-                            $pct = (int)$r[4];
-                            $barColor = $pct >= 90 ? 'bg-rose-500' : ($pct >= 70 ? 'bg-amber-500' : 'bg-blue-600');
-                        @endphp
-                        <tr class="hover:bg-slate-50 transition-colors">
-                            <td class="py-3.5 px-6">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded-full bg-[#0f2744] text-white flex items-center justify-center font-bold text-xs shrink-0">{{ $r[0] }}</div>
-                                    <span class="font-semibold text-[#0b1c30] text-xs">{{ $r[1] }}</span>
-                                </div>
-                            </td>
-                            <td class="py-3.5 px-4">
-                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">{{ $r[2] }}</span>
-                            </td>
-                            <td class="py-3.5 px-4 font-bold text-[#0b1c30]">{{ $r[3] }}</td>
-                            <td class="py-3.5 px-4">
-                                <div class="flex items-center gap-2 min-w-[100px]">
-                                    <div class="w-20 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                                        <div class="{{ $barColor }} h-full rounded-full" style="width: {{ $pct }}%"></div>
-                                    </div>
-                                    <span class="text-[11px] text-slate-500">{{ $pct }}%</span>
-                                </div>
-                            </td>
-                            <td class="py-3.5 px-4 text-slate-500">5h 20m</td>
-                            <td class="py-3.5 px-4">
-                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                    Activo
-                                </span>
-                            </td>
+                        @if(auth()->check() && auth()->user()->esSupervisor())
                             <td class="py-3.5 px-4 text-right">
-                                <button class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 text-[11px] font-semibold transition-colors">
+                                <button type="button"
+                                        @click="showAssignModal = true; selectedRevisorId = {{ $revisor->ID_Usuarios }}; selectedRevisorName = '{{ addslashes($revisor->Nombre) }}';"
+                                        class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 text-[11px] font-semibold transition-colors cursor-pointer">
                                     <span class="material-symbols-outlined text-xs">add_task</span>
                                     Asignar
                                 </button>
                             </td>
-                        </tr>
-                    @endforeach
+                        @endif
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="{{ (auth()->check() && auth()->user()->esSupervisor()) ? 5 : 4 }}" class="py-12 text-center text-slate-400">
+                            <span class="material-symbols-outlined text-4xl block mb-2 text-slate-300">group_off</span>
+                            <p class="font-semibold text-slate-700 text-sm">No hay revisores técnicos registrados aún</p>
+                            <p class="text-xs text-slate-400 mt-1">Cree usuarios con rol de Revisor Técnico desde la Gestión de Usuarios para comenzar la asignación.</p>
+                        </td>
+                    </tr>
                 @endforelse
             </tbody>
         </table>
@@ -288,7 +230,7 @@
 
     {{-- Paginación --}}
     <div class="px-6 py-4 border-t border-slate-100 flex items-center justify-between">
-        <span class="text-xs text-slate-500">Mostrando {{ isset($revisores) ? $revisores->count() : 4 }} revisores</span>
+        <span class="text-xs text-slate-500">Mostrando {{ isset($revisores) ? $revisores->count() : 0 }} revisores</span>
         <div class="flex items-center gap-2">
             @if(isset($revisores) && $revisores instanceof \Illuminate\Pagination\LengthAwarePaginator)
                 {{ $revisores->links() }}

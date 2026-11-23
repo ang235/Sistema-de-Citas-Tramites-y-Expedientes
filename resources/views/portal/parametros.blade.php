@@ -51,6 +51,11 @@
             </div>
         </div>
         <div class="flex items-center flex-wrap gap-2.5 self-start lg:self-center">
+            <a href="{{ route('portal.parametros', ['tab' => 'versiones']) }}"
+               class="px-4 py-2 rounded-lg {{ ($tab ?? 'activos') === 'versiones' ? 'bg-purple-700 text-white' : 'bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200' }} font-semibold text-xs flex items-center gap-1.5 shadow-xs transition-all cursor-pointer">
+                <span class="material-symbols-outlined text-base">history_edu</span>
+                <span>Historial de Versiones</span>
+            </a>
             <button type="button"
                     @click="showNewTramiteModal = true"
                     class="px-4 py-2 rounded-lg bg-[#001229] hover:bg-[#0f2744] text-white font-semibold text-xs flex items-center gap-1.5 shadow-sm hover:shadow transition-all cursor-pointer">
@@ -76,18 +81,19 @@
         </div>
     </div>
 
-    <div class="bg-white p-4 rounded-xl border border-slate-200/90 shadow-xs flex items-center justify-between hover:border-slate-300 transition-all">
+    <a href="{{ route('portal.parametros', ['tab' => 'versiones']) }}"
+       class="bg-white p-4 rounded-xl border {{ ($tab ?? 'activos') === 'versiones' ? 'border-purple-400 ring-2 ring-purple-100' : 'border-slate-200/90' }} shadow-xs flex items-center justify-between hover:border-purple-400 hover:shadow-xs transition-all group cursor-pointer">
         <div class="flex flex-col">
-            <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Versiones Activas</span>
+            <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider group-hover:text-purple-700 transition-colors">Historial de Versiones</span>
             <div class="flex items-baseline gap-2 mt-1">
                 <span class="text-2xl font-bold text-emerald-700">{{ $kpis['versiones_activas'] ?? 12 }}</span>
-                <span class="text-xs text-emerald-600">vigentes</span>
+                <span class="text-xs text-purple-600 font-semibold group-hover:underline">Ver todas ({{ $totalVersiones ?? 0 }}) →</span>
             </div>
         </div>
-        <div class="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
-            <span class="material-symbols-outlined text-lg">verified</span>
+        <div class="w-9 h-9 rounded-lg bg-purple-50 text-purple-700 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-lg">history_edu</span>
         </div>
-    </div>
+    </a>
 
     <div class="bg-white p-4 rounded-xl border border-slate-200/90 shadow-xs flex items-center justify-between hover:border-slate-300 transition-all">
         <div class="flex flex-col">

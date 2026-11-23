@@ -84,6 +84,10 @@ class ExpedienteCiudadanoController extends Controller
             abort(403, 'No tiene autorización para solventar este expediente.');
         }
 
+        if ($solicitud->Estado_Solicitud === 'Rechazado' || $solicitud->documentos->where('Estado_Doc', 'Rechazado')->isNotEmpty()) {
+            return back()->with('error', 'El expediente ha sido rechazado. Para volver a intentar debe comenzar de nuevo el trámite creando otro expediente.');
+        }
+
         DB::transaction(function () use ($request, $observacion, $solicitud): void {
             $idVersionDoc = null;
 
@@ -117,15 +121,13 @@ class ExpedienteCiudadanoController extends Controller
 
             $observacion->update(['Estado_Obs' => 'Subsanada']);
 
-            // Si no quedan más observaciones abiertas en la solicitud, regresa a estado 'En_Revision'
-            $otrasObsAbiertas = Observacion::whereHas('revision.asignacion', fn ($q) => $q->where('ID_Solicitud', $solicitud->ID_Solicitud))
+            // Marcar todas las observaciones abiertas de este expediente como subsanadas
+            Observacion::whereHas('revision.asignacion', fn ($q) => $q->where('ID_Solicitud', $solicitud->ID_Solicitud))
                 ->where('Estado_Obs', 'Abierta')
-                ->where('ID_Observacion', '!=', $observacion->ID_Observacion)
-                ->exists();
+                ->update(['Estado_Obs' => 'Subsanada']);
 
-            if (! $otrasObsAbiertas && $solicitud->Estado_Solicitud === 'Observado') {
-                $solicitud->update(['Estado_Solicitud' => 'En_Revision']);
-            }
+            // El expediente pasa a revisión técnica y se oculta el formulario de subsanación
+            $solicitud->update(['Estado_Solicitud' => 'En_Revision']);
 
             Bitacora::create([
                 'ID_Usuarios' => (int) Auth::id(),

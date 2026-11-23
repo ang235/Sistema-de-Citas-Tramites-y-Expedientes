@@ -1,4 +1,4 @@
-**<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full scroll-smooth">
 <head>
     <meta charset="utf-8" />
@@ -54,7 +54,7 @@
     </script>
 
     <style>
-        /* ── Estilos para Sidebar en formato Botones de Lista con Colores ── */
+        /* ── Estilos para Sidebar en formato Botones de Lista con Colores (Adaptativo a Modo Claro y Oscuro) ── */
         .sidebar-btn-item {
             display: flex;
             align-items: center;
@@ -63,26 +63,53 @@
             border-radius: 0.75rem;
             font-size: 13px;
             font-weight: 500;
-            color: #cbd5e1;
-            background-color: rgba(15, 29, 46, 0.7);
-            border: 1px solid rgba(51, 65, 85, 0.55);
+            color: #334155;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
             text-decoration: none;
             transition: all 160ms cubic-bezier(0.4, 0, 0.2, 1);
             margin-bottom: 0.35rem;
         }
         .sidebar-btn-item:hover {
+            background-color: #f1f5f9;
+            border-color: #cbd5e1;
+            color: #0f172a;
+            transform: translateX(2px);
+        }
+        .sidebar-btn-item.active {
+            background: linear-gradient(135deg, #0051d5 0%, #1d4ed8 100%) !important;
+            border-color: #3b82f6 !important;
+            color: #ffffff !important;
+            font-weight: 600;
+            box-shadow: 0 4px 14px rgba(0, 81, 213, 0.35);
+        }
+        .sidebar-btn-item.active .sidebar-btn-icon {
+            background-color: rgba(255, 255, 255, 0.2) !important;
+            color: #ffffff !important;
+            border-color: rgba(255, 255, 255, 0.3) !important;
+        }
+        .sidebar-btn-item.active span {
+            color: #ffffff !important;
+        }
+
+        /* ── En Modo Oscuro (html.dark) ── */
+        html.dark .sidebar-btn-item {
+            color: #cbd5e1;
+            background-color: rgba(15, 29, 46, 0.7);
+            border: 1px solid rgba(51, 65, 85, 0.55);
+        }
+        html.dark .sidebar-btn-item:hover {
             background-color: rgba(26, 44, 69, 0.95);
             border-color: rgba(96, 165, 250, 0.4);
             color: #ffffff;
             transform: translateX(2px);
         }
-        .sidebar-btn-item.active {
-            background: linear-gradient(135deg, #0051d5 0%, #1d4ed8 100%);
-            border-color: rgba(147, 197, 253, 0.5);
-            color: #ffffff;
-            font-weight: 600;
-            box-shadow: 0 4px 14px rgba(0, 81, 213, 0.35);
+        html.dark .sidebar-btn-item.active {
+            background: linear-gradient(135deg, #0051d5 0%, #1d4ed8 100%) !important;
+            border-color: rgba(147, 197, 253, 0.5) !important;
+            color: #ffffff !important;
         }
+
         .sidebar-btn-icon {
             width: 1.85rem;
             height: 1.85rem;
@@ -95,6 +122,40 @@
         }
         .sidebar-btn-item:hover .sidebar-btn-icon {
             transform: scale(1.08);
+        }
+
+        /* Contraste de iconos en modo claro */
+        html:not(.dark) .sidebar-btn-icon {
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+            border-color: rgba(0, 0, 0, 0.08) !important;
+        }
+        html:not(.dark) .sidebar-btn-icon.text-blue-300,
+        html:not(.dark) .sidebar-btn-icon .text-blue-300 { color: #1d4ed8 !important; }
+        html:not(.dark) .sidebar-btn-icon.text-sky-300,
+        html:not(.dark) .sidebar-btn-icon .text-sky-300 { color: #0284c7 !important; }
+        html:not(.dark) .sidebar-btn-icon.text-rose-300,
+        html:not(.dark) .sidebar-btn-icon .text-rose-300 { color: #e11d48 !important; }
+        html:not(.dark) .sidebar-btn-icon.text-purple-300,
+        html:not(.dark) .sidebar-btn-icon .text-purple-300 { color: #7e22ce !important; }
+        html:not(.dark) .sidebar-btn-icon.text-indigo-300,
+        html:not(.dark) .sidebar-btn-icon .text-indigo-300 { color: #4338ca !important; }
+        html:not(.dark) .sidebar-btn-icon.text-teal-300,
+        html:not(.dark) .sidebar-btn-icon .text-teal-300 { color: #0f766e !important; }
+        html:not(.dark) .sidebar-btn-icon.text-amber-300,
+        html:not(.dark) .sidebar-btn-icon .text-amber-300 { color: #b45309 !important; }
+
+        /* ── Alternancia Fiable del Botón Modo Oscuro / Claro ── */
+        html:not(.dark) .theme-toggle-dark {
+            display: inline-flex !important;
+        }
+        html:not(.dark) .theme-toggle-light {
+            display: none !important;
+        }
+        html.dark .theme-toggle-dark {
+            display: none !important;
+        }
+        html.dark .theme-toggle-light {
+            display: inline-flex !important;
         }
 
         /* ── Scrollbars Visibles y Elegantes ── */
@@ -275,41 +336,41 @@
 
     {{-- ════════════════════════════════════════════════════════ SIDEBAR ═════════ --}}
     <aside id="sidebar"
-           class="fixed inset-y-0 left-0 z-50 flex flex-col h-full w-64 bg-[#0a1626] border-r border-slate-800 text-slate-200 transition-transform duration-300 -translate-x-full lg:translate-x-0 lg:static lg:flex-shrink-0"
+           class="fixed inset-y-0 left-0 z-50 flex flex-col h-full w-64 bg-white dark:bg-[#0a1626] border-r border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 transition-transform duration-300 -translate-x-full lg:translate-x-0 lg:static lg:flex-shrink-0 shadow-lg lg:shadow-none"
            aria-label="Panel de navegación">
 
         {{-- Logo & Contexto operativo --}}
-        <div class="px-4 py-4 shrink-0 border-b border-slate-800/80 bg-[#08121f]">
+        <div class="px-4 py-4 shrink-0 border-b border-slate-200 dark:border-slate-800/80 bg-slate-50 dark:bg-[#08121f]">
             <div class="flex items-center justify-between gap-2 mb-3">
                 <div class="flex items-center gap-3 min-w-0">
-                    <div class="w-10 h-10 rounded-xl bg-white/10 p-1 flex items-center justify-center shrink-0 border border-white/20">
+                    <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-white/10 p-1 flex items-center justify-center shrink-0 border border-blue-200/80 dark:border-white/20">
                         <img src="{{ asset('images/logo.png') }}" alt="Logo SETC" class="h-8 w-auto object-contain">
                     </div>
                     <div class="flex flex-col leading-tight min-w-0">
                         <div class="flex items-center gap-1.5">
-                            <span class="text-white font-bold text-base tracking-tight" style="font-family: var(--font-display);">S.E.T.C.</span>
+                            <span class="text-slate-900 dark:text-white font-bold text-base tracking-tight" style="font-family: var(--font-display);">S.E.T.C.</span>
                             <span class="px-1.5 py-0.5 rounded text-white font-bold text-[9px] bg-[#0051d5] tracking-wider">ENTERPRISE</span>
                         </div>
-                        <span class="text-[11px] truncate text-slate-400 font-medium">Expedientes, Trámites y Citas</span>
+                        <span class="text-[11px] truncate text-slate-500 dark:text-slate-400 font-medium">Expedientes, Trámites y Citas</span>
                     </div>
                 </div>
                 {{-- Botón cerrar sidebar en móvil --}}
-                <button type="button" onclick="toggleSidebar()" class="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors shrink-0" aria-label="Cerrar menú">
+                <button type="button" onclick="toggleSidebar()" class="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors shrink-0 cursor-pointer" aria-label="Cerrar menú">
                     <span class="material-symbols-outlined text-xl">close</span>
                 </button>
             </div>
 
             {{-- Identidad Institucional --}}
-            <div class="px-3 py-2 rounded-xl bg-slate-900/80 border border-slate-800">
+            <div class="px-3 py-2 rounded-xl bg-slate-100/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800">
                 <div class="flex items-center justify-between mb-1">
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Identidad Institucional</span>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Identidad Institucional</span>
                     <div class="flex items-center gap-1">
-                        <div class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></div>
-                        <span class="text-[10px] text-emerald-300 font-semibold">Oficial</span>
+                        <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                        <span class="text-[10px] text-emerald-600 dark:text-emerald-300 font-semibold">Oficial</span>
                     </div>
                 </div>
-                <div class="flex items-center gap-1.5 text-white text-xs">
-                    <span class="material-symbols-outlined text-sm text-blue-400">verified</span>
+                <div class="flex items-center gap-1.5 text-slate-800 dark:text-white text-xs">
+                    <span class="material-symbols-outlined text-sm text-[#0051d5] dark:text-blue-400">verified</span>
                     <span class="font-medium truncate">{{ auth()->user()->role_label ?? 'Personal Institucional' }}</span>
                 </div>
             </div>
@@ -357,11 +418,19 @@
                     </a>
 
                     <a href="{{ route('portal.parametros') }}"
-                       class="sidebar-btn-item {{ Request::routeIs('portal.parametros*') ? 'active' : '' }}">
+                       class="sidebar-btn-item {{ Request::routeIs('portal.parametros*') && request('tab') !== 'versiones' ? 'active' : '' }}">
                         <div class="sidebar-btn-icon bg-rose-500/20 text-rose-300 border border-rose-400/20">
                             <span class="material-symbols-outlined text-base">tune</span>
                         </div>
                         <span class="flex-1 truncate">Gestion de tramites y requisitos</span>
+                    </a>
+
+                    <a href="{{ route('portal.parametros', ['tab' => 'versiones']) }}"
+                       class="sidebar-btn-item {{ Request::routeIs('portal.parametros*') && request('tab') === 'versiones' ? 'active' : '' }}">
+                        <div class="sidebar-btn-icon bg-purple-500/20 text-purple-300 border border-purple-400/20">
+                            <span class="material-symbols-outlined text-base">history_edu</span>
+                        </div>
+                        <span class="flex-1 truncate">Historial de Versiones</span>
                     </a>
 
                     <a href="{{ route('portal.auditoria') }}"
@@ -376,14 +445,6 @@
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
                         Control Operativo
                     </div>
-
-                    <a href="{{ route('portal.matriz-cargas') }}"
-                       class="sidebar-btn-item {{ Request::routeIs('portal.matriz-cargas*') ? 'active' : '' }}">
-                        <div class="sidebar-btn-icon bg-indigo-500/20 text-indigo-300 border border-indigo-400/20">
-                            <span class="material-symbols-outlined text-base">balance</span>
-                        </div>
-                        <span class="flex-1 truncate">Matriz de Cargas</span>
-                    </a>
 
                     <a href="{{ route('portal.citas') }}"
                        class="sidebar-btn-item {{ Request::routeIs('portal.citas*') ? 'active' : '' }}">
@@ -492,18 +553,18 @@
         </nav>
 
         {{-- Usuario actual e interactividad de sesión (pie del sidebar) --}}
-        <div class="shrink-0 px-3 py-3 border-t border-slate-800 bg-[#08121f]" x-data="{ openUser: false }">
+        <div class="shrink-0 px-3 py-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#08121f]" x-data="{ openUser: false }">
             <div class="relative">
                 <div @click="openUser = !openUser"
-                     class="flex items-center gap-2.5 p-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 transition-all cursor-pointer group">
+                     class="flex items-center gap-2.5 p-2 rounded-xl bg-white dark:bg-slate-900/90 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-all cursor-pointer group">
                     <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-xs shrink-0 bg-[#0051d5] group-hover:scale-105 transition-transform">
                         {{ strtoupper(substr(auth()->user()->Nombre ?? auth()->user()->name ?? 'U', 0, 1)) }}
                     </div>
                     <div class="flex-1 min-w-0">
-                        <p class="text-white font-semibold truncate text-xs group-hover:text-blue-300 transition-colors">
+                        <p class="text-slate-900 dark:text-white font-semibold truncate text-xs group-hover:text-blue-600 dark:group-hover:text-blue-300 transition-colors">
                             {{ auth()->user()->Nombre ?? auth()->user()->name ?? 'Usuario' }}
                         </p>
-                        <p class="truncate text-[10px] text-slate-400">
+                        <p class="truncate text-[10px] text-slate-500 dark:text-slate-400">
                             {{ auth()->user()->role_label ?? 'Personal SETC' }}
                         </p>
                     </div>
@@ -512,7 +573,7 @@
                     <form method="POST" action="{{ route('logout') }}" @click.stop class="shrink-0">
                         @csrf
                         <button type="submit"
-                                class="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                                class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors cursor-pointer"
                                 title="Cerrar Sesión Inmediatamente">
                             <span class="material-symbols-outlined text-base">logout</span>
                         </button>
@@ -528,17 +589,17 @@
                      x-transition:leave="transition ease-in duration-100"
                      x-transition:leave-start="opacity-100 translate-y-0 scale-100"
                      x-transition:leave-end="opacity-0 translate-y-2 scale-95"
-                     class="absolute bottom-full mb-2 left-0 right-0 bg-[#0c1a2e] border border-slate-700/80 rounded-xl shadow-2xl p-2 z-50 text-slate-200"
+                     class="absolute bottom-full mb-2 left-0 right-0 bg-white dark:bg-[#0c1a2e] border border-slate-200 dark:border-slate-700/80 rounded-xl shadow-2xl p-2 z-50 text-slate-800 dark:text-slate-200"
                      style="display: none;">
-                    <div class="px-2.5 py-1.5 border-b border-slate-800 mb-1">
+                    <div class="px-2.5 py-1.5 border-b border-slate-100 dark:border-slate-800 mb-1">
                         <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Sesión Institucional</span>
-                        <p class="text-xs font-semibold text-white truncate">{{ auth()->user()->Email ?? auth()->user()->email }}</p>
-                        <span class="text-[10px] text-emerald-400 font-medium block mt-0.5">{{ auth()->user()->role_label }}</span>
+                        <p class="text-xs font-semibold text-slate-900 dark:text-white truncate">{{ auth()->user()->Email ?? auth()->user()->email }}</p>
+                        <span class="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium block mt-0.5">{{ auth()->user()->role_label }}</span>
                     </div>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit"
-                                class="w-full flex items-center gap-2 px-2.5 py-2 text-xs font-semibold text-rose-400 hover:bg-rose-500/15 rounded-lg transition-colors cursor-pointer text-left">
+                                class="w-full flex items-center gap-2 px-2.5 py-2 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/15 rounded-lg transition-colors cursor-pointer text-left">
                             <span class="material-symbols-outlined text-base">logout</span>
                             <span>Cerrar Sesión</span>
                         </button>
@@ -607,11 +668,11 @@
                 {{-- BOTÓN MODO OSCURO / CLARO --}}
                 <button type="button"
                         onclick="toggleDarkMode()"
-                        class="p-1.5 sm:p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shrink-0"
+                        class="p-1.5 sm:p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shrink-0 cursor-pointer flex items-center justify-center"
                         title="Alternar Modo Oscuro / Claro"
                         aria-label="Alternar Modo Oscuro">
-                    <span class="material-symbols-outlined block dark:hidden text-amber-500 text-xl">dark_mode</span>
-                    <span class="material-symbols-outlined hidden dark:block text-yellow-300 text-xl">light_mode</span>
+                    <span class="material-symbols-outlined theme-toggle-dark text-slate-700 dark:text-slate-200 text-xl">dark_mode</span>
+                    <span class="material-symbols-outlined theme-toggle-light text-amber-400 text-xl">light_mode</span>
                 </button>
 
                 {{-- Notificaciones con Dropdown --}}

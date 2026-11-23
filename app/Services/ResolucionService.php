@@ -34,7 +34,7 @@ class ResolucionService
             throw new AuthorizationException('Solo un usuario con rol de Supervisor o Administrador puede emitir resoluciones finales.');
         }
 
-        $tiposValidos = ['Aprobada', 'Rechazada', 'Improcedente', 'Concluida'];
+        $tiposValidos = ['Aprobada', 'Rechazada', 'Improcedente', 'Concluida', 'Favorable', 'Desfavorable', 'Inadmisible', 'Cancelada'];
         if (! in_array($tipoResolucion, $tiposValidos, true)) {
             throw new DomainException(sprintf(
                 'Tipo de resolución "%s" inválido. Tipos permitidos: %s',
@@ -53,8 +53,8 @@ class ResolucionService
 
             // Sincronizar el estado del expediente con la resolución emitida
             $nuevoEstado = match ($tipoResolucion) {
-                'Aprobada', 'Concluida' => 'Aprobado',
-                'Rechazada', 'Improcedente' => 'Rechazado',
+                'Aprobada', 'Concluida', 'Favorable' => 'Aprobado',
+                'Rechazada', 'Improcedente', 'Desfavorable', 'Inadmisible', 'Cancelada' => 'Rechazado',
                 default => 'Concluido',
             };
             $solicitud->update(['Estado_Solicitud' => $nuevoEstado]);

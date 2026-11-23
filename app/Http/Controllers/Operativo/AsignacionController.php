@@ -11,6 +11,7 @@ use App\Models\Bitacora;
 use App\Models\Revision;
 use App\Models\Solicitud;
 use App\Models\Usuario;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -23,7 +24,11 @@ class AsignacionController extends Controller
     {
         /** @var Usuario|null $currentUser */
         $currentUser = Auth::user();
-        if (! $currentUser || ! ($currentUser->esSupervisor() || $currentUser->esAdministrador())) {
+        if (! $currentUser || ! $currentUser->esSupervisor()) {
+            if ($currentUser?->esAdministrador()) {
+                return redirect()->route('portal.dashboard');
+            }
+
             if ($currentUser?->esRevisor()) {
                 return redirect()->route('portal.revisor-dashboard');
             }
@@ -54,18 +59,156 @@ class AsignacionController extends Controller
                         ->orWhere('Email', 'like', "%{$term}%");
                 });
             })
-            ->withCount('asignacionesComoRevisor')
+            ->withCount([
+                'asignacionesComoRevisor as asignaciones_count',
+                'asignacionesComoRevisor as asignaciones_activas_count' => function ($q): void {
+                    $q->where('Estado_Asignacion', 'Activo')->orWhereNull('Estado_Asignacion');
+                },
+            ])
             ->get();
 
-        $enCurso = AsignacionRevisor::whereHas('revisiones', function ($q): void {
-            $q->where('Resultado', 'En Revisión');
-        })->count();
+        // 1. Revisores y Supervisores reales
+        $totalRevisores = Usuario::whereHas('roles', fn ($q) => $q->where('Nombre', 'like', '%Revisor%'))->count();
+        $revisoresConCarga = Usuario::whereHas('roles', fn ($q) => $q->where('Nombre', 'like', '%Revisor%'))
+            ->whereHas('asignacionesComoRevisor', fn ($q) => $q->where('Estado_Asignacion', 'Activo')->orWhereNull('Estado_Asignacion'))
+            ->count();
+        $totalSupervisores = Usuario::whereHas('roles', fn ($q) => $q->where('Nombre', 'like', '%Supervisor%'))->count();
+
+        // 2. Expedientes en Cola y Críticos (>3 días sin asignar)
+        $enCola = Solicitud::doesntHave('asignaciones')->count();
+        $criticos = Solicitud::doesntHave('asignaciones')
+            ->where('Fecha_Creacion_Solicitud', '<=', now()->subDays(3))
+            ->count();
+
+        // 3. Tiempos promedio de dictamen a partir de revisiones formalizadas
+        $revisionesConcluidas = Revision::whereIn('Resultado', ['Aprobado', 'Rechazado', 'Observado'])
+            ->whereNotNull('Fecha_Revision')
+            ->with('asignacion')
+            ->get();
+
+        $minutosTotales = 0;
+        $conteoRevisiones = 0;
+        $enPlazoSLA = 0;
+
+        foreach ($revisionesConcluidas as $rev) {
+            if ($rev->asignacion && $rev->asignacion->Fecha_Asignacion) {
+                $inicio = Carbon::parse($rev->asignacion->Fecha_Asignacion);
+                $fin = Carbon::parse($rev->Fecha_Revision);
+                $diff = max(1, $fin->diffInMinutes($inicio));
+                $minutosTotales += $diff;
+                $conteoRevisiones++;
+
+                if ($fin->diffInDays($inicio) <= 5) {
+                    $enPlazoSLA++;
+                }
+            }
+        }
+
+        $tiempoPromedioTexto = 'Sin registros';
+        if ($conteoRevisiones > 0) {
+            $promMinutos = (int) round($minutosTotales / $conteoRevisiones);
+            $horas = intdiv($promMinutos, 60);
+            $mins = $promMinutos % 60;
+            $tiempoPromedioTexto = ($horas > 0 ? "{$horas}h " : '')."{$mins}m";
+        }
+
+        $cumplimientoSLA = $conteoRevisiones > 0
+            ? round(($enPlazoSLA / $conteoRevisiones) * 100, 1)
+            : 100.0;
+
+        // 4. Capacidad Operativa Real
+        $capacidadNominal = $totalRevisores * 10;
+        $enCurso = AsignacionRevisor::where('Estado_Asignacion', 'Activo')
+            ->orWhereNull('Estado_Asignacion')
+            ->count();
+        $cuposDisponibles = max(0, $capacidadNominal - $enCurso);
+        $capacidadPorcentaje = $capacidadNominal > 0
+            ? min(100, (int) round(($enCurso / $capacidadNominal) * 100))
+            : 0;
+
+        $kpis = [
+            'revisores_totales' => $totalRevisores,
+            'revisores_con_carga' => $revisoresConCarga,
+            'supervisores_totales' => $totalSupervisores,
+            'en_cola' => $enCola,
+            'criticos' => $criticos,
+            'tiempo_promedio' => $tiempoPromedioTexto,
+            'total_dictaminados' => $conteoRevisiones,
+            'cumplimiento_sla' => $cumplimientoSLA,
+        ];
+
+        // 2. Expedientes en Cola y Críticos (>3 días sin asignar)
+        $enCola = Solicitud::doesntHave('asignaciones')->count();
+        $criticos = Solicitud::doesntHave('asignaciones')
+            ->where('Fecha_Creacion_Solicitud', '<=', now()->subDays(3))
+            ->count();
+
+        // 3. Tiempos promedio de dictamen a partir de revisiones formalizadas
+        $revisionesConcluidas = Revision::whereIn('Resultado', ['Aprobado', 'Rechazado', 'Observado'])
+            ->whereNotNull('Fecha_Revision')
+            ->with('asignacion')
+            ->get();
+
+        $minutosTotales = 0;
+        $conteoRevisiones = 0;
+        $enPlazoSLA = 0;
+
+        foreach ($revisionesConcluidas as $rev) {
+            if ($rev->asignacion && $rev->asignacion->Fecha_Asignacion) {
+                $inicio = Carbon::parse($rev->asignacion->Fecha_Asignacion);
+                $fin = Carbon::parse($rev->Fecha_Revision);
+                $diff = max(1, $fin->diffInMinutes($inicio));
+                $minutosTotales += $diff;
+                $conteoRevisiones++;
+
+                if ($fin->diffInDays($inicio) <= 5) {
+                    $enPlazoSLA++;
+                }
+            }
+        }
+
+        $tiempoPromedioTexto = 'Sin registros';
+        if ($conteoRevisiones > 0) {
+            $promMinutos = (int) round($minutosTotales / $conteoRevisiones);
+            $horas = intdiv($promMinutos, 60);
+            $mins = $promMinutos % 60;
+            $tiempoPromedioTexto = ($horas > 0 ? "{$horas}h " : '')."{$mins}m";
+        }
+
+        $cumplimientoSLA = $conteoRevisiones > 0
+            ? round(($enPlazoSLA / $conteoRevisiones) * 100, 1)
+            : 100.0;
+
+        // 4. Capacidad Operativa Real
+        $capacidadNominal = $totalRevisores * 10;
+        $enCurso = AsignacionRevisor::where('Estado_Asignacion', 'Activo')
+            ->orWhereNull('Estado_Asignacion')
+            ->count();
+        $cuposDisponibles = max(0, $capacidadNominal - $enCurso);
+        $capacidadPorcentaje = $capacidadNominal > 0
+            ? min(100, (int) round(($enCurso / $capacidadNominal) * 100))
+            : 0;
+
+        $kpis = [
+            'revisores_totales' => $totalRevisores,
+            'revisores_con_carga' => $revisoresConCarga,
+            'supervisores_totales' => $totalSupervisores,
+            'en_cola' => $enCola,
+            'criticos' => $criticos,
+            'tiempo_promedio' => $tiempoPromedioTexto,
+            'total_dictaminados' => $conteoRevisiones,
+            'cumplimiento_sla' => $cumplimientoSLA,
+        ];
 
         return view('portal.matriz-cargas', [
             'pendientes' => $pendientes,
             'revisores' => $revisores,
             'enCurso' => $enCurso,
-            'capacidad' => min(100, (int) round(($enCurso / max(1, 85)) * 100)),
+            'capacidadNominal' => $capacidadNominal,
+            'cuposDisponibles' => $cuposDisponibles,
+            'capacidadPorcentaje' => $capacidadPorcentaje,
+            'capacidad' => $capacidadPorcentaje,
+            'kpis' => $kpis,
             'buscar' => $buscar,
             'nivel' => $nivel,
         ]);

@@ -241,7 +241,6 @@
                     {{-- Botón Desplegable Touch para Móvil --}}
                     <button
                         type="button"
-                        data-toggle-exp="{{ $solId }}"
                         @click="toggle({{ $solId }})"
                         class="w-full mt-2 flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition-all shadow-2xs cursor-pointer"
                         :class="abierto === {{ $solId }}
@@ -347,7 +346,6 @@
 
                         {{-- Fila Principal del Expediente --}}
                         <tr
-                            data-toggle-exp="{{ $solId }}"
                             @click="toggle({{ $solId }})"
                             class="hover:bg-blue-50/50 dark:hover:bg-blue-950/30 cursor-pointer transition-colors group select-none"
                             :class="abierto === {{ $solId }} ? 'bg-blue-50/70 dark:bg-blue-950/40 border-l-4 border-l-[#0051d5]' : 'border-l-4 border-l-transparent'"
@@ -472,7 +470,6 @@
                             <td class="py-3.5 px-4 text-center">
                                 <button
                                     type="button"
-                                    data-toggle-exp="{{ $solId }}"
                                     @click.stop="toggle({{ $solId }})"
                                     class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all shadow-2xs cursor-pointer"
                                     :class="abierto === {{ $solId }}
@@ -641,26 +638,4 @@
     </div>
 
 </div>
-
-{{-- Script de respaldo para alternar desplegable tanto en móvil como en escritorio --}}
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        document.querySelectorAll('[data-toggle-exp]').forEach(function (trigger) {
-            trigger.addEventListener('click', function (e) {
-                if (e.target.closest('a')) return;
-
-                const expId = trigger.getAttribute('data-toggle-exp');
-                const targetRow = document.getElementById('desplegable-' + expId);
-                const targetMobile = document.getElementById('desplegable-mobile-' + expId);
-
-                if (targetRow && (!window.Alpine || !targetRow._x_dataStack)) {
-                    targetRow.classList.toggle('hidden');
-                }
-                if (targetMobile && (!window.Alpine || !targetMobile._x_dataStack)) {
-                    targetMobile.classList.toggle('hidden');
-                }
-            });
-        });
-    });
-</script>
 @endsection

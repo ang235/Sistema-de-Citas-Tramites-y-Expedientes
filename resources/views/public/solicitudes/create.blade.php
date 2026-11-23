@@ -20,7 +20,7 @@
             Iniciar Expediente: {{ $tramite->Nombre }}
         </h1>
         <p class="text-sm text-[#44474d] dark:text-slate-400">
-            Ingresa la descripción de tu solicitud y adjunta los recaudos requeridos conforme a la versión normativa vigente (Ver. {{ $versionVigente->No_Version }}).
+            Adjunta los recaudos requeridos conforme a la versión normativa vigente (Ver. {{ $versionVigente->No_Version }}).
         </p>
     </div>
 
@@ -57,31 +57,13 @@
         @csrf
         <input type="hidden" name="id_version_tramite" value="{{ $versionVigente->ID_Version_Tramite }}">
 
-        {{-- 1. Datos complementarios --}}
-        <div class="bg-white dark:bg-[#0e1c2e] p-6 sm:p-8 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-4">
-            <h2 class="text-base font-bold text-[#001229] dark:text-white flex items-center gap-2" style="font-family: var(--font-display);">
-                <span class="material-symbols-outlined text-[#0051d5] dark:text-blue-400">edit_note</span>
-                <span>1. Descripción de la Solicitud</span>
-            </h2>
-            <div class="space-y-1.5">
-                <label for="descripcion" class="block text-xs font-semibold text-[#0b1c30] dark:text-slate-200">
-                    Detalles, motivo o referencias del establecimiento / predio
-                </label>
-                <textarea name="descripcion"
-                          id="descripcion"
-                          rows="3"
-                          placeholder="Indica información adicional útil para el revisor (dirección del local, actividad comercial, antecedentes)..."
-                          class="w-full p-3.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#0b1624] text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-[#0051d5]">{{ old('descripcion') }}</textarea>
-            </div>
-        </div>
-
-        {{-- 2. Carga de Recaudos Normativos --}}
+        {{-- Carga de Recaudos Normativos --}}
         <div class="bg-white dark:bg-[#0e1c2e] p-6 sm:p-8 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-6">
             <div class="border-b border-slate-100 dark:border-slate-800 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
                     <h2 class="text-base font-bold text-[#001229] dark:text-white flex items-center gap-2" style="font-family: var(--font-display);">
                         <span class="material-symbols-outlined text-[#0051d5] dark:text-blue-400">upload_file</span>
-                        <span>2. Documentación y Requisitos Digitales</span>
+                        <span>Documentación y Requisitos Digitales</span>
                     </h2>
                     <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
                         Solo se aceptan archivos en formato <strong>.PDF</strong> (Máx. 10MB por archivo). Los marcados como <span class="text-amber-700 dark:text-amber-400 font-semibold">Obligatorio</span> son indispensables para continuar.

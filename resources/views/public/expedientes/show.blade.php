@@ -10,9 +10,11 @@
     $revision = $asignacion?->revisiones->last();
     $observacionesAbiertas = collect();
 
-    if ($asignacion) {
-        foreach ($asignacion->revisiones as $rev) {
-            foreach ($rev->observaciones as $obs) {
+    // SOLO recopilar observaciones si el expediente está formalmente en estado 'Observado' y no tiene resolución
+    if ($solicitud->Estado_Solicitud === 'Observado' && ! $tieneResolucion && $asignacion) {
+        $ultimaRevision = $asignacion->revisiones->last();
+        if ($ultimaRevision) {
+            foreach ($ultimaRevision->observaciones as $obs) {
                 if ($obs->estaAbierta()) {
                     $observacionesAbiertas->push($obs);
                 }
@@ -22,7 +24,20 @@
 
     $totalDocs = $solicitud->documentos->count();
     $aprobadosDocs = $solicitud->documentos->where('Estado_Doc', 'Aprobado')->count();
+    $subsanadosDocs = $solicitud->documentos->where('Estado_Doc', 'Subsanado')->count();
+    $observadosDocs = $solicitud->documentos->where('Estado_Doc', 'Observado')->count();
+    $documentosRechazados = $solicitud->documentos->where('Estado_Doc', 'Rechazado');
+    $rechazadosDocs = $documentosRechazados->count();
+
+    $hayRechazo = $rechazadosDocs > 0
+        || $solicitud->Estado_Solicitud === 'Rechazado'
+        || ($revision && $revision->Resultado === 'Rechazado')
+        || ($tieneResolucion && in_array(strtolower($ultimaResolucion->Tipo_Resolucion), ['rechazado', 'rechazada', 'negativa', 'rechazo'], true));
+
     $porcentajeAvance = $totalDocs > 0 ? (int) round(($aprobadosDocs / $totalDocs) * 100) : ($tieneResolucion ? 100 : 40);
+
+    $hayObsAbiertas = $observacionesAbiertas->isNotEmpty() && ! $hayRechazo;
+    $haySubsanacionesPorRevisar = ! $hayRechazo && ($subsanadosDocs > 0 || ($solicitud->Estado_Solicitud === 'En_Revision' && $solicitud->asignaciones->flatMap->revisiones->flatMap->observaciones->where('Estado_Obs', 'Subsanada')->isNotEmpty() && $aprobadosDocs < $totalDocs));
 @endphp
 
 @section('title', 'Expediente ' . $folioCodigo)
@@ -79,10 +94,20 @@
                             <span class="w-2 h-2 rounded-full bg-[#10b981]"></span>
                             Resolución Final: {{ $ultimaResolucion->Tipo_Resolucion }}
                         </span>
-                    @elseif ($observacionesAbiertas->isNotEmpty())
+                    @elseif ($hayRechazo)
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 text-rose-900 border border-rose-200 text-xs font-semibold">
+                            <span class="w-2 h-2 rounded-full bg-rose-600"></span>
+                            Solicitud Rechazada
+                        </span>
+                    @elseif ($hayObsAbiertas)
                         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 text-amber-900 border border-amber-200/60 text-xs font-semibold">
                             <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
                             En proceso de subsanación técnica
+                        </span>
+                    @elseif ($haySubsanacionesPorRevisar)
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-900 border border-blue-200/60 text-xs font-semibold">
+                            <span class="w-2 h-2 rounded-full bg-[#0051d5] animate-pulse"></span>
+                            Subsanación recibida &mdash; En reevaluación técnica
                         </span>
                     @else
                         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#eff4ff] text-[#0051d5] text-xs font-semibold">
@@ -142,8 +167,13 @@
                         <span class="text-slate-500 text-[10px]">Recaudos</span>
                     </div>
                     <div class="p-2 rounded-lg bg-white shadow-xs">
-                        <span class="block text-sm font-bold text-amber-700">{{ $observacionesAbiertas->count() }}</span>
-                        <span class="text-slate-500 text-[10px]">Observados</span>
+                        @if ($hayRechazo)
+                            <span class="block text-sm font-bold text-rose-600">{{ $rechazadosDocs }}</span>
+                            <span class="text-slate-500 text-[10px]">Rechazados</span>
+                        @else
+                            <span class="block text-sm font-bold text-amber-700">{{ $observacionesAbiertas->count() }}</span>
+                            <span class="text-slate-500 text-[10px]">Observados</span>
+                        @endif
                     </div>
                     <div class="p-2 rounded-lg bg-white shadow-xs">
                         <span class="block text-sm font-bold text-[#0051d5]">{{ $solicitud->citas->count() }}</span>
@@ -160,22 +190,41 @@
 
     {{-- ══════════════════════════════════════════ LÍNEA DE TIEMPO / TIMELINE DINÁMICO ══ --}}
     @php
+        $totalDocs = $solicitud->documentos->count();
+        $aprobadosDocs = $solicitud->documentos->where('Estado_Doc', 'Aprobado')->count();
+        $subsanadosDocs = $solicitud->documentos->where('Estado_Doc', 'Subsanado')->count();
+        $observadosDocs = $solicitud->documentos->where('Estado_Doc', 'Observado')->count();
+
+        // Subsanación activa / en curso
+        $hayObsAbiertas = $observacionesAbiertas->isNotEmpty();
+        $haySubsanacionesPorRevisar = $subsanadosDocs > 0 || ($solicitud->Estado_Solicitud === 'En_Revision' && $solicitud->asignaciones->flatMap->revisiones->flatMap->observaciones->where('Estado_Obs', 'Subsanada')->isNotEmpty() && $aprobadosDocs < $totalDocs);
+
+        // Hito 1: Radicación (siempre completado)
         $step1_done = true;
+
+        // Hito 2: Asignación Técnica
         $step2_done = (bool) $asignacion;
         $step2_active = !$step2_done;
         $step2_date = $asignacion?->Fecha_Asignacion;
 
-        $hayObs = $observacionesAbiertas->isNotEmpty();
-        $step3_done = ($step2_done && ($porcentajeAvance === 100 || $tieneResolucion || ($revision && $revision->Resultado === 'Aprobado')));
-        $step3_active = ($step2_done && !$step3_done);
+        // Hito 3: Evaluación de Recaudos
+        // Se considera completada SOLO si no hay observaciones abiertas, no hay documentos subsanados pendientes de calificar,
+        // y todos los recaudos fueron aprobados o ya existe resolución final formal.
+        $step3_done = $step2_done && !$hayObsAbiertas && !$haySubsanacionesPorRevisar && ($aprobadosDocs === $totalDocs || $tieneResolucion || ($revision && $revision->Resultado === 'Aprobado' && $solicitud->Estado_Solicitud === 'Aprobado'));
+        $step3_active = $step2_done && !$step3_done;
 
-        $step4_done = (bool) ($revision && in_array($revision->Resultado, ['Aprobado', 'Rechazado']));
-        $step4_active = ($step3_done && !$step4_done);
-        $step4_date = $revision?->Fecha_Revision;
+        // Hito 4: Dictamen de Calificación
+        // SOLO puede estar completado si la Fase 3 está completada, existe un dictamen emitido que corresponda al estado actual,
+        // y NO se encuentra en proceso de subsanación o reevaluación.
+        $step4_done = $step3_done && (bool) ($revision && in_array($revision->Resultado, ['Aprobado', 'Rechazado']) && in_array($solicitud->Estado_Solicitud, ['Aprobado', 'Rechazado']));
+        $step4_active = $step3_done && !$step4_done;
+        $step4_date = $step4_done ? $revision?->Fecha_Revision : null;
 
-        $step5_done = $tieneResolucion;
-        $step5_active = ($step4_done && !$step5_done);
-        $step5_date = $ultimaResolucion?->Fecha_Resolucion;
+        // Hito 5: Resolución Final
+        // SOLO puede estar activo o completado si el Dictamen (Fase 4) está completado.
+        $step5_done = $step4_done && $tieneResolucion;
+        $step5_active = $step4_done && !$step5_done;
+        $step5_date = $step5_done ? $ultimaResolucion?->Fecha_Emision_Resolucion : null;
     @endphp
     <div class="bg-white rounded-2xl border border-slate-200/80 p-6 lg:p-8 shadow-xs space-y-6">
         <div class="flex items-center justify-between border-b border-slate-100 pb-4">
@@ -234,15 +283,19 @@
 
                 {{-- Hito 3: Evaluación de Recaudos --}}
                 <div class="relative flex md:flex-col items-start gap-4 md:gap-3">
-                    <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 font-bold text-xs {{ $step3_done ? 'bg-emerald-500 text-white' : ($hayObs ? 'bg-amber-500 text-white ring-4 ring-amber-100 dark:ring-amber-950 animate-pulse' : ($step3_active ? 'bg-[#0051d5] text-white ring-4 ring-blue-100 dark:ring-blue-950' : 'bg-slate-200 dark:bg-slate-700 text-slate-500')) }} shadow-xs">
-                        <span class="material-symbols-outlined text-lg">{{ $step3_done ? 'check' : ($hayObs ? 'warning' : ($step3_active ? 'hourglass_top' : 'folder')) }}</span>
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 font-bold text-xs {{ $hayRechazo ? 'bg-rose-500 text-white ring-4 ring-rose-100 dark:ring-rose-950' : ($step3_done ? 'bg-emerald-500 text-white' : ($hayObsAbiertas ? 'bg-amber-500 text-white ring-4 ring-amber-100 dark:ring-amber-950 animate-pulse' : ($haySubsanacionesPorRevisar ? 'bg-[#0051d5] text-white ring-4 ring-blue-100 dark:ring-blue-950 animate-pulse' : ($step3_active ? 'bg-[#0051d5] text-white ring-4 ring-blue-100 dark:ring-blue-950' : 'bg-slate-200 dark:bg-slate-700 text-slate-500')))) }} shadow-xs">
+                        <span class="material-symbols-outlined text-lg">{{ $hayRechazo ? 'cancel' : ($step3_done ? 'check' : ($hayObsAbiertas ? 'warning' : ($haySubsanacionesPorRevisar ? 'published_with_changes' : ($step3_active ? 'hourglass_top' : 'folder')))) }}</span>
                     </div>
                     <div>
-                        <span class="text-[11px] font-bold uppercase tracking-wider {{ $step3_done ? 'text-emerald-700 dark:text-emerald-400' : ($hayObs ? 'text-amber-700 dark:text-amber-400' : ($step3_active ? 'text-[#0051d5] dark:text-blue-400' : 'text-slate-400')) }} block">Fase 3</span>
+                        <span class="text-[11px] font-bold uppercase tracking-wider {{ $hayRechazo ? 'text-rose-700 dark:text-rose-400' : ($step3_done ? 'text-emerald-700 dark:text-emerald-400' : ($hayObsAbiertas ? 'text-amber-700 dark:text-amber-400' : ($step3_active ? 'text-[#0051d5] dark:text-blue-400' : 'text-slate-400'))) }} block">Fase 3</span>
                         <h3 class="text-sm font-bold text-slate-900 dark:text-white mt-0.5">Evaluación de Recaudos</h3>
                         <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                            @if($hayObs)
+                            @if($hayRechazo)
+                                <span class="text-rose-700 dark:text-rose-400 font-semibold">Recaudos con dictamen no favorable</span>
+                            @elseif($hayObsAbiertas)
                                 <span class="text-amber-800 dark:text-amber-300 font-medium">{{ $observacionesAbiertas->count() }} requerimiento(s) por solventar</span>
+                            @elseif($haySubsanacionesPorRevisar)
+                                <span class="text-blue-700 dark:text-blue-300 font-medium">Subsanación enviada &mdash; En revisión técnica</span>
                             @elseif($step3_done)
                                 <span class="text-emerald-700 dark:text-emerald-400 font-medium">Recaudos técnicos validados</span>
                             @else
@@ -254,14 +307,18 @@
 
                 {{-- Hito 4: Dictamen Técnico --}}
                 <div class="relative flex md:flex-col items-start gap-4 md:gap-3">
-                    <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 font-bold text-xs {{ $step4_done ? 'bg-emerald-500 text-white' : ($step4_active ? 'bg-[#0051d5] text-white ring-4 ring-blue-100 dark:ring-blue-950' : 'bg-slate-200 dark:bg-slate-700 text-slate-500') }} shadow-xs">
-                        <span class="material-symbols-outlined text-lg">{{ $step4_done ? 'check' : ($step4_active ? 'gavel' : 'balance') }}</span>
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 font-bold text-xs {{ $hayRechazo ? 'bg-rose-500 text-white ring-4 ring-rose-100 dark:ring-rose-950' : ($step4_done ? 'bg-emerald-500 text-white' : ($step4_active ? 'bg-[#0051d5] text-white ring-4 ring-blue-100 dark:ring-blue-950' : 'bg-slate-200 dark:bg-slate-700 text-slate-500')) }} shadow-xs">
+                        <span class="material-symbols-outlined text-lg">{{ $hayRechazo ? 'cancel' : ($step4_done ? 'check' : ($step4_active ? 'gavel' : 'balance')) }}</span>
                     </div>
                     <div>
-                        <span class="text-[11px] font-bold uppercase tracking-wider {{ $step4_done ? 'text-emerald-700 dark:text-emerald-400' : ($step4_active ? 'text-[#0051d5] dark:text-blue-400' : 'text-slate-400') }} block">Fase 4</span>
+                        <span class="text-[11px] font-bold uppercase tracking-wider {{ $hayRechazo ? 'text-rose-700 dark:text-rose-400' : ($step4_done ? 'text-emerald-700 dark:text-emerald-400' : ($step4_active ? 'text-[#0051d5] dark:text-blue-400' : 'text-slate-400')) }} block">Fase 4</span>
                         <h3 class="text-sm font-bold text-slate-900 dark:text-white mt-0.5">Dictamen de Calificación</h3>
                         <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                            {{ $revision ? 'Calificación: ' . $revision->Resultado : 'Pendiente de emisión de dictamen' }}
+                            @if($hayRechazo)
+                                <span class="text-rose-700 dark:text-rose-400 font-semibold">Calificación: Rechazado</span>
+                            @else
+                                {{ $step4_done && $revision ? 'Calificación: ' . $revision->Resultado : ($haySubsanacionesPorRevisar ? 'Pendiente de nuevo dictamen técnico' : 'Pendiente de emisión de dictamen') }}
+                            @endif
                         </p>
                         @if($step4_date)
                             <span class="text-[11px] text-slate-400 dark:text-slate-500 font-mono mt-1 block capitalize">
@@ -280,12 +337,20 @@
                         <span class="text-[11px] font-bold uppercase tracking-wider {{ $step5_done ? 'text-emerald-700 dark:text-emerald-400' : ($step5_active ? 'text-indigo-700 dark:text-indigo-300' : 'text-slate-400') }} block">Fase 5</span>
                         <h3 class="text-sm font-bold text-slate-900 dark:text-white mt-0.5">Resolución Final</h3>
                         <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                            {{ $tieneResolucion ? 'Acto emitido: ' . $ultimaResolucion->Tipo_Resolucion : 'Pendiente de firma resolutiva' }}
+                            {{ $step5_done ? 'Acto emitido: ' . $ultimaResolucion->Tipo_Resolucion : 'Pendiente de firma resolutiva' }}
                         </p>
                         @if($step5_date)
                             <span class="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold font-mono mt-1 block capitalize">
                                 {{ \Carbon\Carbon::parse($step5_date)->translatedFormat('d \d\e F, Y') }}
                             </span>
+                        @endif
+                        @if($tieneResolucion)
+                            <a href="{{ route('expedientes.resolucion.pdf', $folio->Codigo_Folio) }}"
+                               target="_blank"
+                               class="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer">
+                                <span class="material-symbols-outlined text-sm">picture_as_pdf</span>
+                                <span>Descargar Resolución Oficial (PDF)</span>
+                            </a>
                         @endif
                     </div>
                 </div>
@@ -294,8 +359,55 @@
         </div>
     </div>
 
-    {{-- ══════════════════════════════════════════ OBSERVACIONES ABIERTAS (SI EXISTEN) ══ --}}
-    @if ($observacionesAbiertas->isNotEmpty())
+    {{-- ══════════════════════════════════════════ ESTADO DE RECHAZO / OBSERVACIONES / SUBSANACIONES ══ --}}
+    @if ($hayRechazo)
+        <div class="bg-rose-50 border-2 border-rose-300 rounded-2xl p-6 lg:p-8 space-y-4 shadow-xs">
+            <div class="flex items-start gap-4">
+                <div class="w-12 h-12 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center shrink-0 border border-rose-200">
+                    <span class="material-symbols-outlined text-3xl">cancel</span>
+                </div>
+                <div class="space-y-2 flex-1">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <h2 class="text-lg font-bold text-rose-900" style="font-family: var(--font-display);">
+                            Se ha rechazado su solicitud
+                        </h2>
+                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-rose-200 text-rose-900 border border-rose-300">
+                            Expediente No Favorable
+                        </span>
+                    </div>
+                    <p class="text-sm text-rose-800 leading-relaxed font-medium">
+                        Se ha rechazado su solicitud, para volver a intentar debe comenzar de nuevo el trámite creando otro nuevamente.
+                    </p>
+                    @if ($documentosRechazados->isNotEmpty())
+                        <div class="bg-white/80 p-3.5 rounded-xl border border-rose-200 space-y-1.5 mt-2">
+                            <span class="text-xs font-bold text-rose-900 block">Recaudos calificados con rechazo:</span>
+                            <ul class="list-disc list-inside text-xs text-rose-800 space-y-1">
+                                @foreach ($documentosRechazados as $docRechazado)
+                                    <li>
+                                        <span class="font-semibold">{{ $docRechazado->requisito?->Nombre ?? 'Documento' }}</span> &mdash; Rechazado en revisión técnica
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+                    <div class="pt-3 flex flex-wrap items-center gap-3">
+                        @if ($solicitud->versionTramite?->tipoTramite)
+                            <a href="{{ route('solicitudes.create', $solicitud->versionTramite->tipoTramite->ID_Tipo_Tramite) }}"
+                               class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-rose-700 hover:bg-rose-800 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer">
+                                <span class="material-symbols-outlined text-base">restart_alt</span>
+                                <span>Comenzar trámite de nuevo</span>
+                            </a>
+                        @endif
+                        <a href="{{ route('tramites.index') }}"
+                           class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-rose-300 text-rose-800 hover:bg-rose-100 text-xs font-semibold transition-colors">
+                            <span class="material-symbols-outlined text-base">arrow_back</span>
+                            <span>Ver catálogo de trámites</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @elseif ($solicitud->Estado_Solicitud === 'Observado' && $observacionesAbiertas->isNotEmpty() && ! $tieneResolucion)
         <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6 lg:p-8 space-y-6">
             <div class="flex items-start gap-4">
                 <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center shrink-0">
@@ -313,7 +425,7 @@
 
             <div class="space-y-4">
                 @foreach ($observacionesAbiertas as $obs)
-                    <div class="bg-white rounded-xl p-5 border border-amber-200/80 shadow-xs space-y-4">
+                    <div class="bg-white rounded-xl p-5 border border-amber-200/80 shadow-xs space-y-4" x-data="{ enviando: false }">
                         <div class="flex items-center justify-between text-xs text-slate-500">
                             <span class="font-semibold text-amber-800">Observación #{{ $obs->ID_Observacion }}</span>
                             <span>{{ $obs->created_at ? $obs->created_at->diffForHumans() : '' }}</span>
@@ -323,7 +435,7 @@
                         </p>
 
                         {{-- Formulario de subsanación --}}
-                        <form action="{{ route('expedientes.solventar', $obs->ID_Observacion) }}" method="POST" enctype="multipart/form-data" class="space-y-3 pt-2">
+                        <form action="{{ route('expedientes.solventar', $obs->ID_Observacion) }}" method="POST" enctype="multipart/form-data" class="space-y-3 pt-2" @submit="enviando = true">
                             @csrf
                             <div>
                                 <label for="mensaje_{{ $obs->ID_Observacion }}" class="block text-xs font-semibold text-[#0b1c30] mb-1">
@@ -347,14 +459,27 @@
                                            accept=".pdf,.png,.jpg,.jpeg"
                                            class="text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#eff4ff] file:text-[#0051d5] hover:file:bg-[#dce9ff]">
                                 </div>
-                                <button type="submit" class="px-4 py-2 bg-[#001229] hover:bg-[#0f2744] text-white rounded-lg text-xs font-semibold transition-colors shrink-0 flex items-center gap-1.5 shadow-xs">
-                                    <span class="material-symbols-outlined text-sm">send</span>
-                                    <span>Enviar Subsanación</span>
+                                <button type="submit" :disabled="enviando" class="px-4 py-2 bg-[#001229] hover:bg-[#0f2744] disabled:opacity-50 text-white rounded-lg text-xs font-semibold transition-colors shrink-0 flex items-center gap-1.5 shadow-xs cursor-pointer">
+                                    <span class="material-symbols-outlined text-sm" x-show="!enviando">send</span>
+                                    <span class="material-symbols-outlined text-sm animate-spin" x-show="enviando" x-cloak>sync</span>
+                                    <span x-text="enviando ? 'Enviando...' : 'Enviar Subsanación'">Enviar Subsanación</span>
                                 </button>
                             </div>
                         </form>
                     </div>
                 @endforeach
+            </div>
+        </div>
+    @elseif ($haySubsanacionesPorRevisar && ! $tieneResolucion && $solicitud->Estado_Solicitud === 'En_Revision')
+        <div class="bg-blue-50 border border-blue-200 rounded-2xl p-5 flex items-start sm:items-center gap-4">
+            <div class="w-10 h-10 rounded-xl bg-blue-100 text-[#0051d5] flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-2xl animate-pulse">hourglass_top</span>
+            </div>
+            <div>
+                <h3 class="text-sm font-bold text-[#001229]">Subsanación enviada — En reevaluación técnica</h3>
+                <p class="text-xs text-slate-600 mt-0.5">
+                    Sus respuestas y documentos corregidos han sido recibidos con éxito y están en proceso de calificación por el especialista. No requiere realizar ninguna acción hasta que se emita un nuevo dictamen.
+                </p>
             </div>
         </div>
     @endif

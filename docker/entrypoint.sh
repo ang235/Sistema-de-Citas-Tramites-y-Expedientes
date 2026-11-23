@@ -21,7 +21,7 @@ mkdir -p \
     storage/logs \
     bootstrap/cache
 
-chmod -R 775 storage bootstrap/cache
+chmod -R 775 storage bootstrap/cache 2>/dev/null || true
 
 # ------------------------------------------------------------------
 # 2. Verificar que existe la base de datos SQLite y sincronizar migraciones

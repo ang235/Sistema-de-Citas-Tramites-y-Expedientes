@@ -61,6 +61,14 @@
                             <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
                                 Resolución Emitida
                             </span>
+                        @elseif ($solicitud->Estado_Solicitud === 'Rechazado' || $solicitud->documentos->where('Estado_Doc', 'Rechazado')->isNotEmpty())
+                            <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
+                                Rechazado
+                            </span>
+                        @elseif ($solicitud->Estado_Solicitud === 'Observado')
+                            <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                                Observado
+                            </span>
                         @else
                             <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-950/60 text-[#0051d5] dark:text-blue-300">
                                 {{ str_replace('_', ' ', $solicitud->Estado_Solicitud) }}

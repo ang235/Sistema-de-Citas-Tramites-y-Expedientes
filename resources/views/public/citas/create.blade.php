@@ -176,7 +176,7 @@
                     <span>Módulo de Gestión de Turnos Ciudadanos</span>
                 </div>
                 <h1 class="text-2xl font-bold tracking-tight text-[#001229] dark:text-white" style="font-family: var(--font-display);">
-                    Agenda tu turno presencial o virtual
+                    Agenda tu turno presencial
                 </h1>
                 <p class="text-sm text-[#44474d] dark:text-slate-400">
                     Solo se permite una cita activa por usuario. Completa los 3 pasos para generar tu Pase Digital.
@@ -281,28 +281,19 @@
                         </h2>
                         <span class="text-xs px-2.5 py-0.5 rounded-full bg-[#eff4ff] dark:bg-blue-950/60 text-[#0051d5] dark:text-blue-300 font-semibold">Requerido</span>
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div @click="modalidad = 'presencial'"
-                             :class="modalidad === 'presencial' ? 'border-[#0051d5] bg-[#eff4ff]/40 dark:bg-blue-950/30 ring-2 ring-[#0051d5]' : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'"
-                             class="p-4 rounded-xl border cursor-pointer transition-all space-y-2">
-                            <div class="w-9 h-9 rounded-lg bg-white dark:bg-slate-800 shadow-xs flex items-center justify-center text-[#0051d5] dark:text-blue-400">
-                                <span class="material-symbols-outlined text-xl">apartment</span>
+                    <div>
+                        <div class="p-4 rounded-xl border border-[#0051d5] bg-[#eff4ff]/40 dark:bg-blue-950/30 ring-2 ring-[#0051d5] transition-all space-y-2">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-lg bg-white dark:bg-slate-800 shadow-xs flex items-center justify-center text-[#0051d5] dark:text-blue-400 shrink-0">
+                                    <span class="material-symbols-outlined text-xl">apartment</span>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-bold text-[#0b1c30] dark:text-white">Presencial en Sede Central</h3>
+                                    <p class="text-xs text-[#44474d] dark:text-slate-400 leading-relaxed">
+                                        Ventanilla 08 • Mesa Técnica de Obras e ITSE. Atención presencial con el especialista.
+                                    </p>
+                                </div>
                             </div>
-                            <h3 class="text-sm font-bold text-[#0b1c30] dark:text-white">Presencial en Sede Central</h3>
-                            <p class="text-xs text-[#44474d] dark:text-slate-400 leading-relaxed">
-                                Ventanilla 08 • Mesa Técnica de Obras e ITSE. Atención presencial con el especialista.
-                            </p>
-                        </div>
-                        <div @click="modalidad = 'virtual'"
-                             :class="modalidad === 'virtual' ? 'border-[#0051d5] bg-[#eff4ff]/40 dark:bg-blue-950/30 ring-2 ring-[#0051d5]' : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'"
-                             class="p-4 rounded-xl border cursor-pointer transition-all space-y-2">
-                            <div class="w-9 h-9 rounded-lg bg-white dark:bg-slate-800 shadow-xs flex items-center justify-center text-[#0051d5] dark:text-blue-400">
-                                <span class="material-symbols-outlined text-xl">videocam</span>
-                            </div>
-                            <h3 class="text-sm font-bold text-[#0b1c30] dark:text-white">Virtual (ITSE GovMeet)</h3>
-                            <p class="text-xs text-[#44474d] dark:text-slate-400 leading-relaxed">
-                                Videollamada cifrada y revisión de planos en tiempo real con el especialista.
-                            </p>
                         </div>
                     </div>
                 </div>
@@ -566,7 +557,7 @@
                                 </div>
                                 <div class="flex items-center justify-between py-3">
                                     <span class="text-slate-500 dark:text-slate-400 text-xs">Modalidad</span>
-                                    <span class="font-bold text-[#0051d5] dark:text-blue-400 capitalize" x-text="modalidad === 'presencial' ? 'Presencial en Sede Central' : 'Virtual (ITSE GovMeet)'"></span>
+                                    <span class="font-bold text-[#0051d5] dark:text-blue-400">Presencial en Sede Central</span>
                                 </div>
                                 <div class="flex items-center justify-between py-3">
                                     <span class="text-slate-500 dark:text-slate-400 text-xs">Expediente</span>

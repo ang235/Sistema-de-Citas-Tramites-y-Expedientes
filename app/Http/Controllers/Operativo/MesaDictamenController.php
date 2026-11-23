@@ -127,7 +127,21 @@ class MesaDictamenController extends Controller
             $asignacionActiva = $solicitudSeleccionada->asignaciones
                 ->filter(fn ($a) => (int) $a->ID_Revisor === $idUsuario && in_array($a->Estado_Asignacion, ['Activo', null]))
                 ->last()
-                ?? ($esAdmin ? $solicitudSeleccionada->asignaciones->last() : null);
+                ?? (($esAdmin || $esSupervisor) ? ($solicitudSeleccionada->asignaciones->filter(fn ($a) => in_array($a->Estado_Asignacion, ['Activo', null]))->last() ?? $solicitudSeleccionada->asignaciones->last()) : null);
+
+            // Si es Admin o Supervisor y el expediente aún no tiene asignación, asegurar una asignación operativa
+            if (! $asignacionActiva && ($esAdmin || $esSupervisor)) {
+                $asignacionActiva = AsignacionRevisor::firstOrCreate(
+                    [
+                        'ID_Solicitud' => $solicitudSeleccionada->ID_Solicitud,
+                        'ID_Revisor' => $idUsuario,
+                    ],
+                    [
+                        'Fecha_Asignacion' => now(),
+                        'Estado_Asignacion' => 'Activo',
+                    ]
+                );
+            }
         }
 
         // Métricas de sala
@@ -175,7 +189,7 @@ class MesaDictamenController extends Controller
             'documentos.requisito',
             'documentos.versionesDoc',
             'asignaciones.revisor',
-            'asignaciones.revisiones.observaciones.respuestas',
+            'asignaciones.revisiones.observaciones.respuestas.versionDoc',
             'resoluciones.supervisor',
         ])->findOrFail($idSolicitud);
 
@@ -183,13 +197,15 @@ class MesaDictamenController extends Controller
             ->filter(fn ($a) => (int) $a->ID_Revisor === $idUsuario && in_array($a->Estado_Asignacion, ['Activo', null]))
             ->last();
 
-        $esConcluido = $solicitud->resoluciones->isNotEmpty() || in_array($solicitud->Estado_Solicitud, ['Aprobado', 'Rechazado']);
-        $esSoloLectura = $request->boolean('readonly') || $esConcluido || ($usuario->esSupervisor() && ! $asignacionPropia) || ($usuario->esAdministrador() && ! $asignacionPropia);
+        $tieneResolucion = $solicitud->resoluciones->isNotEmpty();
+        $esConcluido = $tieneResolucion;
+        $esRevisorPuro = $usuario->esRevisor() && ! $usuario->esSupervisor() && ! $usuario->esAdministrador();
+        $esSoloLectura = $request->boolean('readonly') || $tieneResolucion || ($esRevisorPuro && ! $asignacionPropia);
 
         // Si es revisor y no es supervisor ni admin, verificar asignación obligatoria previa por el supervisor
         // O si ya fue concluido / visto en modo auditoría o solo lectura
-        if ($usuario->esRevisor() && ! $usuario->esSupervisor() && ! $usuario->esAdministrador()) {
-            if (! $asignacionPropia && ! $esConcluido && ! $request->boolean('readonly')) {
+        if ($esRevisorPuro) {
+            if (! $asignacionPropia && ! $tieneResolucion && ! $request->boolean('readonly')) {
                 abort(403, 'Acceso no autorizado: Este expediente aún no ha sido asignado a su mesa por el supervisor en la Matriz de Cargas.');
             }
 
@@ -197,11 +213,25 @@ class MesaDictamenController extends Controller
         } else {
             $asignacionActiva = $solicitud->asignaciones->filter(fn ($a) => in_array($a->Estado_Asignacion, ['Activo', null]))->last()
                 ?? $solicitud->asignaciones->last();
+
+            if (! $asignacionActiva) {
+                $asignacionActiva = AsignacionRevisor::firstOrCreate(
+                    [
+                        'ID_Solicitud' => $solicitud->ID_Solicitud,
+                        'ID_Revisor' => $idUsuario,
+                    ],
+                    [
+                        'Fecha_Asignacion' => now(),
+                        'Estado_Asignacion' => 'Activo',
+                    ]
+                );
+            }
         }
 
         return view('portal.evaluacion', [
             'solicitud' => $solicitud,
             'asignacionActiva' => $asignacionActiva,
+            'tieneResolucion' => $tieneResolucion,
             'esSoloLectura' => $esSoloLectura,
             'esConcluido' => $esConcluido,
         ]);
@@ -217,8 +247,8 @@ class MesaDictamenController extends Controller
         $documento = Documento::with('solicitud.resoluciones')->findOrFail($idDocumento);
         $solicitud = $documento->solicitud;
 
-        if ($solicitud && ($solicitud->resoluciones->isNotEmpty() || in_array($solicitud->Estado_Solicitud, ['Aprobado', 'Rechazado']))) {
-            return back()->with('error', 'El expediente ya se encuentra concluido y en modo inmutable de auditoría (solo lectura). No se permiten modificaciones.');
+        if ($solicitud && $solicitud->resoluciones->isNotEmpty()) {
+            return back()->with('error', 'El expediente ya se encuentra formalmente concluido con resolución emitida. No se permiten modificaciones.');
         }
 
         /** @var Usuario $usuario */
@@ -252,8 +282,20 @@ class MesaDictamenController extends Controller
         $asignacion = AsignacionRevisor::with('solicitud.resoluciones')->findOrFail($idAsignacion);
         $solicitud = $asignacion->solicitud;
 
-        if ($solicitud && ($solicitud->resoluciones->isNotEmpty() || in_array($solicitud->Estado_Solicitud, ['Aprobado', 'Rechazado']))) {
+        if ($solicitud && $solicitud->resoluciones->isNotEmpty()) {
             return back()->with('error', 'El expediente ya se encuentra concluido y cuenta con resolución formal emitida. No se pueden registrar más dictámenes.');
+        }
+
+        $estadoSol = $solicitud->Estado_Solicitud;
+        if (! in_array($estadoSol, ['Pendiente', 'En_Revision'], true)) {
+            if ($estadoSol === 'Observado') {
+                return back()->with('error', 'El expediente tiene observaciones técnicas pendientes de subsanación por el ciudadano. No es posible emitir un nuevo dictamen hasta recibir su respuesta.');
+            }
+            if ($estadoSol === 'Aprobado') {
+                return back()->with('error', 'El expediente ya cuenta con dictamen aprobatorio emitido. Se encuentra en etapa de supervisión para su resolución final.');
+            }
+
+            return back()->with('error', "El expediente se encuentra en estado '{$estadoSol}' y no admite nuevos dictámenes sin una subsanación previa.");
         }
 
         /** @var Usuario $usuario */
@@ -291,8 +333,16 @@ class MesaDictamenController extends Controller
                     $solicitud->update(['Estado_Solicitud' => 'Observado']);
                 } elseif ($resultado === 'Aprobado') {
                     $solicitud->update(['Estado_Solicitud' => 'Aprobado']);
+                    // Si se aprueba, cerrar cualquier observación previa
+                    Observacion::whereHas('revision.asignacion', fn ($q) => $q->where('ID_Solicitud', $solicitud->ID_Solicitud))
+                        ->where('Estado_Obs', 'Abierta')
+                        ->update(['Estado_Obs' => 'Subsanada']);
                 } elseif ($resultado === 'Rechazado') {
                     $solicitud->update(['Estado_Solicitud' => 'Rechazado']);
+                    // Si se rechaza, cerrar observaciones previas para no dejar subsanaciones huérfanas
+                    Observacion::whereHas('revision.asignacion', fn ($q) => $q->where('ID_Solicitud', $solicitud->ID_Solicitud))
+                        ->where('Estado_Obs', 'Abierta')
+                        ->update(['Estado_Obs' => 'Subsanada']);
                 }
             }
 
@@ -326,8 +376,11 @@ class MesaDictamenController extends Controller
             abort(403, 'No tiene autorización para visualizar este archivo.');
         }
 
-        $ultimaVersion = $documento->versionesDoc->last();
-        $ruta = $ultimaVersion?->Ruta_Archivo;
+        $versionId = $request->query('version_id');
+        $version = $versionId
+            ? $documento->versionesDoc->firstWhere('ID_Version_Doc', (int) $versionId)
+            : $documento->versionesDoc->last();
+        $ruta = $version?->Ruta_Archivo;
 
         // Búsqueda de respaldo por carpeta de expediente si no está la ruta exacta
         if (! $ruta || ! Storage::disk('local')->exists($ruta)) {
@@ -344,7 +397,7 @@ class MesaDictamenController extends Controller
             abort(404, 'El archivo digital no fue encontrado en el almacenamiento institucional.');
         }
 
-        $nombreDescarga = $ultimaVersion?->Nombre_Original ?? (($documento->requisito?->Nombre ?? 'documento').'.pdf');
+        $nombreDescarga = $version?->Nombre_Original ?? (($documento->requisito?->Nombre ?? 'documento').'.pdf');
         $nombreLimpio = preg_replace('/[^A-Za-z0-9_\-\.]/', '_', $nombreDescarga);
 
         return Storage::disk('local')->response(
