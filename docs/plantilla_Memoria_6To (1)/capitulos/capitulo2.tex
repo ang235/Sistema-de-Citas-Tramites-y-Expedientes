@@ -1,67 +1,51 @@
-\chapter{Marco Teórico.}
+%!TEX root = ../Proeycto.tex
+\chapter{Marco Teórico}
 
-En el desarrollo de sistemas de control para vehículos aéreos no tripulados (UAVs), los Vehículos de Despegue y Aterrizaje Vertical (VTOL, por sus siglas en inglés) y sus variantes Planas (PVTOL) han captado una atención significativa debido a sus aplicaciones en diversas áreas como la vigilancia \cite{johnson1997arti}, entrega de paquetes \cite{9129495} y exploración \cite{5278262}. Este capítulo aborda los principios teóricos que respaldan el diseño y control de estos vehículos, incluyendo modelos matemáticos y técnicas avanzadas de control.
-En primer lugar, se describen los enfoques de modelado matemático utilizados para representar el comportamiento dinámico de los VTOL y PVTOL. Estos modelos son esenciales para comprender y predecir las respuestas del sistema ante diferentes estímulos. Particularmente, se emplea el formalismo de Euler-Lagrange, un método robusto y ampliamente aceptado en la dinámica de sistemas mecánicos.
+En este capítulo se desarrollan los fundamentos conceptuales y tecnológicos que respaldan el diseño, arquitectura e implementación del Sistema de Expedientes de Trámites y Citas (SETC). Se abordan los principios de la arquitectura Modelo-Vista-Controlador (MVC), el ecosistema de desarrollo en Laravel 13 y PHP 8.4, los modelos de seguridad basados en roles (RBAC), la asistencia interactiva mediante Inteligencia Artificial, la gestión documental digital y los esquemas de validación mediante sellos digitales y códigos QR.
 
-\section{Sección}
+\section{Arquitectura de Software y Patrón Modelo-Vista-Controlador}
 
-La capacidad de despegue y aterrizaje vertical (VTOL) es muy apreciada en los vehículos aéreos no tripulados (UAV) y tripulados (MAV), siempre que se alcance un rendimiento de vuelo comparable. La tecnología VTOL no solo resulta muy adecuada para los UAV debido a los requisitos de misión y la necesidad de ocultación, sino que también es de gran importancia para los MAV, tanto en aplicaciones militares como civiles, debido a las ventajas que ofrece, como una menor o incluso nula dependencia de aeropuertos o campos de aviación.
+El desarrollo de aplicaciones web empresariales requiere una separación clara de responsabilidades para garantizar mantenibilidad, modularidad y escalabilidad. El patrón arquitectónico Modelo-Vista-Controlador (MVC) desacopla la lógica de negocio, la presentación visual y el control del flujo de datos:
 
-\section{Sección 2}
+\begin{itemize}
+    \item \textbf{Modelo:} Encapsula el estado de la aplicación, las reglas de validación de dominio, la integridad de los datos y las relaciones cardinales entre entidades.
+    \item \textbf{Vista:} Representa la interfaz gráfica de usuario encargada de renderizar la información de manera accesible y responsiva.
+    \item \textbf{Controlador:} Intercepta las solicitudes HTTP provenientes de los clientes, invoca la lógica de negocio o servicios correspondientes y retorna la respuesta adecuada (HTML, JSON o flujos binarios de documentos).
+\end{itemize}
 
-El modelo PVTOL (Plataforma Vertical Despegue y Aterrizaje) describe el movimiento vertical de un objeto en un plano, caracterizado por tres grados de libertad $(x, y, \phi)$ que corresponden a la posición y la orientación del objeto en dicho plano. Este sistema incluye dos propulsores independientes que generan fuerzas y momentos en la máquina voladora, como se muestra en la figura \ref{fig1:PVTOL}. Es importante destacar que el PVTOL es un sistema subactuado, ya que aunque tiene tres grados de libertad, solo cuenta con dos entradas para su control. Debido a esta característica, el PVTOL constituye un desafío significativo en el ámbito del control no lineal \cite{lin1999robust}.
+\section{Ecosistema Laravel 13 y PHP 8.4}
 
+El sistema SETC está desarrollado sobre el lenguaje de programación \textbf{PHP 8.4}, aprovechando características avanzadas de tipado estricto, promoción de propiedades en constructores, enumeraciones tipadas y optimizaciones en el compilador JIT (\textit{Just-In-Time}), lo que se traduce en una reducción significativa del consumo de memoria y un menor tiempo de procesamiento por solicitud.
 
-\subsection{Subsección}
-El modelado y diseño de control para plataformas UAV es un trabajo difícil debido a su complicada estructura no lineal y subactuada, donde su comportamiento es función de efectos aerodinámicos, estructura mecánica, perturbaciones, incertidumbre, etc. 
+Sobre esta base, se adoptó el framework \textbf{Laravel 13}, el cual aporta componentes de ingeniería robustos:
 
-\section{Modelos matemáticos.}
+\begin{itemize}
+    \item \textbf{Eloquent ORM:} Mapeo objeto-relacional que permite interactuar con la base de datos utilizando sintaxis orientada a objetos expresiva, asegurando protección nativa contra inyecciones SQL mediante consultas parametrizadas PDO.
+    \item \textbf{Motor de Plantillas Blade y Alpine.js:} Blade proporciona una estructura jerárquica de vistas con componentes reutilizables y directivas de seguridad contra ataques XSS (\textit{Cross-Site Scripting}). Por su parte, \textbf{Alpine.js} brinda reactividad declarativa y liviana en el navegador del cliente para el manejo de estados dinámicos, validación de formularios en tiempo real y modales interactivos.
+    \item \textbf{Tailwind CSS:} Framework CSS utilitario que permite construir interfaces responsivas, accesibles y consistentes bajo un diseño ergonómico de alta productividad.
+    \item \textbf{Canalización de Middlewares:} Permite encadenar capas de inspección previas a la ejecución de los controladores para garantizar la autenticación, autorización y registro de bitácora.
+\end{itemize}
 
-Para entender los sistemas, es esencial desarrollar modelos matemáticos que los representen con exactitud. Un modelo de un sistema se describe como una representación de sus características relevantes, y el proceso de abstracción necesario para crear esta representación se conoce como modelado. El modelo es una versión simplificada de una realidad compleja; el término \say{modelar}se refiere a crear una descripción que capture de manera precisa un sistema y sus actividades. Los modelos científicos se desarrollan para realizar inferencias sobre ciertos aspectos de sistemas reales previamente observados. Este proceso de creación y utilización de un modelo se ilustra en la figura \ref{fig: tipos de modelo} a). Estos modelos se pueden clasificar de acuerdo al conocimiento previo sobre el proceso ilustrados en la figura \ref{fig: tipos de modelo} b).
+\section{Seguridad de la Información y Control de Acceso Basado en Roles (RBAC)}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth, height=8cm]{imagenes/esquema_modelado.png}
-    \caption{Sistema de modelado.}
-    \label{fig: tipos de modelo}
-\end{figure}
+La protección de expedientes telemáticos gubernamentales exige políticas de control de acceso estrictas. El modelo de \textbf{Control de Acceso Basado en Roles} (\textit{Role-Based Access Control}, RBAC) asigna permisos a roles definidos en lugar de a usuarios individuales, simplificando la administración y previniendo brechas de privilegios.
 
-Otra forma de modelar un sistema es mediante modelos matemáticos, los cuales replican las relaciones de entrada(s) - salida(s) utilizando expresiones matemáticas. Cuando existe una relación lineal entre la entrada y la salida, el modelo matemático se expresa como:
-\begin{equation}
-     y(t) = u(t)k_{p}
-     \label{eq_modelo}
-\end{equation}
+En el sistema SETC, se modelaron cuatro roles institucionales:
+\begin{enumerate}
+    \item \textbf{Ciudadano:} Acceso restringido al catálogo público, inicio de solicitudes propias, consulta de su propia línea de tiempo, subsanación de recaudos observados y descarga de resoluciones y citas.
+    \item \textbf{Revisor Técnico:} Operación de la Mesa de Dictamen para evaluar expedientes asignados, revisar recaudos digitales, emitir observaciones y formalizar dictámenes técnicos.
+    \item \textbf{Supervisor / Dictaminador:} Supervisión global de expedientes y coordinación del flujo pericial en la consola de distribución de trabajo.
+    \item \textbf{Administrador:} Gestión integral de catálogos de trámites, requisitos, usuarios, roles institucionales y auditoría del sistema.
+\end{enumerate}
 
-Donde $y(t)$ es la salida, $u(t)$ es la entrada del sistema, y $k_{p}$ es la constante de proporcionalidad. No obstante, la ecuación (\ref{eq_modelo}) implica que cualquier cambio en la entrada se reflejará instantáneamente en la salida, lo cual no es cierto en sistemas reales, ya que la salida requiere tiempo para ajustarse. Esta relación se cumple únicamente cuando se ha alcanzado un tiempo suficiente para estabilizarse, conocido como la condición de estado estable, y puede representarse como:\\
-\textit{El Valor en estado estable de $u(t)$ = $y(t)$ por el Valor en estado estable de $k_{p}$}
-\begin{equation}
-    k_{p} = \frac{y(t)}{u(t)}
-\end{equation}
+\section{Asistentes Basados en Inteligencia Artificial en Entornos Telemáticos}
 
-Donde $k_{p}$ se refiere a la ganancia del sistema o función de transferencia. Así, una función de transferencia se define como la relación entre la salida en estado estable y la entrada en estado estable de un sistema.
+La integración de asistentes conversacionales dotados de Inteligencia Artificial en plataformas de gobierno electrónico representa una evolución sustancial en la experiencia del usuario. Estos agentes permiten procesar las consultas en lenguaje natural de los ciudadanos, guiándolos paso a paso a través de los requisitos documentales exigibles para cada trámite específico. Al operar de forma interactiva y contextual, el asistente reduce el índice de errores en la radicación inicial de documentos, disminuye la necesidad de subsanaciones posteriores y alivia la saturación en los canales convencionales de soporte institucional.
 
- 
-\subsection{Formalismo de Euler-Lagrange.}
+\section{Gestión Documental Digital y Validación Criptográfica}
 
-La formulación Lagrangiana proporciona una forma de modelar la dinámica de un robot al analizar el balance de energía. En este enfoque, el robot se conceptualiza como una entidad cerrada, y las ecuaciones derivadas se centran únicamente en la energía almacenada, representada a través de las energías cinética y potencial. Para un robot dado, los resultados obtenidos mediante esta formulación son idénticos a los obtenidos mediante la formulación de Newton-Euler.
-El Lagrangiano es una función escalar definida como la diferencia entre las energías cinética y potencial de un sistema mecánico, en función de las llamadas coordenadas generalizadas \cite{torres2002robots}. En la figura \ref{fig 2_2: Esquema de Euler_lagrange} se desarrolla en detalle la formulación Lagrangiana.
+\subsection{Almacenamiento Estructurado y Formato PDF}
+El estándar \texttt{PDF} (\textit{Portable Document Format}) garantiza que los recaudos adjuntados por la ciudadanía y las resoluciones emitidas por la autoridad mantengan su integridad visual, metadatos y fidelidad independientemente del dispositivo en que se visualicen. El sistema implementa almacenamiento estructurado con asignación de nombres basados en hashes criptográficos (\texttt{SHA-256}) y validación de cabeceras MIME reales en el servidor para impedir la carga de archivos no autorizados.
 
-
-\begin{equation}
-J_{i}=
-    \begin{bmatrix}
-        \lambda_{i} & 1           & 0      &...  & 0  \\
-        0           & \lambda_{i} & 1      & ...& 0 \\
-        \vdots      & \vdots      & \ddots & \ddots & \vdots \\
-             0   &    0    &  ... & \lambda_{i} & 1   \\
-           0 &   0   &  ...       &  0   & \lambda_{i} \\
-    \end{bmatrix}_{m \times m}
-\end{equation}
-
-Donde $J_{i}$ es el bloque de Jordan asociado al eigenvalor $\lambda_{i}$  en $A$ y $m$ es el orden del bloque de Jordan. Esta representación es útil porque simplifica el análisis de la dinámica de sistemas lineales, especialmente cuando $A$ no es diagonalizable. La solución del sistema en términos de la forma de Jordan es:
-
-\begin{equation}
-     exp(at) = P exp(Jt) P^{-1} = \sum_{i=1}^{r}\sum_{k=1}^{m_{i}}t^{k-1}exp(\lambda_{i}t)R_{ik}
-\end{equation}
-
-Donde $m_{i}$ es el orden del bloque de  Jordan asociado al eigenvalor $A$. El siguiente teorema caracteriza las propiedades de estabilidad del origen.
+\subsection{Validación Telemática mediante Códigos QR}
+Para permitir la verificación inmediata de la autenticidad de las resoluciones administrativas y pases digitales de cita, el sistema integra la generación dinámica de \textbf{Códigos QR} (\textit{Quick Response Code}). Estos códigos codifican un identificador unívoco y firma digital que enlaza al registro oficial centralizado, permitiendo a cualquier autoridad o verificador comprobar al instante la validez del documento mediante un dispositivo móvil.

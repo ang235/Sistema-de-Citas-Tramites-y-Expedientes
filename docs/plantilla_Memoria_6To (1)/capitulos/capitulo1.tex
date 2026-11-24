@@ -1,20 +1,22 @@
 %!TEX root = ../Proeycto.tex
 \chapter{Marco de Referencia}
 
- Desde finales del siglo pasado, los avances tecnológicos en la miniaturización de la electrónica y los componentes mecánicos han allanado el camino para la creación y desarrollo de objetos voladores de pequeñas dimensiones, tales como aviones y helicópteros, los cuales están adquiriendo cada vez más habilidades para realizar vuelos de forma autónoma. Estos dispositivos son popularmente conocidos como drones, un término derivado del inglés \say{abejorros}, y se consideran máquinas voladoras autónomas o semi-autónomas capaces de llevar a cabo misiones de vuelo. En el ámbito internacional, se les conoce como UAVs del ingles \say{Unmanned Aerial Vehicles}, y representan una tecnología compleja cuyo control presenta desafíos, dado que sus características aerodinámicas son similares a las de las aeronaves convencionales \cite{eisenbeiss2004mini}.
+En la última década, la transformación digital de la administración pública y las organizaciones corporativas ha cobrado un papel primordial como estrategia para mejorar la eficiencia operativa, la transparencia y la cercanía con la ciudadanía. La adopción de plataformas de gobierno electrónico (\textit{e-Government}) busca erradicar la burocracia documental tradicional, caracterizada por la manipulación intensiva de papel, tiempos de espera prolongados y saturación física de las dependencias gubernamentales. En este contexto, el desarrollo e implantación de ventanillas telemáticas centralizadas permite a los usuarios radicar trámites, agendar citas y consultar el estado procesal de sus expedientes de forma autónoma y continua, las 24 horas del día.
 
-El estudio de estos dispositivos despierta un gran interés debido a su versatilidad y capacidad de maniobra, lo que les permite llevar a cabo una amplia gama de tareas en diversas aplicaciones, tales como el uso civil, militar y aeroespacial \cite{nawaz2019applications, shakhatreh2019unmanned, xiaoning2020analysis}. En la figura \ref{fig1_aplicacion_UAV}, se presenta una clasificación detallada de las aplicaciones más importantes de los UAVs.
+El Sistema de Expedientes de Trámites y Citas (SETC) se erige como una solución tecnológica integral diseñada para responder a esta necesidad de modernización. Mediante una arquitectura web basada en estándares de seguridad estricta, la plataforma articula un flujo de trabajo digitalizado y auditable que abarca desde la captura inicial de recaudos digitales hasta la emisión formal de cédulas resolutivas, estructurado en cinco fases dinámicas que rigen el ciclo de vida de los trámites dentro de la plataforma. En la Figura \ref{fig:portal_ciudadano}, se presenta la interfaz principal de la ventanilla telemática desarrollada, donde los ciudadanos acceden al catálogo normativo institucional y al asistente virtual interactivo.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=16cm, height=7.5cm]{imagenes/Aplicaciones_UAV.png}
-    \caption{Áreas de aplicación UAVS.}
-    \label{fig1_aplicacion_UAV}
+    \includegraphics[width=15.5cm]{imagenes/portal_ciudadano.jpg}
+    \caption{Ventanilla telemática ciudadana y catálogo normativo en el sistema SETC.}
+    \label{fig:portal_ciudadano}
 \end{figure}
 
 \section{Antecedentes.}
 
-Los drones han atraído la atención de la comunidad investigadora que trabaja tanto en el campo militar como en el civil, con una gran cantidad de usos que han sido propuestos por los grupos de investigación, debido a sus características como capacidad y configuraciones, donde el helicóptero de cuatro rotores tiene el mayor número de citas en la literatura de control y ha sido ampliamente investigado para pruebas tanto en interiores como en exteriores . 
+Tradicionalmente, los modelos de atención ciudadana en ventanilla han dependido de esquemas presenciales y archivísticos basados en papel. Los solicitantes debían acudir físicamente a las oficinas gubernamentales para solicitar informes, entregar copias físicas de identificaciones y comprobantes, y esperar resoluciones sin contar con visibilidad alguna sobre el avance de sus trámites o el funcionario responsable de su evaluación. 
+
+Este enfoque analógico generaba graves problemas de gestión: saturación recurrente en salas de espera, pérdida o deterioro de expedientes físicos por almacenamiento deficiente, duplicidad de esfuerzos administrativos y una notable asimetría informativa que mermaba la confianza ciudadana. Asimismo, las primeras iniciativas de sistematización solían limitarse a formularios estáticos o bases de datos aisladas que no ofrecían trazabilidad en tiempo real, no contemplaban mecanismos granulares de subsanación documental ni disponían de bitácoras de auditoría transaccional para la rendición de cuentas. Frente a este panorama, surge la imperiosa necesidad de diseñar un sistema telemático robusto que integre autenticación multi-rol, validación documental digital, agendamiento de citas con validación criptográfica QR, asistencia interactiva inteligente y distribución equilibrada de cargas de trabajo pericial.
 
 \section{Objetivo General}
 
@@ -23,15 +25,17 @@ Desarrollar el sistema de citas trámites y expedientes como una plataforma web,
 \section{Objetivos Específicos}
 
 \begin{itemize}
-    \item Establecer un esquema de base de datos y migraciones optimizadas en Laravel para las entidades críticas del sistema (usuarios, roles, solicitud, asignación de revisor y bitácora) garantizando la integridad referencial, el almacenamiento estructurado de expediente y la gestión eficiente de relaciones de muchos a muchos para el control multi-rol.
+    \item Establecer un esquema de base de datos y migraciones optimizadas en Laravel 13 para las entidades críticas del sistema (usuarios, roles, solicitud, asignación de revisor y bitácora) garantizando la integridad referencial, el almacenamiento estructurado de expediente y la gestión eficiente de relaciones de muchos a muchos para el control multi-rol.
     \item Desarrollar middlewares especializados en cifrado estricto en PHP 8.4 que garantice una autorización que restrinja la visualización y modificación de expedientes exclusivamente a sus propietarios legítimos o al personal técnico antes asignado y brinde acceso a las funciones administrativas.
     \item Diseñar la lógica de negocio y el flujo que permita a la ciudadanía realizar sus solicitudes de forma digital y autónoma mientras los revisores, supervisores y administradores operan bajo esquemas de asignación de cargas de trabajo.
+    \item Integrar un asistente de inteligencia artificial conversacional orientado a guiar al ciudadano en la comprensión de requisitos, resolución de dudas frecuentes y acompañamiento contextual durante el ciclo de radicación telemática.
 \end{itemize}
 
 \section{Alcance}
 
 \begin{itemize}
     \item \textbf{Módulo de Autenticación y Usuarios:} Gestión de registro, inicio de sesión e identificación de perfiles institucionales (Ciudadano, Revisor, Supervisor, Administrador).
+    \item \textbf{Módulo de Asistente de Inteligencia Artificial (IA):} Agente interactivo que asiste y guía al ciudadano en tiempo real sobre los requisitos exigibles, formatos permitidos y resolución de dudas comunes durante la solicitud.
     \item \textbf{Módulo de Gestión de Expedientes y Citas:} Programación de citas y procesamiento del ciclo de vida de los trámites (creación, seguimiento, revisión y dictamen).
     \item \textbf{Seguridad y Control de Acceso:} Restricción de permisos por roles (\texttt{CheckRole}) y validación de acceso a expedientes por propiedad o asignación (\texttt{VerificarAccesoSolicitud}).
     \item \textbf{Módulo de Auditoría y Trazabilidad:} Registro automático en bitácora con marcas de tiempo, usuarios, ID y cargas útiles de operaciones de cambio (\texttt{RegistrarBitacora}).
@@ -56,4 +60,3 @@ La problemática se centra en que la gestión presencial o mediante sistemas obs
 \section{Justificación}
 
 El desarrollo del sistema se justifica como una solución integral que elimina la saturación en ventanillas, los tiempos de espera y el uso excesivo de papel mediante un expediente digital centralizado. Asimismo, incorpora un sistema de auditoría automatizado que garantiza la transparencia y la rendición de cuentas al registrar con exactitud cada modificación realizada por los usuarios.
-
