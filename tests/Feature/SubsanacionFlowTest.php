@@ -183,3 +183,104 @@ test('flujo completo de subsanacion: timeline retrocede a fase 3 y revisor puede
     $responseShowAprobado->assertSee('Calificación: Aprobado');
     $responseShowAprobado->assertSee('Pendiente de firma resolutiva');
 });
+
+test('el timeline avanza inmediatamente a Fase 4 completada y Fase 5 activa cuando el revisor dictamina Aprobado sobre un expediente con subsanacion', function () {
+    Storage::fake('local');
+
+    $ciudadano = Usuario::create([
+        'Nombre' => 'Carlos Trejo',
+        'Email' => 'sus@sus.com',
+        'Contrasena' => bcrypt('password123'),
+        'Activo' => true,
+    ]);
+    $rolCiudadano = Rol::firstOrCreate(['Nombre' => 'Ciudadano']);
+    $ciudadano->roles()->attach($rolCiudadano->ID_Rol);
+
+    $revisor = Usuario::create([
+        'Nombre' => 'Jesus Hernandez Bustos',
+        'Email' => 'revisor_jesus@test.gob',
+        'Contrasena' => bcrypt('password123'),
+        'Activo' => true,
+    ]);
+    $rolRevisor = Rol::firstOrCreate(['Nombre' => 'Revisor']);
+    $revisor->roles()->attach($rolRevisor->ID_Rol);
+
+    $supervisor = Usuario::create([
+        'Nombre' => 'Supervisor General',
+        'Email' => 'super@test.gob',
+        'Contrasena' => bcrypt('password123'),
+        'Activo' => true,
+    ]);
+    $rolSupervisor = Rol::firstOrCreate(['Nombre' => 'Supervisor']);
+    $supervisor->roles()->attach($rolSupervisor->ID_Rol);
+
+    $tipo = TipoTramite::create(['Nombre' => 'Tramite para Licencia de Manejo']);
+    $versionTramite = VersionTramite::create([
+        'ID_Tipo_Tramite' => $tipo->ID_Tipo_Tramite,
+        'No_Version' => 'v1.0',
+    ]);
+    $req1 = Requisito::create([
+        'ID_Version_Tramite' => $versionTramite->ID_Version_Tramite,
+        'Nombre' => 'Identificación Oficial',
+        'Prioridad' => 'Obligatorio',
+        'Formato' => 'PDF',
+    ]);
+    $req2 = Requisito::create([
+        'ID_Version_Tramite' => $versionTramite->ID_Version_Tramite,
+        'Nombre' => 'Comprobante de Domicilio',
+        'Prioridad' => 'Obligatorio',
+        'Formato' => 'PDF',
+    ]);
+
+    $solicitud = Solicitud::create([
+        'ID_Solicitante' => $ciudadano->ID_Usuarios,
+        'ID_Version_Tramite' => $versionTramite->ID_Version_Tramite,
+        'Estado_Solicitud' => 'En_Revision',
+    ]);
+
+    $folio = Folio::create([
+        'ID_Solicitud' => $solicitud->ID_Solicitud,
+        'Codigo_Folio' => 'SETC-2026-TREJO1',
+        'Fecha_Emision' => now(),
+    ]);
+
+    // Recaudo 1 aprobado, Recaudo 2 subsanado
+    $doc1 = Documento::create([
+        'ID_Solicitud' => $solicitud->ID_Solicitud,
+        'ID_Requisitos' => $req1->ID_Requisitos,
+        'Estado_Doc' => 'Aprobado',
+    ]);
+    $doc2 = Documento::create([
+        'ID_Solicitud' => $solicitud->ID_Solicitud,
+        'ID_Requisitos' => $req2->ID_Requisitos,
+        'Estado_Doc' => 'Subsanado',
+    ]);
+
+    $asignacion = AsignacionRevisor::create([
+        'ID_Solicitud' => $solicitud->ID_Solicitud,
+        'ID_Revisor' => $revisor->ID_Usuarios,
+        'ID_Asignador' => $supervisor->ID_Usuarios,
+        'Estado_Asignacion' => 'Activo',
+        'Fecha_Asignacion' => now(),
+    ]);
+
+    // El revisor emite Dictamen Técnico Aprobado directamente
+    $response = $this->actingAs($revisor)->post(route('portal.revisiones.store', $asignacion->ID_Asignacion), [
+        'resultado' => 'Aprobado',
+        'observaciones' => [],
+    ]);
+    $response->assertSessionHasNoErrors();
+
+    // Verificamos que todos los documentos pasaron a Aprobado
+    expect($doc2->fresh()->Estado_Doc)->toBe('Aprobado');
+    expect($solicitud->fresh()->Estado_Solicitud)->toBe('Aprobado');
+
+    // Verificamos que la vista del ciudadano refleja el avance completo en el timeline
+    $responseShow = $this->actingAs($ciudadano)->get(route('expedientes.show', 'SETC-2026-TREJO1'));
+    $responseShow->assertOk();
+    $responseShow->assertSee('Recaudos técnicos validados');
+    $responseShow->assertSee('Calificación: Aprobado');
+    $responseShow->assertSee('Pendiente de firma resolutiva');
+    $responseShow->assertDontSee('Subsanación enviada — En revisión técnica');
+    $responseShow->assertDontSee('Pendiente de nuevo dictamen técnico');
+});

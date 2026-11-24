@@ -337,6 +337,11 @@ class MesaDictamenController extends Controller
                     Observacion::whereHas('revision.asignacion', fn ($q) => $q->where('ID_Solicitud', $solicitud->ID_Solicitud))
                         ->where('Estado_Obs', 'Abierta')
                         ->update(['Estado_Obs' => 'Subsanada']);
+                    // Pasar todos los documentos pendientes, observados o subsanados a 'Aprobado'
+                    // para que el timeline y el avance general de recaudos se completen al 100%
+                    $solicitud->documentos()
+                        ->whereIn('Estado_Doc', ['Subsanado', 'Observado', 'Pendiente', 'Cargado'])
+                        ->update(['Estado_Doc' => 'Aprobado']);
                 } elseif ($resultado === 'Rechazado') {
                     $solicitud->update(['Estado_Solicitud' => 'Rechazado']);
                     // Si se rechaza, cerrar observaciones previas para no dejar subsanaciones huérfanas

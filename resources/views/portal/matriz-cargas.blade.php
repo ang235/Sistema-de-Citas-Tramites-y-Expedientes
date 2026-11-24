@@ -165,6 +165,7 @@
                     <th class="py-3 px-6">Revisor Técnico</th>
                     <th class="py-3 px-4">Nivel / Rol</th>
                     <th class="py-3 px-4">Expedientes Asignados</th>
+                    <th class="py-3 px-4">Expedientes Resueltos</th>
                     <th class="py-3 px-4">Estado</th>
                     @if(auth()->check() && auth()->user()->esSupervisor())
                         <th class="py-3 px-4 text-right">Acción</th>
@@ -174,7 +175,8 @@
             <tbody class="divide-y divide-slate-100 text-slate-700">
                 @forelse ($revisores ?? [] as $revisor)
                     @php
-                        $asignados = $revisor->asignaciones_activas_count ?? $revisor->asignaciones_count ?? 0;
+                        $asignadosActivos = $revisor->asignaciones_activas_count ?? 0;
+                        $asignadosResueltos = $revisor->asignaciones_resueltas_count ?? 0;
                     @endphp
                     <tr class="hover:bg-slate-50 transition-colors">
                         <td class="py-3.5 px-6">
@@ -194,8 +196,16 @@
                             </span>
                         </td>
                         <td class="py-3.5 px-4 font-bold text-slate-900 dark:text-white text-sm">
-                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold {{ $asignados > 0 ? 'bg-blue-50 dark:bg-blue-950/40 text-[#0051d5] dark:text-blue-400 border border-blue-200 dark:border-blue-800' : 'bg-slate-100 dark:bg-slate-800 text-slate-500' }}">
-                                {{ $asignados }}
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold {{ $asignadosActivos > 0 ? 'bg-blue-50 dark:bg-blue-950/40 text-[#0051d5] dark:text-blue-400 border border-blue-200 dark:border-blue-800' : 'bg-slate-100 dark:bg-slate-800 text-slate-500' }}" title="Expedientes en curso / pendientes de dictamen">
+                                {{ $asignadosActivos }}
+                            </span>
+                        </td>
+                        <td class="py-3.5 px-4 font-bold text-slate-900 dark:text-white text-sm">
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold {{ $asignadosResueltos > 0 ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800' : 'bg-slate-100 dark:bg-slate-800 text-slate-500' }}" title="Expedientes dictaminados y concluidos">
+                                @if($asignadosResueltos > 0)
+                                    <span class="material-symbols-outlined text-xs text-emerald-600">check</span>
+                                @endif
+                                {{ $asignadosResueltos }}
                             </span>
                         </td>
                         <td class="py-3.5 px-4">
@@ -217,7 +227,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="{{ (auth()->check() && auth()->user()->esSupervisor()) ? 5 : 4 }}" class="py-12 text-center text-slate-400">
+                        <td colspan="{{ (auth()->check() && auth()->user()->esSupervisor()) ? 6 : 5 }}" class="py-12 text-center text-slate-400">
                             <span class="material-symbols-outlined text-4xl block mb-2 text-slate-300">group_off</span>
                             <p class="font-semibold text-slate-700 text-sm">No hay revisores técnicos registrados aún</p>
                             <p class="text-xs text-slate-400 mt-1">Cree usuarios con rol de Revisor Técnico desde la Gestión de Usuarios para comenzar la asignación.</p>

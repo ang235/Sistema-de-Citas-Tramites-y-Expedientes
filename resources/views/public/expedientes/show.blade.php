@@ -5,9 +5,9 @@
     $tramiteNombre = $solicitud->versionTramite?->tipoTramite?->Nombre ?? 'Expediente Institucional';
     $tieneResolucion = $solicitud->resoluciones->isNotEmpty();
     $ultimaResolucion = $solicitud->resoluciones->last();
-    $asignacion = $solicitud->asignaciones->last();
+    $asignacion = $solicitud->asignaciones->sortBy('ID_Asignacion')->last();
     $revisor = $asignacion?->revisor;
-    $revision = $asignacion?->revisiones->last();
+    $revision = $solicitud->asignaciones->flatMap->revisiones->sortBy('ID_Revision')->last();
     $observacionesAbiertas = collect();
 
     // SOLO recopilar observaciones si el expediente está formalmente en estado 'Observado' y no tiene resolución
@@ -34,10 +34,22 @@
         || ($revision && $revision->Resultado === 'Rechazado')
         || ($tieneResolucion && in_array(strtolower($ultimaResolucion->Tipo_Resolucion), ['rechazado', 'rechazada', 'negativa', 'rechazo'], true));
 
-    $porcentajeAvance = $totalDocs > 0 ? (int) round(($aprobadosDocs / $totalDocs) * 100) : ($tieneResolucion ? 100 : 40);
+    // Si ya hay un dictamen formal Aprobado y el Estado_Solicitud lo refleja, la subsanación ya fue resuelta
+    $solicitudAprobadaPorDictamen = $revision && $revision->Resultado === 'Aprobado' && $solicitud->Estado_Solicitud === 'Aprobado';
+
+    $porcentajeAvance = ($solicitudAprobadaPorDictamen || $tieneResolucion) ? 100 : ($totalDocs > 0 ? (int) round(($aprobadosDocs / $totalDocs) * 100) : 40);
 
     $hayObsAbiertas = $observacionesAbiertas->isNotEmpty() && ! $hayRechazo;
-    $haySubsanacionesPorRevisar = ! $hayRechazo && ($subsanadosDocs > 0 || ($solicitud->Estado_Solicitud === 'En_Revision' && $solicitud->asignaciones->flatMap->revisiones->flatMap->observaciones->where('Estado_Obs', 'Subsanada')->isNotEmpty() && $aprobadosDocs < $totalDocs));
+    // Hay subsanaciones pendientes de revisar si: quedan docs en Subsanado, o el estado es En_Revision con obs Subsanadas
+    // Pero NO si ya existe un dictamen Aprobado formal (el revisor ya aprobó el resultado de la subsanación)
+    $haySubsanacionesPorRevisar = ! $hayRechazo && ! $solicitudAprobadaPorDictamen && (
+        $subsanadosDocs > 0 ||
+        (
+            $solicitud->Estado_Solicitud === 'En_Revision' &&
+            $solicitud->asignaciones->flatMap->revisiones->flatMap->observaciones->where('Estado_Obs', 'Subsanada')->isNotEmpty() &&
+            $aprobadosDocs < $totalDocs
+        )
+    );
 @endphp
 
 @section('title', 'Expediente ' . $folioCodigo)
@@ -163,7 +175,7 @@
                 </div>
                 <div class="grid grid-cols-3 text-center gap-2 pt-1 text-xs">
                     <div class="p-2 rounded-lg bg-white shadow-xs">
-                        <span class="block text-sm font-bold text-[#0b1c30]">{{ $aprobadosDocs }}/{{ $totalDocs }}</span>
+                        <span class="block text-sm font-bold text-[#0b1c30]">{{ ($solicitudAprobadaPorDictamen || $tieneResolucion) ? $totalDocs : $aprobadosDocs }}/{{ $totalDocs }}</span>
                         <span class="text-slate-500 text-[10px]">Recaudos</span>
                     </div>
                     <div class="p-2 rounded-lg bg-white shadow-xs">
@@ -190,41 +202,69 @@
 
     {{-- ══════════════════════════════════════════ LÍNEA DE TIEMPO / TIMELINE DINÁMICO ══ --}}
     @php
-        $totalDocs = $solicitud->documentos->count();
-        $aprobadosDocs = $solicitud->documentos->where('Estado_Doc', 'Aprobado')->count();
-        $subsanadosDocs = $solicitud->documentos->where('Estado_Doc', 'Subsanado')->count();
-        $observadosDocs = $solicitud->documentos->where('Estado_Doc', 'Observado')->count();
+        // Recalcular valores para el timeline (pueden haber cambiado vs el bloque inicial por rechazo)
+        $totalDocsTl     = $solicitud->documentos->count();
+        $aprobadosDocsTl = $solicitud->documentos->whereIn('Estado_Doc', ['Aprobado'])->count();
+        $subsanadosDocsTl = $solicitud->documentos->where('Estado_Doc', 'Subsanado')->count();
 
-        // Subsanación activa / en curso
-        $hayObsAbiertas = $observacionesAbiertas->isNotEmpty();
-        $haySubsanacionesPorRevisar = $subsanadosDocs > 0 || ($solicitud->Estado_Solicitud === 'En_Revision' && $solicitud->asignaciones->flatMap->revisiones->flatMap->observaciones->where('Estado_Obs', 'Subsanada')->isNotEmpty() && $aprobadosDocs < $totalDocs);
+        // Una subsanación está "pendiente de revisar" si quedan docs en Subsanado
+        // O si el expediente está en En_Revision con observaciones Subsanadas aún por calificar,
+        // PERO NO si ya existe un dictamen Aprobado posterior a esas observaciones (eso lo resolvió el revisor).
+        $ultimaRevisionResultado = $revision?->Resultado;
+        $solicitudAprobadaPorDictamen = $solicitudAprobadaPorDictamen ?? (
+            $ultimaRevisionResultado === 'Aprobado' &&
+            $solicitud->Estado_Solicitud === 'Aprobado'
+        );
+
+        $haySubsanacionesPendientesRev = ! $hayRechazo && ! $solicitudAprobadaPorDictamen && (
+            $subsanadosDocsTl > 0 ||
+            (
+                $solicitud->Estado_Solicitud === 'En_Revision' &&
+                $solicitud->asignaciones->flatMap->revisiones->flatMap->observaciones->where('Estado_Obs', 'Subsanada')->isNotEmpty() &&
+                $aprobadosDocsTl < $totalDocsTl
+            )
+        );
 
         // Hito 1: Radicación (siempre completado)
         $step1_done = true;
 
         // Hito 2: Asignación Técnica
-        $step2_done = (bool) $asignacion;
-        $step2_active = !$step2_done;
-        $step2_date = $asignacion?->Fecha_Asignacion;
+        $step2_done   = (bool) $asignacion;
+        $step2_active = ! $step2_done;
+        $step2_date   = $asignacion?->Fecha_Asignacion;
 
         // Hito 3: Evaluación de Recaudos
-        // Se considera completada SOLO si no hay observaciones abiertas, no hay documentos subsanados pendientes de calificar,
-        // y todos los recaudos fueron aprobados o ya existe resolución final formal.
-        $step3_done = $step2_done && !$hayObsAbiertas && !$haySubsanacionesPorRevisar && ($aprobadosDocs === $totalDocs || $tieneResolucion || ($revision && $revision->Resultado === 'Aprobado' && $solicitud->Estado_Solicitud === 'Aprobado'));
-        $step3_active = $step2_done && !$step3_done;
+        // Completado si:
+        //  - No hay observaciones abiertas pendientes del ciudadano
+        //  - No hay subsanaciones esperando re-evaluación del revisor
+        //  - Y todos los recaudos están aprobados, o hay resolución, o el dictamen oficial dice Aprobado
+        $step3_done = $step2_done
+            && ! $hayObsAbiertas
+            && ! $haySubsanacionesPendientesRev
+            && (
+                $aprobadosDocsTl === $totalDocsTl
+                || $tieneResolucion
+                || $solicitudAprobadaPorDictamen
+                || $hayRechazo
+            );
+        $step3_active = $step2_done && ! $step3_done;
 
         // Hito 4: Dictamen de Calificación
-        // SOLO puede estar completado si la Fase 3 está completada, existe un dictamen emitido que corresponda al estado actual,
-        // y NO se encuentra en proceso de subsanación o reevaluación.
-        $step4_done = $step3_done && (bool) ($revision && in_array($revision->Resultado, ['Aprobado', 'Rechazado']) && in_array($solicitud->Estado_Solicitud, ['Aprobado', 'Rechazado']));
-        $step4_active = $step3_done && !$step4_done;
-        $step4_date = $step4_done ? $revision?->Fecha_Revision : null;
+        $step4_done = $step3_done && (bool) (
+            $revision &&
+            in_array($revision->Resultado, ['Aprobado', 'Rechazado']) &&
+            in_array($solicitud->Estado_Solicitud, ['Aprobado', 'Rechazado'])
+        );
+        $step4_active = $step3_done && ! $step4_done;
+        $step4_date   = $step4_done ? $revision?->Fecha_Revision : null;
 
         // Hito 5: Resolución Final
-        // SOLO puede estar activo o completado si el Dictamen (Fase 4) está completado.
-        $step5_done = $step4_done && $tieneResolucion;
-        $step5_active = $step4_done && !$step5_done;
-        $step5_date = $step5_done ? $ultimaResolucion?->Fecha_Emision_Resolucion : null;
+        $step5_done   = $step4_done && $tieneResolucion;
+        $step5_active = $step4_done && ! $step5_done;
+        $step5_date   = $step5_done ? $ultimaResolucion?->Fecha_Emision_Resolucion : null;
+
+        // Alias para el template (compatibilidad con variables del bloque superior)
+        $haySubsanacionesPorRevisar = $haySubsanacionesPendientesRev;
     @endphp
     <div class="bg-white rounded-2xl border border-slate-200/80 p-6 lg:p-8 shadow-xs space-y-6">
         <div class="flex items-center justify-between border-b border-slate-100 pb-4">

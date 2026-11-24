@@ -62,7 +62,22 @@ class AsignacionController extends Controller
             ->withCount([
                 'asignacionesComoRevisor as asignaciones_count',
                 'asignacionesComoRevisor as asignaciones_activas_count' => function ($q): void {
-                    $q->where('Estado_Asignacion', 'Activo')->orWhereNull('Estado_Asignacion');
+                    $q->where(function ($sub): void {
+                        $sub->where('Estado_Asignacion', 'Activo')->orWhereNull('Estado_Asignacion');
+                    })->whereHas('solicitud', function ($sub): void {
+                        $sub->whereNotIn('Estado_Solicitud', ['Aprobado', 'Rechazado'])
+                            ->doesntHave('resoluciones');
+                    });
+                },
+                'asignacionesComoRevisor as asignaciones_resueltas_count' => function ($q): void {
+                    $q->where(function ($sub): void {
+                        $sub->whereHas('solicitud', function ($s): void {
+                            $s->whereIn('Estado_Solicitud', ['Aprobado', 'Rechazado'])
+                                ->orWhereHas('resoluciones');
+                        })->orWhereHas('revisiones', function ($r): void {
+                            $r->whereIn('Resultado', ['Aprobado', 'Rechazado']);
+                        });
+                    });
                 },
             ])
             ->get();
@@ -70,7 +85,14 @@ class AsignacionController extends Controller
         // 1. Revisores y Supervisores reales
         $totalRevisores = Usuario::whereHas('roles', fn ($q) => $q->where('Nombre', 'like', '%Revisor%'))->count();
         $revisoresConCarga = Usuario::whereHas('roles', fn ($q) => $q->where('Nombre', 'like', '%Revisor%'))
-            ->whereHas('asignacionesComoRevisor', fn ($q) => $q->where('Estado_Asignacion', 'Activo')->orWhereNull('Estado_Asignacion'))
+            ->whereHas('asignacionesComoRevisor', function ($q): void {
+                $q->where(function ($sub): void {
+                    $sub->where('Estado_Asignacion', 'Activo')->orWhereNull('Estado_Asignacion');
+                })->whereHas('solicitud', function ($sub): void {
+                    $sub->whereNotIn('Estado_Solicitud', ['Aprobado', 'Rechazado'])
+                        ->doesntHave('resoluciones');
+                });
+            })
             ->count();
         $totalSupervisores = Usuario::whereHas('roles', fn ($q) => $q->where('Nombre', 'like', '%Supervisor%'))->count();
 
@@ -116,74 +138,15 @@ class AsignacionController extends Controller
             ? round(($enPlazoSLA / $conteoRevisiones) * 100, 1)
             : 100.0;
 
-        // 4. Capacidad Operativa Real
+        // 4. Capacidad Operativa Real (solo expedientes en curso / activos, excluyendo resueltos)
         $capacidadNominal = $totalRevisores * 10;
-        $enCurso = AsignacionRevisor::where('Estado_Asignacion', 'Activo')
-            ->orWhereNull('Estado_Asignacion')
-            ->count();
-        $cuposDisponibles = max(0, $capacidadNominal - $enCurso);
-        $capacidadPorcentaje = $capacidadNominal > 0
-            ? min(100, (int) round(($enCurso / $capacidadNominal) * 100))
-            : 0;
+        $enCurso = AsignacionRevisor::where(function ($q): void {
+            $q->where('Estado_Asignacion', 'Activo')->orWhereNull('Estado_Asignacion');
+        })->whereHas('solicitud', function ($q): void {
+            $q->whereNotIn('Estado_Solicitud', ['Aprobado', 'Rechazado'])
+                ->doesntHave('resoluciones');
+        })->count();
 
-        $kpis = [
-            'revisores_totales' => $totalRevisores,
-            'revisores_con_carga' => $revisoresConCarga,
-            'supervisores_totales' => $totalSupervisores,
-            'en_cola' => $enCola,
-            'criticos' => $criticos,
-            'tiempo_promedio' => $tiempoPromedioTexto,
-            'total_dictaminados' => $conteoRevisiones,
-            'cumplimiento_sla' => $cumplimientoSLA,
-        ];
-
-        // 2. Expedientes en Cola y Críticos (>3 días sin asignar)
-        $enCola = Solicitud::doesntHave('asignaciones')->count();
-        $criticos = Solicitud::doesntHave('asignaciones')
-            ->where('Fecha_Creacion_Solicitud', '<=', now()->subDays(3))
-            ->count();
-
-        // 3. Tiempos promedio de dictamen a partir de revisiones formalizadas
-        $revisionesConcluidas = Revision::whereIn('Resultado', ['Aprobado', 'Rechazado', 'Observado'])
-            ->whereNotNull('Fecha_Revision')
-            ->with('asignacion')
-            ->get();
-
-        $minutosTotales = 0;
-        $conteoRevisiones = 0;
-        $enPlazoSLA = 0;
-
-        foreach ($revisionesConcluidas as $rev) {
-            if ($rev->asignacion && $rev->asignacion->Fecha_Asignacion) {
-                $inicio = Carbon::parse($rev->asignacion->Fecha_Asignacion);
-                $fin = Carbon::parse($rev->Fecha_Revision);
-                $diff = max(1, $fin->diffInMinutes($inicio));
-                $minutosTotales += $diff;
-                $conteoRevisiones++;
-
-                if ($fin->diffInDays($inicio) <= 5) {
-                    $enPlazoSLA++;
-                }
-            }
-        }
-
-        $tiempoPromedioTexto = 'Sin registros';
-        if ($conteoRevisiones > 0) {
-            $promMinutos = (int) round($minutosTotales / $conteoRevisiones);
-            $horas = intdiv($promMinutos, 60);
-            $mins = $promMinutos % 60;
-            $tiempoPromedioTexto = ($horas > 0 ? "{$horas}h " : '')."{$mins}m";
-        }
-
-        $cumplimientoSLA = $conteoRevisiones > 0
-            ? round(($enPlazoSLA / $conteoRevisiones) * 100, 1)
-            : 100.0;
-
-        // 4. Capacidad Operativa Real
-        $capacidadNominal = $totalRevisores * 10;
-        $enCurso = AsignacionRevisor::where('Estado_Asignacion', 'Activo')
-            ->orWhereNull('Estado_Asignacion')
-            ->count();
         $cuposDisponibles = max(0, $capacidadNominal - $enCurso);
         $capacidadPorcentaje = $capacidadNominal > 0
             ? min(100, (int) round(($enCurso / $capacidadNominal) * 100))
@@ -270,8 +233,15 @@ class AsignacionController extends Controller
         }
 
         $revisores = Usuario::whereHas('roles', fn ($q) => $q->where('Nombre', 'like', '%Revisor%'))
-            ->withCount('asignacionesComoRevisor')
-            ->orderBy('asignaciones_como_revisor_count')
+            ->withCount(['asignacionesComoRevisor as asignaciones_activas_count' => function ($q): void {
+                $q->where(function ($sub): void {
+                    $sub->where('Estado_Asignacion', 'Activo')->orWhereNull('Estado_Asignacion');
+                })->whereHas('solicitud', function ($sub): void {
+                    $sub->whereNotIn('Estado_Solicitud', ['Aprobado', 'Rechazado'])
+                        ->doesntHave('resoluciones');
+                });
+            }])
+            ->orderBy('asignaciones_activas_count')
             ->get();
 
         if ($revisores->isEmpty()) {

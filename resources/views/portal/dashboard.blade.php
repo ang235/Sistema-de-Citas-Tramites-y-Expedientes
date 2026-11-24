@@ -33,10 +33,12 @@
         </div>
 
         <div class="flex items-center gap-3 shrink-0">
-            <a href="{{ route('portal.matriz-cargas') }}" class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-[#0b1c30] text-xs font-semibold transition-all flex items-center gap-2">
-                <span class="material-symbols-outlined text-base">balance</span>
-                <span>Matriz de Cargas</span>
-            </a>
+            @if(auth()->check() && auth()->user()->esSupervisor() && !auth()->user()->esAdministrador())
+                <a href="{{ route('portal.matriz-cargas') }}" class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-[#0b1c30] text-xs font-semibold transition-all flex items-center gap-2">
+                    <span class="material-symbols-outlined text-base">balance</span>
+                    <span>Matriz de Cargas</span>
+                </a>
+            @endif
             @if(auth()->check() && auth()->user()->esRevisor())
                 <a href="{{ route('portal.mesa-dictamen') }}" class="px-4 py-2.5 rounded-xl bg-[#001229] hover:bg-[#0f2744] text-white text-xs font-semibold transition-all flex items-center gap-2 shadow-xs">
                     <span class="material-symbols-outlined text-base">gavel</span>
@@ -121,10 +123,17 @@
                     Últimas solicitudes ingresadas a la ventanilla única telemática.
                 </p>
             </div>
-            <a href="{{ route('portal.matriz-cargas') }}" class="text-xs text-[#0051d5] font-semibold hover:underline flex items-center gap-1">
-                <span>Gestionar asignaciones</span>
-                <span class="material-symbols-outlined text-sm">arrow_forward</span>
-            </a>
+            @if(auth()->check() && auth()->user()->esSupervisor())
+                <a href="{{ route('portal.matriz-cargas') }}" class="text-xs text-[#0051d5] font-semibold hover:underline flex items-center gap-1">
+                    <span>Gestionar asignaciones</span>
+                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </a>
+            @else
+                <a href="{{ route('portal.expedientes') }}" class="text-xs text-[#0051d5] font-semibold hover:underline flex items-center gap-1">
+                    <span>Ver todos los expedientes</span>
+                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </a>
+            @endif
         </div>
 
         <div class="overflow-x-auto">
